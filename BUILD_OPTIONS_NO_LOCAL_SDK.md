@@ -127,17 +127,9 @@ We've updated all GitHub Actions workflows to fix the deprecated `actions/upload
 
 ### Updated Workflows
 
-1. **`.github/workflows/build-all-apks.yml`**
-   - Changed `actions/upload-artifact@v3` to `actions/upload-artifact@v4`
+We've simplified to a single unified workflow file that follows the working pattern from your other project: **`.github/workflows/build-apk.yml`**
 
-2. **`.github/workflows/build-debug-apk.yml`**
-   - Changed `actions/upload-artifact@v3` to `actions/upload-artifact@v4`
-
-3. **`.github/workflows/build-apk.yml`**
-   - Changed `actions/upload-artifact@v3` to `actions/upload-artifact@v4`
-
-4. **`.github/workflows/build-signed-apk.yml`**
-   - Changed `actions/upload-artifact@v3` to `actions/upload-artifact@v4`
+This workflow now includes all the necessary steps to build both debug and release APKs in a single workflow, following the proven working example pattern.
 
 ### Why This Fix Was Needed
 

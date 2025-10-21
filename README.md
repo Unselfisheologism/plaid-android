@@ -58,10 +58,10 @@ You can build the APK without installing Android Studio or the Android SDK by us
 
 1. Fork this repository to your GitHub account
 2. Go to the "Actions" tab in your forked repository
-3. Select a workflow (e.g., "Build Debug APK")
+3. Select the "Build App" workflow (unified workflow that builds both debug and release APKs)
 4. Click "Run workflow"
 5. Wait for the workflow to complete (usually 5-10 minutes)
-6. Download the APK from the "Artifacts" section
+6. Download the APK from the "Artifacts" section (both debug-apk and release-apk will be available)
 
 **Alternative approach**: Use the trigger script from your local machine without any local Android tools installed:
 1. Install Python 3 if you don't have it
