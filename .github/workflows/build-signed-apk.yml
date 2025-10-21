@@ -21,9 +21,12 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    # Make gradlew executable
-    - name: Make gradlew executable
-      run: chmod +x ./gradlew
+    # Fix line endings and make gradlew executable
+    - name: Fix gradlew line endings and permissions
+      run: |
+        # Convert Windows line endings to Unix if present
+        sed -i 's/\r$//' gradlew
+        chmod +x gradlew
 
     - name: Create keystore
       run: |

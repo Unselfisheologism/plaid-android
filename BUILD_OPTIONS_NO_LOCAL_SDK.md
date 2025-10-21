@@ -155,7 +155,7 @@ In addition to updating the deprecated upload action, we've also fixed an issue 
 ./gradlew: 140: exec: : Permission denied
 ```
 
-Based on a working example from another project, we've simplified the approach. Instead of trying to fix line endings with sed or dos2unix commands, we now simply ensure the gradlew script has executable permissions using `chmod +x ./gradlew` before running it. This follows the pattern from a known working GitHub Actions workflow that successfully builds Android projects.
+This error occurred because the gradlew script had Windows line endings (CRLF) instead of Unix line endings (LF). We've updated all workflow files to include a step that fixes line endings using the `sed -i 's/\r$//' gradlew` command before executing the gradlew script. This removes any Windows carriage return characters and ensures the script runs properly in the Linux environment of GitHub Actions.
 
 ## Troubleshooting
 
