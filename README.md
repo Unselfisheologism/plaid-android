@@ -54,7 +54,7 @@ The application follows a modular architecture with the following key components
 
 ### Alternative: Build with GitHub Actions (No Android Studio Required)
 
-You can build the APK without installing Android Studio by using GitHub Actions:
+You can build the APK without installing Android Studio or the Android SDK by using GitHub Actions. This approach doesn't require setting up ANDROID_HOME or other local development tools, saving disk space and setup time.
 
 1. Fork this repository to your GitHub account
 2. Go to the "Actions" tab in your forked repository
@@ -63,7 +63,15 @@ You can build the APK without installing Android Studio by using GitHub Actions:
 5. Wait for the workflow to complete (usually 5-10 minutes)
 6. Download the APK from the "Artifacts" section
 
+**Alternative approach**: Use the trigger script from your local machine without any local Android tools installed:
+1. Install Python 3 if you don't have it
+2. Run `trigger_github_action.bat` (Windows) or `trigger_github_action.sh` (macOS/Linux)
+3. Enter your GitHub credentials when prompted
+4. The script will trigger the GitHub Actions workflow for you
+
 For detailed instructions on using GitHub Actions, please see [GITHUB_ACTIONS_README.md](GITHUB_ACTIONS_README.md).
+
+For detailed build options without local SDK setup, please see [BUILD_OPTIONS_NO_LOCAL_SDK.md](BUILD_OPTIONS_NO_LOCAL_SDK.md).
 
 For detailed local build instructions, please see [README_BUILD.md](README_BUILD.md).
 

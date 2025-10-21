@@ -44,17 +44,6 @@ class SlashCommandsActivity : AppCompatActivity() {
     }
     
     private fun setupCommandClickListeners() {
-        // Set click listeners for each slash command
-        findViewById<TextView>(android.R.id.text1).apply {
-            // We need to find the specific command text views by their content
-            findViewById<TextView>(android.R.id.text1)?.setOnClickListener { 
-                handleCommandClick("/search") 
-            }
-        }
-        
-    }
-    
-    private fun setupCommandClickListeners() {
         // Set click listeners for each slash command using their IDs
         findViewById<TextView>(R.id.searchCommand).setOnClickListener { handleCommandClick("/search") }
         findViewById<TextView>(R.id.askCommand).setOnClickListener { handleCommandClick("/ask") }

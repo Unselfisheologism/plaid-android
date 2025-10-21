@@ -1,23 +1,26 @@
 package com.yourcompany.myagenticbrowser.ui
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import androidx.fragment.app.Fragment
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.yourcompany.myagenticbrowser.R
 import com.yourcompany.myagenticbrowser.agent.AgentHomePage
 import com.yourcompany.myagenticbrowser.agent.SearchVisualizationActivity
 import com.yourcompany.myagenticbrowser.ai.puter.PuterConfigActivity
+import com.yourcompany.myagenticbrowser.browser.BrowserActivity
 import com.yourcompany.myagenticbrowser.utilities.Logger
+import com.yourcompany.myagenticbrowser.ui.WorkflowActivity
 
 /**
- * Fragment for the side menu with circular icons as described in the UI specification
+ * Bottom sheet fragment for the side menu with circular icons as described in the UI specification
  * This implements the middle-right wireframe showing a vertical menu with various functions
  */
-class SideMenuFragment : Fragment() {
+class SideMenuFragment : BottomSheetDialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,12 +36,18 @@ class SideMenuFragment : Fragment() {
         return view
     }
 
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return super.onCreateDialog(savedInstanceState).apply {
+            // Customize the dialog if needed
+        }
+    }
+
     private fun setupMenuItems(view: View) {
         // Close button
         val closeButton = view.findViewById<ImageButton>(R.id.closeButton)
         closeButton.setOnClickListener {
-            // Dismiss the side menu (in a real implementation, this would close the drawer)
-            parentFragmentManager.popBackStack()
+            // Dismiss the side menu
+            dismiss()
         }
 
         // Set up click listeners for each menu item by finding them by text content
@@ -58,7 +67,7 @@ class SideMenuFragment : Fragment() {
         textView?.setOnClickListener {
             action()
             // Close the menu after selection
-            parentFragmentManager.popBackStack()
+            dismiss()
         }
     }
 
@@ -86,7 +95,7 @@ class SideMenuFragment : Fragment() {
 
     private fun openSettingsActivity() {
         // In a real implementation, this would open the settings activity
-        startActivity(Intent(context, PuterConfigActivity::class.java))
+        activity?.startActivity(Intent(context, PuterConfigActivity::class.java))
         Logger.logInfo("SideMenuFragment", "Settings menu item selected")
     }
 
@@ -97,13 +106,13 @@ class SideMenuFragment : Fragment() {
 
     private fun openWorkflowsActivity() {
         // In a real implementation, this would open workflows
-        startActivity(Intent(context, WorkflowActivity::class.java))
+        activity?.startActivity(Intent(context, WorkflowActivity::class.java))
         Logger.logInfo("SideMenuFragment", "Workflows menu item selected")
     }
 
     private fun openAgentsExpertsActivity() {
         // In a real implementation, this would open agents/experts
-        startActivity(Intent(context, AgentHomePage::class.java))
+        activity?.startActivity(Intent(context, AgentHomePage::class.java))
         Logger.logInfo("SideMenuFragment", "Agents Experts menu item selected")
     }
 
@@ -114,11 +123,27 @@ class SideMenuFragment : Fragment() {
 
     private fun summarizeCurrentPage() {
         // In a real implementation, this would summarize the current page
+        // Try to get the current page content from the browser activity
+        val browserActivity = activity as? BrowserActivity
+        browserActivity?.getCurrentWebViewFragment()?.let { webViewFragment ->
+            val webView = webViewFragment.getWebView()
+            val url = webViewFragment.getUrl()
+            Logger.logInfo("SideMenuFragment", "Summarizing page: $url")
+            // In a real implementation, we would send this to the AI agent for summarization
+        }
         Logger.logInfo("SideMenuFragment", "Summarize Page menu item selected")
     }
 
     private fun askAboutCurrentPage() {
         // In a real implementation, this would ask about the current page
+        // Try to get the current page content from the browser activity
+        val browserActivity = activity as? BrowserActivity
+        browserActivity?.getCurrentWebViewFragment()?.let { webViewFragment ->
+            val webView = webViewFragment.getWebView()
+            val url = webViewFragment.getUrl()
+            Logger.logInfo("SideMenuFragment", "Asking about page: $url")
+            // In a real implementation, we would send this to the AI agent for analysis
+        }
         Logger.logInfo("SideMenuFragment", "Ask About Page menu item selected")
     }
 

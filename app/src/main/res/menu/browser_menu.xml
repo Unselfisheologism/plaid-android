@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     
     <item
+        android:id="@+id/action_menu"
+        android:title="Menu"
+        android:icon="@android:drawable/ic_menu_more"
+        app:showAsAction="ifRoom" />
+        
+    <item
         android:id="@+id/action_puter_config"
         android:title="AI Configuration"
         android:icon="@android:drawable/ic_menu_manage"

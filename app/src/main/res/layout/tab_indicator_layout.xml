@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tab Preview System"
+        android:text="Tab Indicator System"
         android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center"
@@ -59,6 +59,7 @@
                     android:maxLines="1"
                     android:ellipsize="end" />
 
+                <!-- Tab indicator with owner icon -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -66,13 +67,15 @@
                     android:gravity="center_vertical"
                     android:layout_marginTop="4dp">
 
+                    <!-- User tab indicator -->
                     <ImageView
-                        android:id="@+id/tab1Icon"
+                        android:id="@+id/tab1OwnerIcon"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:src="@drawable/circle_shape"
+                        android:backgroundTint="#2196F3"
                         android:layout_marginEnd="4dp"
-                        android:contentDescription="Tab owner indicator" />
+                        android:contentDescription="User tab indicator" />
 
                     <TextView
                         android:id="@+id/tab1Status"
@@ -116,6 +119,7 @@
                     android:maxLines="1"
                     android:ellipsize="end" />
 
+                <!-- Tab indicator with owner icon -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -123,13 +127,15 @@
                     android:gravity="center_vertical"
                     android:layout_marginTop="4dp">
 
+                    <!-- Agent tab indicator -->
                     <ImageView
-                        android:id="@+id/tab2Icon"
+                        android:id="@+id/tab2OwnerIcon"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:src="@drawable/circle_shape"
+                        android:backgroundTint="#4CAF50"
                         android:layout_marginEnd="4dp"
-                        android:contentDescription="Tab owner indicator" />
+                        android:contentDescription="Agent tab indicator" />
 
                     <TextView
                         android:id="@+id/tab2Status"
@@ -172,6 +178,7 @@
                     android:maxLines="1"
                     android:ellipsize="end" />
 
+                <!-- Tab indicator with owner icon -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -179,13 +186,15 @@
                     android:gravity="center_vertical"
                     android:layout_marginTop="4dp">
 
+                    <!-- User tab indicator -->
                     <ImageView
-                        android:id="@+id/tab3Icon"
+                        android:id="@+id/tab3OwnerIcon"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:src="@drawable/circle_shape"
+                        android:backgroundTint="#2196F3"
                         android:layout_marginEnd="4dp"
-                        android:contentDescription="Tab owner indicator" />
+                        android:contentDescription="User tab indicator" />
 
                     <TextView
                         android:id="@+id/tab3Status"
@@ -239,6 +248,7 @@
                     android:maxLines="1"
                     android:ellipsize="end" />
 
+                <!-- Tab indicator with owner icon -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -246,13 +256,15 @@
                     android:gravity="center_vertical"
                     android:layout_marginTop="4dp">
 
+                    <!-- Agent tab indicator -->
                     <ImageView
-                        android:id="@+id/tab4Icon"
+                        android:id="@+id/tab4OwnerIcon"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:src="@drawable/circle_shape"
+                        android:backgroundTint="#4CAF50"
                         android:layout_marginEnd="4dp"
-                        android:contentDescription="Tab owner indicator" />
+                        android:contentDescription="Agent tab indicator" />
 
                     <TextView
                         android:id="@+id/tab4Status"
@@ -264,8 +276,6 @@
                         android:textColor="#FF9800" />
 
                 </LinearLayout>
-
-            </LinearLayout>
 
             <!-- Tab 5 -->
             <LinearLayout
@@ -296,6 +306,7 @@
                     android:maxLines="1"
                     android:ellipsize="end" />
 
+                <!-- Tab indicator with owner icon -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -303,13 +314,15 @@
                     android:gravity="center_vertical"
                     android:layout_marginTop="4dp">
 
+                    <!-- User tab indicator -->
                     <ImageView
-                        android:id="@+id/tab5Icon"
+                        android:id="@+id/tab5OwnerIcon"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:src="@drawable/circle_shape"
+                        android:backgroundTint="#2196F3"
                         android:layout_marginEnd="4dp"
-                        android:contentDescription="Tab owner indicator" />
+                        android:contentDescription="User tab indicator" />
 
                     <TextView
                         android:id="@+id/tab5Status"
@@ -352,6 +365,7 @@
                     android:maxLines="1"
                     android:ellipsize="end" />
 
+                <!-- Tab indicator with owner icon -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -359,13 +373,15 @@
                     android:gravity="center_vertical"
                     android:layout_marginTop="4dp">
 
+                    <!-- Agent tab indicator -->
                     <ImageView
-                        android:id="@+id/tab6Icon"
+                        android:id="@+id/tab6OwnerIcon"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:src="@drawable/circle_shape"
+                        android:backgroundTint="#4CAF50"
                         android:layout_marginEnd="4dp"
-                        android:contentDescription="Tab owner indicator" />
+                        android:contentDescription="Agent tab indicator" />
 
                     <TextView
                         android:id="@+id/tab6Status"

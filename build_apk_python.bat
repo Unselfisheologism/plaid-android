@@ -1,8 +1,8 @@
 @echo off
-echo Building MyAgenticBrowser APK using Python script...
+echo Building MyAgenticBrowser APK using py script...
 echo ======================================================
 
-python build_apk.py
+py build_apk.py
 
 if %ERRORLEVEL% EQU 0 (
     echo.

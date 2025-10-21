@@ -139,6 +139,10 @@ class BrowserActivity : AppCompatActivity() {
     
     override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_menu -> {
+                showSideMenu()
+                true
+            }
             R.id.action_puter_config -> {
                 startActivity(Intent(this, PuterConfigActivity::class.java))
                 true
@@ -153,6 +157,14 @@ class BrowserActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+    
+    /**
+     * Show the side menu as a bottom sheet fragment
+     */
+    private fun showSideMenu() {
+        val sideMenuFragment = com.yourcompany.myagenticbrowser.ui.SideMenuFragment()
+        sideMenuFragment.show(supportFragmentManager, "SideMenuBottomSheet")
     }
     
     /**

@@ -1,0 +1,83 @@
+MyAgenticBrowser GitHub Actions Usage Guide
+=========================================
+
+This guide explains how to use GitHub Actions to build the MyAgenticBrowser APK without installing Android Studio.
+
+Prerequisites:
+1. A GitHub account
+2. This repository forked to your GitHub account
+
+Steps to build the APK using GitHub Actions:
+
+1. Fork this repository to your GitHub account:
+   - Go to the original repository page
+   - Click the "Fork" button in the top-right corner
+   - Select your account as the destination
+
+2. Navigate to the Actions tab in your forked repository:
+   - Go to your forked repository on GitHub
+   - Click on the "Actions" tab
+
+3. Select a workflow to run:
+   - You should see several workflows:
+     * "Build Debug APK" - Builds a debug APK for testing
+     * "Build All APKs" - Builds both debug and release APKs
+     * "Build Signed APK" - Builds a signed release APK (requires setup)
+
+4. Run a workflow:
+   - Click on the workflow you want to run (e.g., "Build Debug APK")
+   - Click the "Run workflow" button
+   - Select the branch (usually "main" or "master")
+   - Click "Run workflow" again
+
+5. Wait for the workflow to complete:
+   - The workflow will take 5-10 minutes to complete
+   - You can watch the progress in real-time
+
+6. Download the APK:
+   - Once the workflow completes, click on the completed run
+   - Scroll down to the "Artifacts" section
+   - Click on the artifact you want to download (e.g., "debug-apk")
+   - Save the ZIP file to your computer
+   - Extract the ZIP file to get the APK
+
+7. Install the APK on your Android device:
+   - Transfer the APK file to your Android device
+   - On your Android device, locate the APK file and tap on it
+   - If prompted, enable "Install from unknown sources" in your device settings
+   - Follow the prompts to install the app
+
+Alternative: Using the trigger script
+
+If you prefer to trigger the workflow from your local machine:
+
+1. Install Python 3 if you don't have it already
+2. Run the trigger script:
+   - On Windows: double-click "trigger_github_action.bat"
+   - On macOS/Linux: run "./trigger_github_action.sh" in terminal
+3. Enter your GitHub username, repository name, and personal access token when prompted
+4. The script will trigger the workflow and provide a link to monitor progress
+
+Creating a GitHub Personal Access Token:
+
+1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Click "Generate new token" → "Generate new token (classic)"
+3. Give the token a name (e.g., "MyAgenticBrowser Actions")
+4. Select the "repo" scope
+5. Click "Generate token"
+6. Copy the token and save it securely (you won't see it again)
+
+Monitoring Builds:
+
+- Go to the "Actions" tab in your repository
+- Click on a workflow run to see detailed logs
+- Check the "Artifacts" section for downloadable APKs
+
+Troubleshooting:
+
+- If the workflow fails, check the logs for error messages
+- Make sure all required secrets are set for signed builds
+- Ensure your repository has the correct structure and files
+- Check that the ANDROID_HOME environment variable is set correctly in the workflow
+
+For detailed instructions, see GITHUB_ACTIONS_README.md
