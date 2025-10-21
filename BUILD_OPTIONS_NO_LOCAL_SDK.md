@@ -143,6 +143,20 @@ We've updated all GitHub Actions workflows to fix the deprecated `actions/upload
 
 The `actions/upload-artifact@v3` action has been deprecated and is no longer supported. Using it would cause workflow failures with error messages indicating that the action is no longer available. The update to `v4` ensures workflows continue to function properly and can successfully upload the built APKs as artifacts for download. This fix allows you to build the APK using GitHub Actions without encountering the deprecated action error you experienced.
 
+
+## Additional GitHub Actions Fixes
+
+In addition to updating the deprecated upload action, we've also fixed an issue with the gradlew script that was causing parsing errors in the Linux environment of GitHub Actions. The error looked like this:
+
+
+```
+./gradlew: 2: eval: -Xms64m: not found
+./gradlew: 138: die: not found
+./gradlew: 140: exec: : Permission denied
+```
+
+This error occurred because the gradlew script had Windows line endings (CRLF) instead of Unix line endings (LF). We've updated all workflow files to include a step that fixes line endings using the `dos2unix` command before executing the gradlew script. This ensures the script runs properly in the Linux environment of GitHub Actions.
+
 ## Troubleshooting
 
 ### Workflow Fails
