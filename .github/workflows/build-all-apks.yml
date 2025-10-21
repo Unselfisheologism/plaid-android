@@ -22,11 +22,9 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Fix gradlew line endings and permissions
-      run: |
-        # Ensure proper line endings and permissions for gradlew
-        sed -i 's/\r$//' gradlew
-        chmod +x gradlew
+    # Make gradlew executable
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
 
     - name: Build Debug APK
       run: ./gradlew assembleDebug
