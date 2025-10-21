@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Slash Commands Interface"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Large rectangular box with slash command options -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/node_background"
+        android:padding="24dp"
+        android:layout_marginBottom="24dp"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/searchCommand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="/search"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"
+            android:padding="8dp"
+            android:background="@drawable/command_background"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:id="@+id/askCommand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="/ask"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"
+            android:padding="8dp"
+            android:background="@drawable/command_background"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:id="@+id/automateCommand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="/automate"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"
+            android:padding="8dp"
+            android:background="@drawable/command_background"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:id="@+id/expertCommand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="/expert"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"
+            android:padding="8dp"
+            android:background="@drawable/command_background"
+            android:layout_gravity="center" />
+
+    </LinearLayout>
+
+    <!-- Large empty space around the rectangular box -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Input area that appears when a slash command is selected -->
+    <LinearLayout
+        android:id="@+id/inputArea"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/node_background"
+        android:padding="12dp"
+        android:visibility="gone"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/plusButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_input_add"
+            android:contentDescription="Upload media or attachments" />
+
+        <ImageButton
+            android:id="@+id/settingsButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_manage"
+            android:contentDescription="Settings" />
+
+        <EditText
+            android:id="@+id/commandInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:hint="Enter your command..."
+            android:padding="12dp"
+            android:background="@android:color/white"
+            android:layout_marginEnd="8dp" />
+
+        <ImageButton
+            android:id="@+id/sendButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_send"
+            android:contentDescription="Send command" />
+
+    </LinearLayout>
+
+</LinearLayout>

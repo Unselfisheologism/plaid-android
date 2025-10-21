@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:elevation="8dp">
+
+    <!-- Draggable handle at the top -->
+    <View
+        android:id="@+id/dragHandle"
+        android:layout_width="60dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Chat messages container -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:id="@+id/chatMessagesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Example chat message from user -->
+            <TextView
+                android:id="@+id/userMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:background="#E3F2FD"
+                android:padding="12dp"
+                android:layout_marginBottom="8dp"
+                android:text="USER <- user's message to the AI"
+                android:textSize="14sp" />
+
+            <!-- AI response title -->
+            <TextView
+                android:id="@+id/aiTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:background="#F5F5F5"
+                android:padding="12dp"
+                android:layout_marginBottom="4dp"
+                android:text="AI Response Title"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <!-- AI response subtitle -->
+            <TextView
+                android:id="@+id/aiSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:background="#F5F5F5"
+                android:padding="12dp"
+                android:layout_marginBottom="8dp"
+                android:text="Two lines below the user's message"
+                android:textSize="12sp" />
+
+            <!-- AI response content area -->
+            <TextView
+                android:id="@+id/aiResponse"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:background="#F5F5F5"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="A large rectangular content area in the middle (for the actual response of the AI agent)"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Input area with buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="#F5F5F5">
+
+        <!-- Plus button for attachments -->
+        <ImageButton
+            android:id="@+id/plusButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_input_add"
+            android:contentDescription="Upload media or attachments" />
+
+        <!-- Settings button -->
+        <ImageButton
+            android:id="@+id/settingsButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_manage"
+            android:contentDescription="Settings" />
+
+        <!-- Text input for followup -->
+        <EditText
+            android:id="@+id/followUpInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:hint="Type followup..."
+            android:padding="12dp"
+            android:background="@android:color/white"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Send button -->
+        <ImageButton
+            android:id="@+id/sendButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_send"
+            android:contentDescription="Send message" />
+
+    </LinearLayout>
+
+</LinearLayout>

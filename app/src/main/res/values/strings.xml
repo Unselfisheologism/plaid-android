@@ -1,0 +1,65 @@
+<resources>
+    <string name="app_name">MyAgenticBrowser</string>
+    <string name="accessibility_service_label">MyAgenticBrowser Accessibility Service</string>
+    <string name="accessibility_service_description">This service helps the AI agent interact with the screen for automation tasks.</string>
+    
+    <!-- Agent Home Page -->
+    <string name="agent_home_title">AI Agent Home</string>
+    <string name="voice_command">Voice Command</string>
+    <string name="enter_command">Enter command...</string>
+    <string name="send">Send</string>
+    <string name="agent_response_placeholder">Agent response will appear here...</string>
+    <string name="agent_settings">Settings</string>
+    
+    <!-- Search Visualization -->
+    <string name="search_visualization_title">Search Visualization</string>
+    <string name="back">Back</string>
+    <string name="search_hint">Enter search query...</string>
+    <string name="search">Search</string>
+    
+    <!-- Puter Config -->
+    <string name="puter_config_title">Puter.js Configuration</string>
+    <string name="puter_auth_hint">Puter.js Authentication (Browser-based authentication)</string>
+    <string name="save">Save</string>
+    <string name="test_connection">Test Connection</string>
+    <string name="connection_success">Connection successful!</string>
+    <string name="connection_failed">Connection failed. Please ensure Puter.js is properly loaded.</string>
+    
+    <!-- Search Visualization Activity -->
+    <string name="search_visualization_activity_title">Perplexity Sonar Search Visualization</string>
+    <string name="search_input_hint">Enter your search query...</string>
+    <string name="search_button_text">Search</string>
+    <string name="back_button_text">Back</string>
+    <string name="searching_message">Searching the web through Perplexity Sonar models via Puter.js infrastructure...</string>
+    <string name="no_results_message">No results found for your query.</string>
+    <string name="search_error_message">Failed to perform search: %1$s</string>
+    
+    <!-- Search Visualization Fragment -->
+    <string name="search_visualization_fragment_title">Perplexity Sonar Search Visualization</string>
+    <string name="search_fragment_input_hint">Enter your search query...</string>
+    <string name="search_fragment_button_text">Search</string>
+    <string name="back_fragment_button_text">Back</string>
+    <string name="searching_fragment_message">Searching the web through Perplexity Sonar models via Puter.js infrastructure...</string>
+    <string name="no_results_fragment_message">No results found for your query.</string>
+    <string name="search_error_fragment_message">Failed to perform search: %1$s</string>
+    <!-- Speed options for video editing -->
+    <string-array name="speed_options">
+        <item>0.25x</item>
+        <item>0.5x</item>
+        <item>0.75x</item>
+        <item>1x</item>
+        <item>1.25x</item>
+        <item>1.5x</item>
+        <item>2x</item>
+    </string-array>
+    
+    <!-- Effect options for video editing -->
+    <string-array name="effect_options">
+        <item>None</item>
+        <item>Grayscale</item>
+        <item>Sepia</item>
+        <item>Negative</item>
+        <item>Brightness</item>
+        <item>Contrast</item>
+    </string-array>
+</resources>

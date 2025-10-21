@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:padding="16dp">
+
+    <!-- Close button at the top -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginBottom="24dp">
+
+        <ImageButton
+            android:id="@+id/closeButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Close menu" />
+
+    </LinearLayout>
+
+    <!-- Menu items with circular icons and labels -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <!-- Account -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_my_calendar"
+                android:background="@drawable/circle_shape"
+                android:backgroundTint="#2196F3"
+                android:padding="12dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Account" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Account"
+                android:textSize="16sp"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <!-- Settings -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_manage"
+                android:background="@drawable/circle_shape"
+                android:backgroundTint="#4CAF50"
+                android:padding="12dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Settings" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Settings"
+                android:textSize="16sp"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <!-- Integrations -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_add"
+                android:background="@drawable/circle_shape"
+                android:backgroundTint="#FF9800"
+                android:padding="12dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Integrations" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Integrations"
+                android:textSize="16sp"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <!-- Workflows -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_directions"
+                android:background="@drawable/circle_shape"
+                android:backgroundTint="#9C27B0"
+                android:padding="12dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Workflows" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Workflows"
+                android:textSize="16sp"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <!-- Agents Experts -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:background="@drawable/circle_shape"
+                android:backgroundTint="#E91E63"
+                android:padding="12dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Agents Experts" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Agents Experts"
+                android:textSize="16sp"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <!-- Support -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_help"
+                android:background="@drawable/circle_shape"
+                android:backgroundTint="#795548"
+                android:padding="12dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Support" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Support"
+                android:textSize="16sp"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <!-- Summarize Page -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_agenda"
+                android:background="@drawable/circle_shape"
+                android:backgroundTint="#607D8B"
+                android:padding="12dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Summarize Page" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Summarize Page"
+                android:textSize="16sp"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <!-- Ask About Page -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_info_details"
+                android:background="@drawable/circle_shape"
+                android:backgroundTint="#FF5722"
+                android:padding="12dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Ask About Page" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ask About Page"
+                android:textSize="16sp"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

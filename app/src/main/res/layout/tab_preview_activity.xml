@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tab Preview System"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Six square shapes arranged in two columns (three on each side) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <!-- Left column -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="8dp">
+
+            <!-- Tab 1 -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/node_background"
+                android:padding="8dp">
+
+                <!-- Top left: circle icon with stickman or account icon -->
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    android:layout_gravity="top|start"
+                    android:contentDescription="User tab" />
+
+                <!-- Top right: status indicator -->
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/presence_online"
+                    android:layout_gravity="top|end"
+                    android:contentDescription="Active status" />
+
+                <!-- Tab title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Google"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="top|center_horizontal"
+                    android:layout_marginTop="28dp"
+                    android:gravity="center" />
+
+                <!-- Webpage preview -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginTop="48dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_menu_gallery"
+                        android:layout_marginBottom="4dp"
+                        android:contentDescription="Page preview" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Search engine"
+                        android:textSize="10sp"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <!-- Tab 2 -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/node_background"
+                android:padding="8dp">
+
+                <!-- Top left: circle icon with stickman or account icon -->
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    android:layout_gravity="top|start"
+                    android:contentDescription="User tab" />
+
+                <!-- Top right: status indicator -->
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/presence_invisible"
+                    android:layout_gravity="top|end"
+                    android:contentDescription="Dormant status" />
+
+                <!-- Tab title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gmail"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="top|center_horizontal"
+                    android:layout_marginTop="28dp"
+                    android:gravity="center" />
+
+                <!-- Webpage preview -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginTop="48dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_menu_send"
+                        android:layout_marginBottom="4dp"
+                        android:contentDescription="Page preview" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Email service"
+                        android:textSize="10sp"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <!-- Tab 3 -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/node_background"
+                android:padding="8dp">
+
+                <!-- Top left: circle icon with stickman or account icon -->
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    android:layout_gravity="top|start"
+                    android:contentDescription="User tab" />
+
+                <!-- Top right: status indicator -->
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/presence_online"
+                    android:layout_gravity="top|end"
+                    android:contentDescription="Active status" />
+
+                <!-- Tab title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="YouTube"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="top|center_horizontal"
+                    android:layout_marginTop="28dp"
+                    android:gravity="center" />
+
+                <!-- Webpage preview -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginTop="48dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_media_play"
+                        android:layout_marginBottom="4dp"
+                        android:contentDescription="Page preview" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Video platform"
+                        android:textSize="10sp"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <!-- Right column -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="8dp">
+
+            <!-- Tab 4 -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/node_background"
+                android:padding="8dp">
+
+                <!-- Top left: circle icon with stickman or account icon -->
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    android:layout_gravity="top|start"
+                    android:contentDescription="User tab" />
+
+                <!-- Top right: status indicator -->
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/presence_online"
+                    android:layout_gravity="top|end"
+                    android:contentDescription="Active status" />
+
+                <!-- Tab title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AI Agent"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="top|center_horizontal"
+                    android:layout_marginTop="28dp"
+                    android:gravity="center" />
+
+                <!-- Webpage preview -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginTop="48dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_dialog_info"
+                        android:layout_marginBottom="4dp"
+                        android:contentDescription="Page preview" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AI assistant"
+                        android:textSize="10sp"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <!-- Tab 5 -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/node_background"
+                android:padding="8dp">
+
+                <!-- Top left: circle icon with stickman or account icon -->
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    android:layout_gravity="top|start"
+                    android:contentDescription="User tab" />
+
+                <!-- Top right: status indicator -->
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/presence_invisible"
+                    android:layout_gravity="top|end"
+                    android:contentDescription="Dormant status" />
+
+                <!-- Tab title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Docs"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="top|center_horizontal"
+                    android:layout_marginTop="28dp"
+                    android:gravity="center" />
+
+                <!-- Webpage preview -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginTop="48dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        android:layout_marginBottom="4dp"
+                        android:contentDescription="Page preview" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Document editor"
+                        android:textSize="10sp"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <!-- Tab 6 -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/node_background"
+                android:padding="8dp">
+
+                <!-- Top left: circle icon with stickman or account icon -->
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    android:layout_gravity="top|start"
+                    android:contentDescription="User tab" />
+
+                <!-- Top right: status indicator -->
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/presence_online"
+                    android:layout_gravity="top|end"
+                    android:contentDescription="Active status" />
+
+                <!-- Tab title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AI Canvas"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="top|center_horizontal"
+                    android:layout_marginTop="28dp"
+                    android:gravity="center" />
+
+                <!-- Webpage preview -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginTop="48dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_menu_gallery"
+                        android:layout_marginBottom="4dp"
+                        android:contentDescription="Page preview" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Canvas for AI"
+                        android:textSize="10sp"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,35 @@
+MyAgenticBrowser Build Instructions
+===================================
+
+Prerequisites:
+1. Java JDK 8 or higher
+2. Gradle 7.6.1 or higher
+3. Android SDK with API level 28 or higher
+
+Build Steps:
+1. Open a terminal/command prompt in the project directory
+2. Run one of the following commands:
+
+   On Windows:
+   .\gradlew.bat assembleDebug
+
+   On macOS/Linux:
+   ./gradlew assembleDebug
+
+   Or if Gradle is installed system-wide:
+   gradle assembleDebug
+
+3. The APK will be generated at:
+   app/build/outputs/apk/debug/app-debug.apk
+
+Installation:
+1. Connect your Android device via USB
+2. Enable USB debugging on your device
+3. Run: adb install app/build/outputs/apk/debug/app-debug.apk
+
+Troubleshooting:
+- If you get "ANDROID_HOME not set", install Android Studio and set the ANDROID_HOME environment variable
+- If you get Gradle version conflicts, try: gradle wrapper --gradle-version 7.6.1
+- If the build fails, try: gradle clean && gradle build
+
+For detailed instructions, see BUILD_INSTRUCTIONS.md
