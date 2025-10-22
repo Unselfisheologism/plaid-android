@@ -1,131 +1,96 @@
 package com.yourcompany.myagenticbrowser.automation
 
-import android.content.Context
+import android.accessibilityservice.AccessibilityService
+import android.view.accessibility.AccessibilityNodeInfo
 import com.yourcompany.myagenticbrowser.utilities.Logger
-import kotlinx.coroutines.delay
 
-/**
- * Advanced automation executor for complex UI automation tasks
- * This class handles multi-step automation workflows and provides more sophisticated automation capabilities
- */
-class AutomationExecutor(private val context: Context) {
-    private val finger = Finger(context)
+class AutomationExecutor(private val service: AccessibilityService) {
     
-    /**
-     * Execute a complex automation workflow
-     */
-    suspend fun executeWorkflow(workflow: AutomationWorkflow): Boolean {
-        Logger.logInfo("AutomationExecutor", "Starting automation workflow: ${workflow.name}")
-        
+    fun clickElement(element: AccessibilityNodeInfo): Boolean {
+        Logger.logInfo("AutomationExecutor", "Attempting to click element")
+        return element.performAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK)
+    }
+    
+    fun setText(element: AccessibilityNodeInfo, text: String): Boolean {
+        Logger.logInfo("AutomationExecutor", "Attempting to set text on element: $text")
+        val bundle = android.os.Bundle()
+        bundle.putCharSequence(android.view.accessibility.AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, text)
+        return element.performAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_SET_TEXT, bundle)
+    }
+    
+    fun findElementByResourceName(resourceName: String): AccessibilityNodeInfo? {
+        Logger.logInfo("AutomationExecutor", "Finding element by resource name: $resourceName")
+        return service.rootInActiveWindow?.findAccessibilityNodeInfosByViewId(resourceName)?.firstOrNull()
+    }
+    
+    fun findElementByText(text: String): AccessibilityNodeInfo? {
+        Logger.logInfo("AutomationExecutor", "Finding element by text: $text")
+        return service.rootInActiveWindow?.findAccessibilityNodeInfosByText(text)?.firstOrNull()
+    }
+    
+    fun swipe(startX: Int, startY: Int, endX: Int, endY: Int) {
+        Logger.logInfo("AutomationExecutor", "Performing swipe from ($startX, $startY) to ($endX, $endY)")
+        // Implementation would depend on the specific accessibility service implementation
+    }
+    
+    fun scroll(direction: Int) {
+        Logger.logInfo("AutomationExecutor", "Performing scroll in direction: $direction")
+        // Implementation would depend on the specific accessibility service implementation
+    }
+    
+    fun executeWorkflow(workflow: AutomationWorkflow): Boolean {
+        Logger.logInfo("AutomationExecutor", "Executing workflow: ${workflow.name}")
         var success = true
-        var stepIndex = 0
-        
-        try {
-            for ((index, step) in workflow.steps.withIndex()) {
-                stepIndex = index + 1
-                
-                Logger.logInfo("AutomationExecutor", "Executing step $stepIndex/${workflow.steps.size}: ${step.description}")
-                OverlayManager.show(context, "Executing: ${step.description} (${stepIndex}/${workflow.steps.size})")
-                
-                val stepSuccess = executeStep(step)
-                if (!stepSuccess) {
-                    Logger.logError("AutomationExecutor", "Failed at step $stepIndex: ${step.description}")
-                    success = false
-                    break
-                }
-                
-                // Add delay between steps to allow UI to update
-                delay(500)
+        for (step in workflow.steps) {
+            if (!executeStep(step)) {
+                success = false
+                break
             }
-            
-            if (success) {
-                OverlayManager.show(context, "Workflow completed: ${workflow.name}")
-                Logger.logInfo("AutomationExecutor", "Workflow completed successfully: ${workflow.name} (${workflow.steps.size} steps)")
-            } else {
-                OverlayManager.show(context, "Workflow failed at step $stepIndex: ${workflow.name}")
-                Logger.logError("AutomationExecutor", "Workflow failed at step $stepIndex: ${workflow.name} (${workflow.steps.size} total steps)")
-            }
-        } catch (e: Exception) {
-            Logger.logError("AutomationExecutor", "Error executing workflow: ${e.message}", e)
-            OverlayManager.show(context, "Workflow error: ${e.message}")
-            success = false
         }
-        
         return success
     }
-
-    /**
-     * Get debug information about the automation executor
-     */
-    fun getDebugInfo(): String {
-        val fingerDebug = finger.getDebugInfo()
-        return "AutomationExecutor initialized. Finger debug: $fingerDebug"
-    }
     
-    /**
-     * Execute a single automation step
-     */
-    private suspend fun executeStep(step: AutomationStep): Boolean {
+    private fun executeStep(step: AutomationStep): Boolean {
+        Logger.logInfo("AutomationExecutor", "Executing step: ${step.description}")
         return when (step.type) {
             StepType.CLICK -> {
-                when (step.selector) {
-                    is ElementSelector.ByText -> finger.clickByText(step.selector.value)
-                    is ElementSelector.ById -> finger.clickById(step.selector.value)
-                    is ElementSelector.ByResourceName -> finger.clickByResourceName(step.selector.value)
-                }
+                val element = findElement(step.selector)
+                element?.let { clickElement(it) } ?: false
             }
             StepType.INPUT -> {
-                when (step.selector) {
-                    is ElementSelector.ByText -> finger.inputText(step.selector.value, step.inputValue ?: "")
-                    is ElementSelector.ById -> finger.inputTextById(step.selector.value, step.inputValue ?: "")
-                    is ElementSelector.ByResourceName -> {
-                        val element = finger.findElementById(step.selector.value)
-                        if (element != null) {
-                            finger.inputText(element, step.inputValue ?: "")
-                        } else false
-                    }
-                }
+                val element = findElement(step.selector)
+                element?.let { setText(it, step.inputValue ?: "") } ?: false
             }
             StepType.WAIT -> {
-                delay(step.waitTimeMs ?: 1000)
+                Thread.sleep(step.waitTimeMs.toLong())
                 true
             }
-            StepType.SWIPE -> {
-                val direction = step.swipeDirection ?: Finger.SwipeDirection.UP
-                finger.swipe(direction)
-            }
             StepType.WAIT_FOR_ELEMENT -> {
-                val timeout = step.waitTimeMs ?: 5000
-                when (step.selector) {
-                    is ElementSelector.ByText -> finger.waitForElementByText(step.selector.value, timeout)
-                    is ElementSelector.ById -> {
-                        // Wait for element by ID - we'll check if any element with similar ID exists
-                        var found = false
-                        val startTime = System.currentTimeMillis()
-                        while (System.currentTimeMillis() - startTime < timeout && !found) {
-                            found = finger.findElementById(step.selector.value) != null
-                            delay(500)
-                        }
-                        found
-                    }
-                    is ElementSelector.ByResourceName -> {
-                        // Wait for element by resource name
-                        var found = false
-                        val startTime = System.currentTimeMillis()
-                        while (System.currentTimeMillis() - startTime < timeout && !found) {
-                            found = finger.findElementByResourceName(step.selector.value) != null
-                            delay(500)
-                        }
-                        found
-                    }
+                // Wait for element to appear
+                var attempts = 0
+                val maxAttempts = step.waitTimeMs / 100
+                var element: AccessibilityNodeInfo? = null
+                while (attempts < maxAttempts && element == null) {
+                    element = findElement(step.selector)
+                    Thread.sleep(100)
+                    attempts++
                 }
+                element != null
             }
         }
     }
     
-    /**
-     * Automation workflow data class
-     */
+    private fun findElement(selector: ElementSelector): AccessibilityNodeInfo? {
+        return when (selector) {
+            is ElementSelector.ByText -> findElementByText(selector.text)
+            is ElementSelector.ByResourceName -> findElementByResourceName(selector.resourceName)
+        }
+    }
+    
+    fun getDebugInfo(): String {
+        return "AutomationExecutor ready"
+    }
+    
     data class AutomationWorkflow(
         val id: String,
         val name: String,
@@ -133,31 +98,20 @@ class AutomationExecutor(private val context: Context) {
         val steps: List<AutomationStep>
     )
     
-    /**
-     * Automation step data class
-     */
     data class AutomationStep(
         val type: StepType,
         val selector: ElementSelector,
         val description: String,
         val inputValue: String? = null,
-        val waitTimeMs: Long? = null,
-        val swipeDirection: Finger.SwipeDirection? = null
+        val waitTimeMs: Int = 1000
     )
     
-    /**
-     * Step type enum
-     */
     enum class StepType {
-        CLICK, INPUT, WAIT, SWIPE, WAIT_FOR_ELEMENT
+        CLICK, INPUT, WAIT, WAIT_FOR_ELEMENT
     }
     
-    /**
-     * Element selector sealed class
-     */
     sealed class ElementSelector {
-        data class ByText(val value: String) : ElementSelector()
-        data class ById(val value: String) : ElementSelector()
-        data class ByResourceName(val value: String) : ElementSelector()
+        data class ByText(val text: String) : ElementSelector()
+        data class ByResourceName(val resourceName: String) : ElementSelector()
     }
 }

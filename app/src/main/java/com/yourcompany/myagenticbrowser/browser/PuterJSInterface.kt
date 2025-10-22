@@ -53,7 +53,12 @@ class PuterJSInterface(
     fun callPuterChat(message: String, context: String?, model: String?) {
         scope.launch {
             try {
-                val result = puterClient.chat(webView, message, context, model ?: "gpt-5-nano")
+                val result = puterClient.chat(
+                    webView = webView,
+                    message = message,
+                    context = context,
+                    model = model ?: "gpt-5-nano"
+                )
                 handlePuterResult(result)
             } catch (e: Exception) {
                 Logger.logError("PuterJSInterface", "Error in callPuterChat through Puter.js infrastructure: ${e.message}", e)

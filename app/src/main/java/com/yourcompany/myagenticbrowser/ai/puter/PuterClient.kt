@@ -18,6 +18,8 @@ import kotlin.coroutines.resume
  * No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used
  */
 class PuterClient {
+    // Default constructor for use when a PuterClient is needed without specific parameters
+    constructor()
     companion object {
         private const val PUTER_JS_URL = "https://js.puter.com/v2/"
     }
@@ -41,13 +43,13 @@ class PuterClient {
             ensureAuthenticated(webView)
             
             val contextParam = if (context != null) ", context: '$context'" else ""
-            val chatPromise = "new Promise((resolve, reject) => {
-                |    try {
-                |        puter.ai.chat('$message', { model: '$model'$contextParam }).then(result => resolve(result)).catch(error => reject(error.message));
-                |    } catch (error) {
-                |        reject(error.message);
-                |    }
-                |})".trimMargin()
+            val chatPromise = """new Promise((resolve, reject) => {
+               |    try {
+               |        puter.ai.chat('$message', { model: '$model'$contextParam }).then(result => resolve(result)).catch(error => reject(error.message));
+               |    } catch (error) {
+               |        reject(error.message);
+               |    }
+               |})""".trimMargin()
             
             executeJavaScriptWithResult(webView, "Promise.resolve($chatPromise)")
         } catch (e: Exception) {
@@ -88,22 +90,37 @@ class PuterClient {
             throw e
         }
     }
-
-    suspend fun chat(webView: WebView, message: String, context: String? = null, model: String = "gpt-5-nano"): String = withContext(Dispatchers.Main) {
-        // First verify authentication
-        ensureAuthenticated(webView)
+    
+    // New method that doesn't require a WebView directly (to be used by SearchModel)
+    suspend fun searchWithPerplexitySonar(query: String, model: String = PuterSearchOrchestrator.MODEL_SONAR_PRO): String = withContext(Dispatchers.Main) {
+        Logger.logInfo("PuterClient", "Performing web search with Perplexity Sonar through Puter.js infrastructure with model: $model. Query: $query. All AI capabilities route through Puter.js as required. No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used. Puter.js handles all AI provider endpoints and authentication internally.")
         
-        val contextParam = if (context != null) ", context: '$context'" else ""
-        val chatPromise = "new Promise((resolve, reject) => {
-            |    try {
-            |        puter.ai.chat('$message', { model: '$model'$contextParam }).then(result => resolve(result)).catch(error => reject(error.message));
-            |    } catch (error) {
-            |        reject(error.message);
-            |    }
-            |})".trimMargin()
-
-        executeJavaScriptWithResult(webView, "Promise.resolve($chatPromise)")
+        // This method is intended to be used when a WebView isn't directly available
+        // In a real implementation, this would need to be called from a context that has access to a WebView
+        throw IllegalStateException("This method requires a WebView instance to communicate with Puter.js. Use the search(webView, query, model) method instead.")
     }
+        Logger.logInfo("PuterClient", "Performing web search through Puter.js infrastructure with Perplexity Sonar model: $model. Query: $query. All AI capabilities route through Puter.js as required. No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used. Puter.js handles all AI provider endpoints and authentication internally.")
+        
+        return try {
+            // Formulate the search query for the Perplexity Sonar model
+            val searchPrompt = "Search the web for: $query"
+            
+            // Send the search query to the Perplexity Sonar model through Puter.js
+            val searchResponse = chat(
+                webView = webView,
+                message = searchPrompt,
+                model = model
+            )
+            
+            Logger.logInfo("PuterClient", "Web search completed through Puter.js infrastructure. Response: $searchResponse")
+            searchResponse
+        } catch (e: Exception) {
+            Logger.logError("PuterClient", "Error performing web search through Puter.js infrastructure: ${e.message}", e)
+            throw e
+        }
+    }
+
+    // Duplicate function removed - keeping the first implementation above
 
     /**
      * Generate text-to-image using Puter.js infrastructure
@@ -111,19 +128,25 @@ class PuterClient {
      * According to requirements, all image generation requests must go through Puter.js infrastructure
      * No direct API calls to Stable Diffusion, DALL-E, or other image generation services
      */
-    suspend fun textToImage(webView: WebView, prompt: String, testMode: Boolean = false): String = withContext(Dispatchers.Main) {
-        // First verify authentication
-        ensureAuthenticated(webView)
-        
-        val txt2imgPromise = "new Promise((resolve, reject) => {
-            |    try {
-            |        puter.ai.txt2img('$prompt', { testMode: $testMode }).then(result => resolve(result)).catch(error => reject(error.message));
-            |    } catch (error) {
-            |        reject(error.message);
-            |    }
-            |})".trimMargin()
+    suspend fun textToImage(webView: WebView?, prompt: String, testMode: Boolean = false): String = withContext(Dispatchers.Main) {
+        return if (webView != null) {
+            // First verify authentication
+            ensureAuthenticated(webView)
+            
+            val txt2imgPromise = """new Promise((resolve, reject) => {
+               |    try {
+               |        puter.ai.txt2img('$prompt', { testMode: $testMode }).then(result => resolve(result)).catch(error => reject(error.message));
+               |    } catch (error) {
+               |        reject(error.message);
+               |    }
+               |})""".trimMargin()
 
-        executeJavaScriptWithResult(webView, "Promise.resolve($txt2imgPromise)")
+            executeJavaScriptWithResult(webView, "Promise.resolve($txt2imgPromise)")
+        } else {
+            // Handle case where no WebView is provided - this would be an error condition
+            Logger.logError("PuterClient", "textToImage requires a WebView instance to communicate with Puter.js")
+            throw IllegalStateException("textToImage requires a WebView instance to communicate with Puter.js")
+        }
     }
 
     /**
@@ -131,19 +154,25 @@ class PuterClient {
      * This uses the actual Puter.js JavaScript library loaded in the WebView
      * According to requirements, all AI capabilities route through Puter.js infrastructure
      */
-    suspend fun imageToText(webView: WebView, imageUrl: String, testMode: Boolean = false): String = withContext(Dispatchers.Main) {
-        // First verify authentication
-        ensureAuthenticated(webView)
-        
-        val img2txtPromise = "new Promise((resolve, reject) => {
-            |    try {
-            |        puter.ai.img2txt('$imageUrl', { testMode: $testMode }).then(result => resolve(result)).catch(error => reject(error.message));
-            |    } catch (error) {
-            |        reject(error.message);
-            |    }
-            |})".trimMargin()
+    suspend fun imageToText(webView: WebView?, imageUrl: String, testMode: Boolean = false): String = withContext(Dispatchers.Main) {
+        return if (webView != null) {
+            // First verify authentication
+            ensureAuthenticated(webView)
+            
+            val img2txtPromise = """new Promise((resolve, reject) => {
+               |    try {
+               |        puter.ai.img2txt('$imageUrl', { testMode: $testMode }).then(result => resolve(result)).catch(error => reject(error.message));
+               |    } catch (error) {
+               |        reject(error.message);
+               |    }
+               |})""".trimMargin()
 
-        executeJavaScriptWithResult(webView, "Promise.resolve($img2txtPromise)")
+            executeJavaScriptWithResult(webView, "Promise.resolve($img2txtPromise)")
+        } else {
+            // Handle case where no WebView is provided - this would be an error condition
+            Logger.logError("PuterClient", "imageToText requires a WebView instance to communicate with Puter.js")
+            throw IllegalStateException("imageToText requires a WebView instance to communicate with Puter.js")
+        }
     }
 
     /**
@@ -151,19 +180,25 @@ class PuterClient {
      * This uses the actual Puter.js JavaScript library loaded in the WebView
      * According to requirements, all AI capabilities route through Puter.js infrastructure
      */
-    suspend fun textToSpeech(webView: WebView, text: String, language: String = "en-US", voice: String = "Joanna", engine: String = "standard"): String = withContext(Dispatchers.Main) {
-        // First verify authentication
-        ensureAuthenticated(webView)
-        
-        val ttsPromise = "new Promise((resolve, reject) => {
-            |    try {
-            |        puter.ai.txt2speech('$text', { language: '$language', voice: '$voice', engine: '$engine' }).then(result => resolve(result)).catch(error => reject(error.message));
-            |    } catch (error) {
-            |        reject(error.message);
-            |    }
-            |})".trimMargin()
+    suspend fun textToSpeech(webView: WebView?, text: String, language: String = "en-US", voice: String = "Joanna", engine: String = "standard"): String = withContext(Dispatchers.Main) {
+        return if (webView != null) {
+            // First verify authentication
+            ensureAuthenticated(webView)
+            
+            val ttsPromise = """new Promise((resolve, reject) => {
+               |    try {
+               |        puter.ai.txt2speech('$text', { language: '$language', voice: '$voice', engine: '$engine' }).then(result => resolve(result)).catch(error => reject(error.message));
+               |    } catch (error) {
+               |        reject(error.message);
+               |    }
+               |})""".trimMargin()
 
-        executeJavaScriptWithResult(webView, "Promise.resolve($ttsPromise)")
+            executeJavaScriptWithResult(webView, "Promise.resolve($ttsPromise)")
+        } else {
+            // Handle case where no WebView is provided - this would be an error condition
+            Logger.logError("PuterClient", "textToSpeech requires a WebView instance to communicate with Puter.js")
+            throw IllegalStateException("textToSpeech requires a WebView instance to communicate with Puter.js")
+        }
     }
 
     /**

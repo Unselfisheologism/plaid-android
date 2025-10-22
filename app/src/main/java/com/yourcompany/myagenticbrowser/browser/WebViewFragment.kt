@@ -85,7 +85,7 @@ class WebViewFragment : Fragment() {
         webView.settings.allowFileAccess = true
         webView.settings.allowContentAccess = true
         webView.settings.cacheMode = WebSettings.LOAD_DEFAULT
-        webView.settings.setAppCacheEnabled(true)
+        webView.settings.domStorageEnabled = true  // Modern alternative to app cache
         webView.settings.databaseEnabled = true
         webView.settings.setGeolocationEnabled(false)
         webView.settings.setSaveFormData(false)

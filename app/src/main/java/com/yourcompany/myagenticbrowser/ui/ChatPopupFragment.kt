@@ -38,7 +38,7 @@ class ChatPopupFragment : Fragment() {
 
         // Initialize Puter.js components
         configManager = PuterConfigManager.getInstance(requireContext())
-        puterClient = PuterClient(configManager)
+        puterClient = PuterClient()
 
         // Set up UI elements
         setupUI(view)
@@ -127,9 +127,9 @@ class ChatPopupFragment : Fragment() {
         
         return if (webView != null) {
             puterClient.chat(
-                webView,
-                message,
-                "Current context for chat popup"
+                webView = webView,
+                message = message,
+                context = "Current context for chat popup"
             )
         } else {
             "Unable to get response - no WebView available"

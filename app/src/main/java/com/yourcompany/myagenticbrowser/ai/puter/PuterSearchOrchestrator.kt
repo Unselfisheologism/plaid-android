@@ -18,7 +18,11 @@ import kotlinx.serialization.json.*
  * No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used
  * Puter.js handles all AI provider endpoints and authentication internally as required
  */
-class PuterSearchOrchestrator(private val puterClient: PuterClient) {
+class PuterSearchOrchestrator(
+    private val puterClient: PuterClient,
+    private val chatModel: com.yourcompany.myagenticbrowser.ai.puter.model.ChatModel? = null,
+    private val searchModel: com.yourcompany.myagenticbrowser.ai.puter.model.SearchModel? = null
+) {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     
     companion object {
@@ -201,36 +205,67 @@ class PuterSearchOrchestrator(private val puterClient: PuterClient) {
     fun cancel() {
         scope.cancel()
         Logger.logInfo("PuterSearchOrchestrator", "Cancelled search operations through Puter.js infrastructure")
+}
+
+/**
+ * Perform a natural language search using the Perplexity Sonar model through Puter.js infrastructure
+ * This implements the intercommunication system where the main AI chat model communicates with search models using natural language only
+ */
+suspend fun performNaturalLanguageSearch(query: String, context: String = ""): SearchResults {
+    Logger.logInfo("PuterSearchOrchestrator", "Performing natural language search through Puter.js infrastructure: $query")
+    
+    return try {
+        // Send the search query to the Perplexity Sonar model through Puter.js
+        val searchResponse = searchWithPerplexitySonar(query, MODEL_SONAR_PRO)
+        
+        SearchResults(
+            query = query,
+            results = searchResponse,
+            sources = emptyList(), // Sources would be extracted from the response in a real implementation
+            timestamp = System.currentTimeMillis()
+        )
+    } catch (e: Exception) {
+        Logger.logError("PuterSearchOrchestrator", "Error performing natural language search through Puter.js infrastructure: ${e.message}", e)
+        
+        SearchResults(
+            query = query,
+            results = "",
+            sources = emptyList(),
+            timestamp = System.currentTimeMillis()
+        ).apply { error = e.message }
     }
-    
-    /**
-     * Data class representing a turn in a search conversation
-     */
-    @Serializable
-    data class SearchTurn(
-        val role: String, // "user" or "assistant"
-        val content: String,
-        val timestamp: Long = System.currentTimeMillis()
-    )
-    
-    /**
-     * Data class representing search results
-     */
-    @Serializable
-    data class SearchResults(
-        val query: String,
-        val results: String,
-        val sources: List<SearchSource> = emptyList(),
-        val timestamp: Long = System.currentTimeMillis()
-    )
-    
-    /**
-     * Data class representing a search source
-     */
-    @Serializable
-    data class SearchSource(
-        val title: String,
-        val url: String,
-        val snippet: String
-    )
+}
+
+/**
+ * Data class representing a turn in a search conversation
+ */
+@Serializable
+data class SearchTurn(
+    val role: String, // "user" or "assistant"
+    val content: String,
+    val timestamp: Long = System.currentTimeMillis()
+)
+
+/**
+ * Data class representing search results
+ */
+@Serializable
+data class SearchResults(
+    val query: String,
+    val results: String,
+    val sources: List<SearchSource> = emptyList(),
+    val timestamp: Long = System.currentTimeMillis()
+) {
+    var error: String? = null
+}
+
+/**
+ * Data class representing a search source
+ */
+@Serializable
+data class SearchSource(
+    val title: String,
+    val url: String,
+    val snippet: String
+)
 }

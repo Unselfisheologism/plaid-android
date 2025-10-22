@@ -15,13 +15,16 @@ class MyApplication : Application() {
         Logger.logInfo("MyApplication", "MyAgenticBrowser application created with Puter.js infrastructure")
         MemoryManager.logMemoryUsage()
         
+        // Initialize PuterConfigManager
+        com.yourcompany.myagenticbrowser.ai.puter.PuterConfigManager.initialize(this)
+        
         // Initialize TTS manager for voice feedback
-        com.yourcompany.myagenticbrowser.agent.voice.TTSManager.initialize(this)
+        com.yourcompany.myagenticbrowser.ai.puter.voice.TTSManager.initialize(this)
     }
 
     override fun onTerminate() {
         super.onTerminate()
         // Shutdown TTS manager when application is terminated
-        com.yourcompany.myagenticbrowser.agent.voice.TTSManager.shutdown()
+        com.yourcompany.myagenticbrowser.ai.puter.voice.TTSManager.shutdown()
     }
 }

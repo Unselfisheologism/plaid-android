@@ -18,7 +18,7 @@ import kotlinx.coroutines.*
  */
 class AiAgent private constructor(
     val context: AgentContext = AgentContext(),
-    private val puterClient: PuterClient = PuterClient(),
+    private val puterClient: PuterClient,
     private val configManager: PuterConfigManager,
     private val chatModel: ChatModel,
     private val searchModel: SearchModel,
@@ -145,9 +145,9 @@ class AiAgent private constructor(
                     // Puter.js handles all AI provider endpoints and authentication internally as required
                     try {
                         val aiResponse = puterClient.chat(
-                            webView,
-                            command,
-                            "Current context: ${context.activeTabTitle} at ${context.activeTabUrl}. Page content: ${context.pageContent.take(500)}..."
+                            webView = webView,
+                            message = command,
+                            context = "Current context: ${context.activeTabTitle} at ${context.activeTabUrl}. Page content: ${context.pageContent.take(500)}..."
                         )
                         AgentResponse.Success(aiResponse)
                     } catch (e: Exception) {
@@ -171,7 +171,7 @@ class AiAgent private constructor(
          * Puter.js handles all AI provider endpoints and authentication internally as required
          */
         fun create(context: AgentContext = AgentContext(), configManager: PuterConfigManager): AiAgent {
-            val puterClient = PuterClient()
+            val puterClient = PuterClient() // Using the default constructor
             val chatModel = com.yourcompany.myagenticbrowser.ai.puter.model.ChatModel(puterClient)
             val searchModel = com.yourcompany.myagenticbrowser.ai.puter.model.SearchModel(puterClient)
             val searchOrchestrator = PuterSearchOrchestrator(puterClient, chatModel, searchModel)
