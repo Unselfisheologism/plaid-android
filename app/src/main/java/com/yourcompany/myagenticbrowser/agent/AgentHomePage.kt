@@ -20,7 +20,6 @@ import androidx.core.content.ContextCompat
 import com.yourcompany.myagenticbrowser.R
 import com.yourcompany.myagenticbrowser.agent.voice.TTSManager
 import com.yourcompany.myagenticbrowser.ai.puter.PuterClient
-import com.yourcompany.myagenticbrowser.ai.puter.PuterConfigManager
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.coroutines.*
 
@@ -32,7 +31,6 @@ import kotlinx.coroutines.*
  */
 class AgentHomePage : AppCompatActivity() {
     private lateinit var puterClient: PuterClient
-    private lateinit var configManager: PuterConfigManager
     private var speechRecognizer: SpeechRecognizer? = null
     private var isListening = false
     
@@ -67,13 +65,12 @@ class AgentHomePage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_agent_home)
-        
         // Initialize Puter.js components
-        configManager = PuterConfigManager.getInstance(this)
-        puterClient = PuterClient(configManager)
+        puterClient = PuterClient()
         
         // Initialize speech recognizer
         initializeSpeechRecognizer()
+        
         
         // Set up UI elements
         setupUI()
@@ -117,7 +114,7 @@ class AgentHomePage : AppCompatActivity() {
         // Settings button
         val settingsButton = findViewById<Button>(R.id.settingsButton)
         settingsButton.setOnClickListener {
-            startActivity(Intent(this, com.yourcompany.myagenticbrowser.ai.puter.PuterConfigActivity::class.java))
+            // No settings activity needed since puter.js doesn't use API keys
         }
     }
     
@@ -127,8 +124,8 @@ class AgentHomePage : AppCompatActivity() {
     private fun startVoiceRecognition() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) 
             != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, 
-                arrayOf(Manifest.permission.RECORD_AUDIO), 
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.RECORD_AUDIO),
                 REQUEST_RECORD_AUDIO_PERMISSION)
             return
         }
@@ -228,7 +225,7 @@ class AgentHomePage : AppCompatActivity() {
     }
     
     companion object {
-        private const val REQUEST_VOICE_RECOGNITION = 1001
-        private const val REQUEST_RECORD_AUDIO_PERMISSION = 1002
+        const val REQUEST_VOICE_RECOGNITION = 1001
+        const val REQUEST_RECORD_AUDIO_PERMISSION = 1002
     }
 }

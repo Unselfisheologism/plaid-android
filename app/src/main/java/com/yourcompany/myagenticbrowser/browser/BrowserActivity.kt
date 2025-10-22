@@ -38,7 +38,7 @@ class BrowserActivity : AppCompatActivity() {
         
         // Initialize AI agent with context
         val agentContext = AiAgent.AgentContext()
-        aiAgent = AiAgent.create(agentContext, puterConfigManager)
+        aiAgent = AiAgent.create(agentContext)
 
         // Initialize views
         viewPager = findViewById(R.id.viewPager)
@@ -192,7 +192,7 @@ class BrowserActivity : AppCompatActivity() {
                 webView = webView
             )
             // Update the AI agent with the new context
-            AgentService.updateContext(this, agentContext)
+            AgentService.updateContext(this, webView)
         }
     }
     

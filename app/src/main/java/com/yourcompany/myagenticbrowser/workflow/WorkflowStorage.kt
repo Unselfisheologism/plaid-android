@@ -4,6 +4,7 @@ import android.content.Context
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.builtins.ListSerializer
 import java.io.File
 
 /**
@@ -30,7 +31,7 @@ object WorkflowStorage {
             }
             
             // Save to file
-            val json = Json.encodeToString(WorkflowList.serializer(), WorkflowList(workflows))
+            val json = Json.encodeToString(WorkflowList(workflows))
             context.openFileOutput(WORKFLOWS_FILE, Context.MODE_PRIVATE).use {
                 it.write(json.toByteArray())
             }
@@ -60,7 +61,7 @@ object WorkflowStorage {
         return try {
             context.openFileInput(WORKFLOWS_FILE).use { input ->
                 val json = input.bufferedReader().use { it.readText() }
-                Json.decodeFromString(WorkflowList.serializer(), json).workflows
+                Json.decodeFromString<WorkflowList>(json).workflows
             }
         } catch (e: Exception) {
             Logger.logError("WorkflowStorage", "Error loading all workflows through Puter.js infrastructure: ${e.message}", e)
@@ -86,7 +87,7 @@ object WorkflowStorage {
      */
     private fun saveAllWorkflows(context: Context, workflows: List<WorkflowEngine.Workflow>) {
         try {
-            val json = Json.encodeToString(WorkflowList.serializer(), WorkflowList(workflows))
+            val json = Json.encodeToString(WorkflowList(workflows))
             context.openFileOutput(WORKFLOWS_FILE, Context.MODE_PRIVATE).use {
                 it.write(json.toByteArray())
             }

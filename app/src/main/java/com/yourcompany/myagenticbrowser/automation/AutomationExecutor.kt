@@ -1,6 +1,7 @@
 package com.yourcompany.myagenticbrowser.automation
 
 import android.accessibilityservice.AccessibilityService
+import android.content.Context
 import android.view.accessibility.AccessibilityNodeInfo
 import com.yourcompany.myagenticbrowser.utilities.Logger
 
@@ -113,5 +114,29 @@ class AutomationExecutor(private val service: AccessibilityService) {
     sealed class ElementSelector {
         data class ByText(val text: String) : ElementSelector()
         data class ByResourceName(val resourceName: String) : ElementSelector()
+    }
+    
+    companion object {
+        private var instance: AutomationExecutor? = null
+        
+        fun initialize(service: AccessibilityService) {
+            if (instance == null) {
+                instance = AutomationExecutor(service)
+            }
+        }
+        
+        fun getInstance(): AutomationExecutor? {
+            return instance
+        }
+        
+        fun execute(service: AccessibilityService, workflow: AutomationWorkflow): Boolean {
+            val executor = AutomationExecutor(service)
+            return executor.executeWorkflow(workflow)
+        }
+        
+        fun add(workflow: AutomationWorkflow) {
+            // In a real implementation, this would add the workflow to a queue
+            Logger.logInfo("AutomationExecutor", "Adding workflow to queue: ${workflow.name}")
+        }
     }
 }

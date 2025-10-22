@@ -10,7 +10,6 @@ import com.yourcompany.myagenticbrowser.R
 import com.yourcompany.myagenticbrowser.agent.AiAgent
 import com.yourcompany.myagenticbrowser.agent.AgentService
 import com.yourcompany.myagenticbrowser.ai.puter.PuterClient
-import com.yourcompany.myagenticbrowser.ai.puter.PuterConfigManager
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.coroutines.*
 
@@ -20,7 +19,6 @@ import kotlinx.coroutines.*
  */
 class ChatPopupFragment : Fragment() {
     private lateinit var puterClient: PuterClient
-    private lateinit var configManager: PuterConfigManager
     private lateinit var chatMessagesContainer: LinearLayout
     private lateinit var userMessageTextView: TextView
     private lateinit var aiTitleTextView: TextView

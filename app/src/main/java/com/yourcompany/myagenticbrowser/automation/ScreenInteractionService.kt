@@ -245,7 +245,7 @@ class ScreenInteractionService : AccessibilityService() {
                 .addStroke(strokeDescription)
                 .build()
             
-            dispatchGesture(gestureStart, object : android.accessibilityservice.GestureResultCallback() {
+            dispatchGesture(gestureStart, object : android.accessibilityservice.AccessibilityService.GestureResultCallback() {
                 override fun onCompleted(gestureDescription: android.accessibilityservice.GestureDescription?) {
                     Logger.logInfo("ScreenInteractionService", "Swipe gesture completed successfully")
                 }

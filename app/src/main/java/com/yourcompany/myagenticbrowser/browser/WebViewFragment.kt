@@ -157,7 +157,7 @@ class WebViewFragment : Fragment() {
                                 pageContent = extractedContent,
                                 webView = webView
                             )
-                            AgentService.updateContext(requireContext(), context)
+                            AgentService.updateContext(requireContext(), webView)
                         } catch (e: Exception) {
                             Logger.logError("WebViewFragment", "Error extracting page context through Puter.js: ${e.message}")
                             
@@ -169,7 +169,7 @@ class WebViewFragment : Fragment() {
                                 pageContent = "",
                                 webView = webView
                             )
-                            AgentService.updateContext(requireContext(), context)
+                            AgentService.updateContext(requireContext(), webView)
                         }
                     }
                 )

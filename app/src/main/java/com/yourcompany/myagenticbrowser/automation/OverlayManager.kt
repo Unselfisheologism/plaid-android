@@ -54,28 +54,6 @@ class OverlayManager(private val context: Context) {
                 if (overlayView?.parent == null) {
                     windowManager?.addView(overlayView, layoutParams)
                 }
-                
-                companion object {
-                    private var instance: OverlayManager? = null
-                    
-                    fun initialize(context: Context) {
-                        if (instance == null) {
-                            instance = OverlayManager(context)
-                            instance?.initializeOverlay()
-                        }
-                    }
-                    
-                    fun show(context: Context, message: String) {
-                        if (instance == null) {
-                            initialize(context)
-                        }
-                        instance?.showOverlay()
-                    }
-                    
-                    fun hide(context: Context) {
-                        instance?.hideOverlay()
-                    }
-                }
             }
         } catch (e: Exception) {
             Logger.logError("OverlayManager", "Error showing overlay", e)
@@ -90,6 +68,36 @@ class OverlayManager(private val context: Context) {
             }
         } catch (e: Exception) {
             Logger.logError("OverlayManager", "Error hiding overlay", e)
+        }
+    }
+    
+    fun getDebugInfo(): String {
+        return "OverlayManager ready"
+    }
+    
+    companion object {
+        private var instance: OverlayManager? = null
+        
+        fun initialize(context: Context) {
+            if (instance == null) {
+                instance = OverlayManager(context)
+                instance?.initializeOverlay()
+            }
+        }
+        
+        fun show(context: Context) {
+            if (instance == null) {
+                initialize(context)
+            }
+            instance?.showOverlay()
+        }
+        
+        fun hide(context: Context) {
+            instance?.hideOverlay()
+        }
+        
+        fun getDebugInfo(): String {
+            return instance?.getDebugInfo() ?: "OverlayManager not initialized"
         }
     }
 }

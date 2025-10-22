@@ -15,9 +15,6 @@ class MyApplication : Application() {
         Logger.logInfo("MyApplication", "MyAgenticBrowser application created with Puter.js infrastructure")
         MemoryManager.logMemoryUsage()
         
-        // Initialize PuterConfigManager
-        com.yourcompany.myagenticbrowser.ai.puter.PuterConfigManager.initialize(this)
-        
         // Initialize TTS manager for voice feedback
         com.yourcompany.myagenticbrowser.ai.puter.voice.TTSManager.initialize(this)
     }

@@ -18,8 +18,6 @@ import kotlin.coroutines.resume
  * No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used
  */
 class PuterClient {
-    // Default constructor for use when a PuterClient is needed without specific parameters
-    constructor()
     companion object {
         private const val PUTER_JS_URL = "https://js.puter.com/v2/"
     }
@@ -99,29 +97,6 @@ class PuterClient {
         // In a real implementation, this would need to be called from a context that has access to a WebView
         throw IllegalStateException("This method requires a WebView instance to communicate with Puter.js. Use the search(webView, query, model) method instead.")
     }
-        Logger.logInfo("PuterClient", "Performing web search through Puter.js infrastructure with Perplexity Sonar model: $model. Query: $query. All AI capabilities route through Puter.js as required. No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used. Puter.js handles all AI provider endpoints and authentication internally.")
-        
-        return try {
-            // Formulate the search query for the Perplexity Sonar model
-            val searchPrompt = "Search the web for: $query"
-            
-            // Send the search query to the Perplexity Sonar model through Puter.js
-            val searchResponse = chat(
-                webView = webView,
-                message = searchPrompt,
-                model = model
-            )
-            
-            Logger.logInfo("PuterClient", "Web search completed through Puter.js infrastructure. Response: $searchResponse")
-            searchResponse
-        } catch (e: Exception) {
-            Logger.logError("PuterClient", "Error performing web search through Puter.js infrastructure: ${e.message}", e)
-            throw e
-        }
-    }
-
-    // Duplicate function removed - keeping the first implementation above
-
     /**
      * Generate text-to-image using Puter.js infrastructure
      * This uses the actual Puter.js JavaScript library loaded in the WebView

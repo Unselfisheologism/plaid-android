@@ -15,7 +15,7 @@ class TTSManager(context: Context) {
                 isInitialized = true
                 Logger.logInfo("TTSManager", "TextToSpeech initialized successfully")
             } else {
-                Logger.logError("TSManager", "Failed to initialize TextToSpeech")
+                Logger.logError("TTSManager", "Failed to initialize TextToSpeech")
             }
         }
     }
@@ -25,7 +25,7 @@ class TTSManager(context: Context) {
             textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "TTSManager")
             Logger.logInfo("TTSManager", "Speaking: $text")
         } else {
-            Logger.logError("TSManager", "TextToSpeech not initialized")
+            Logger.logError("TTSManager", "TextToSpeech not initialized")
         }
     }
 
@@ -36,7 +36,7 @@ class TTSManager(context: Context) {
 
     fun shutdown() {
         textToSpeech?.shutdown()
-        Logger.logInfo("TTSManager", "TS shutdown")
+        Logger.logInfo("TTSManager", "TTS shutdown")
     }
 
     fun setLanguage(locale: Locale): Int {
@@ -50,7 +50,7 @@ class TTSManager(context: Context) {
     fun setPitch(pitch: Float) {
         textToSpeech?.setPitch(pitch)
     }
-
+    
     companion object {
         private var instance: TTSManager? = null
 
@@ -71,6 +71,10 @@ class TTSManager(context: Context) {
 
         fun speak(text: String) {
             instance?.speak(text)
+        }
+        
+        fun getDebugInfo(): String {
+            return "TTSManager ready"
         }
     }
 }
