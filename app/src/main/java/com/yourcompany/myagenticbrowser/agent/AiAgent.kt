@@ -100,8 +100,9 @@ class AiAgent private constructor(
                         "Current context: ${context.activeTabTitle} at ${context.activeTabUrl}"
                     )
                     
-                    if (searchResults.error != null) {
-                        AgentResponse.Error(searchResults.error)
+                    val error = searchResults.error
+                    if (error != null) {
+                        AgentResponse.Error(error)
                     } else {
                         val formattedResults = formatSearchResults(searchResults)
                         AgentResponse.RequiresSearch(command, formattedResults)
@@ -195,18 +196,9 @@ class AiAgent private constructor(
             return "No search results found."
         }
         
-        val formatted = StringBuilder("Search Results:\n\n")
-        results.results.forEachIndexed { index, result ->
-            formatted.append("${index + 1}. ${result.title}\n")
-            // Limit description length to avoid overly long responses
-            val description = if (result.description.length > 500) {
-                result.description.substring(0, 500) + "..."
-            } else {
-                result.description
-            }
-            formatted.append("   ${description}\n\n")
-        }
-        return formatted.toString()
+        // The results string from Puter.js contains the formatted search results
+        // We can return it as is or add some additional formatting
+        return "Search Results:\n\n${results.results}"
     }
     
     /**

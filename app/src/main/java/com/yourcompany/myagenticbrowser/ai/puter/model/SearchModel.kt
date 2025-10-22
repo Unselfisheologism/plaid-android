@@ -15,9 +15,10 @@ class SearchModel(private val puterClient: PuterClient) {
     suspend fun performSearch(query: String, context: String? = null): String {
         Logger.logInfo("SearchModel", "Performing search through Puter.js: $query")
         // This would use the puterClient to perform the search via Puter.js
-        return if (webView != null) {
+        val currentWebView = webView
+        return if (currentWebView != null) {
             puterClient.search(
-                webView = webView,
+                webView = currentWebView,
                 query = query,
                 model = "openrouter:perplexity/sonar-pro" // Default Perplexity Sonar model
             )

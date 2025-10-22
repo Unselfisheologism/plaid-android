@@ -36,7 +36,7 @@ class PuterClient {
     ): String = withContext(Dispatchers.Main) {
         Logger.logInfo("PuterClient", "Sending chat message through Puter.js infrastructure: $message. All AI capabilities route through Puter.js as required. No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used. Puter.js handles all AI provider endpoints and authentication internally.")
         
-        return try {
+        try {
             // First verify authentication
             ensureAuthenticated(webView)
             
@@ -70,7 +70,7 @@ class PuterClient {
     ): String = withContext(Dispatchers.Main) {
         Logger.logInfo("PuterClient", "Performing web search through Puter.js infrastructure with Perplexity Sonar model: $model. Query: $query. All AI capabilities route through Puter.js as required. No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used. Puter.js handles all AI provider endpoints and authentication internally.")
         
-        return try {
+        try {
             // Formulate the search query for the Perplexity Sonar model
             val searchPrompt = "Search the web for: $query"
             
@@ -104,7 +104,7 @@ class PuterClient {
      * No direct API calls to Stable Diffusion, DALL-E, or other image generation services
      */
     suspend fun textToImage(webView: WebView?, prompt: String, testMode: Boolean = false): String = withContext(Dispatchers.Main) {
-        return if (webView != null) {
+        if (webView != null) {
             // First verify authentication
             ensureAuthenticated(webView)
             
@@ -130,7 +130,7 @@ class PuterClient {
      * According to requirements, all AI capabilities route through Puter.js infrastructure
      */
     suspend fun imageToText(webView: WebView?, imageUrl: String, testMode: Boolean = false): String = withContext(Dispatchers.Main) {
-        return if (webView != null) {
+        if (webView != null) {
             // First verify authentication
             ensureAuthenticated(webView)
             
@@ -156,7 +156,7 @@ class PuterClient {
      * According to requirements, all AI capabilities route through Puter.js infrastructure
      */
     suspend fun textToSpeech(webView: WebView?, text: String, language: String = "en-US", voice: String = "Joanna", engine: String = "standard"): String = withContext(Dispatchers.Main) {
-        return if (webView != null) {
+        if (webView != null) {
             // First verify authentication
             ensureAuthenticated(webView)
             

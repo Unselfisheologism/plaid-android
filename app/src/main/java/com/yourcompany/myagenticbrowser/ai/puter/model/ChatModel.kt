@@ -15,9 +15,10 @@ class ChatModel(private val puterClient: PuterClient) {
     suspend fun sendMessage(message: String, context: String? = null): String {
         Logger.logInfo("ChatModel", "Sending message to Puter.js: $message")
         // This would use the puterClient to send the message to Puter.js
-        return if (webView != null) {
+        val currentWebView = webView
+        return if (currentWebView != null) {
             puterClient.chat(
-                webView = webView,
+                webView = currentWebView,
                 message = message,
                 context = context
             )

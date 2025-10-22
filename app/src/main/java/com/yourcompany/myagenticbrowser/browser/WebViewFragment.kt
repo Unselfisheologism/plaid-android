@@ -45,7 +45,7 @@ class WebViewFragment : Fragment() {
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate()
+        super.onCreate(savedInstanceState)
         arguments?.let {
             currentUrl = it.getString(ARG_URL) ?: "https://www.google.com"
             position = it.getInt(ARG_POSITION, -1)

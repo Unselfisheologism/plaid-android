@@ -14,7 +14,10 @@ import com.yourcompany.myagenticbrowser.utilities.Logger
  */
 class AutomationActiveIndicatorActivity : AppCompatActivity() {
     
-    private lateinit var dotsIndicator: TextView
+    private lateinit var dot1: View
+    private lateinit var dot2: View
+    private lateinit var dot3: View
+    private lateinit var dot4: View
     private val handler = Handler(Looper.getMainLooper())
     private var dotsAnimationRunnable: Runnable? = null
     private var dotsCount = 0
@@ -30,15 +33,43 @@ class AutomationActiveIndicatorActivity : AppCompatActivity() {
     }
     
     private fun setupViews() {
-        dotsIndicator = findViewById(R.id.dotsIndicator)
+        dot1 = findViewById(R.id.dot1)
+        dot2 = findViewById(R.id.dot2)
+        dot3 = findViewById(R.id.dot3)
+        dot4 = findViewById(R.id.dot4)
     }
     
     private fun startDotsAnimation() {
         dotsAnimationRunnable = object : Runnable {
             override fun run() {
-                dotsCount = (dotsCount + 1) % 4
-                val dots = ".".repeat(dotsCount)
-                dotsIndicator.text = dots
+                // Cycle through visibility states for the dots to create animation
+                when (dotsCount % 4) {
+                    0 -> {
+                        dot1.visibility = View.VISIBLE
+                        dot2.visibility = View.GONE
+                        dot3.visibility = View.GONE
+                        dot4.visibility = View.GONE
+                    }
+                    1 -> {
+                        dot1.visibility = View.VISIBLE
+                        dot2.visibility = View.VISIBLE
+                        dot3.visibility = View.GONE
+                        dot4.visibility = View.GONE
+                    }
+                    2 -> {
+                        dot1.visibility = View.VISIBLE
+                        dot2.visibility = View.VISIBLE
+                        dot3.visibility = View.VISIBLE
+                        dot4.visibility = View.GONE
+                    }
+                    3 -> {
+                        dot1.visibility = View.VISIBLE
+                        dot2.visibility = View.VISIBLE
+                        dot3.visibility = View.VISIBLE
+                        dot4.visibility = View.VISIBLE
+                    }
+                }
+                dotsCount++
                 
                 // Schedule the next update
                 handler.postDelayed(this, 500) // Update every 500ms

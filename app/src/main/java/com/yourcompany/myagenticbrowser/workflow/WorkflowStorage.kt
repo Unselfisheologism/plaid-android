@@ -1,7 +1,9 @@
 package com.yourcompany.myagenticbrowser.workflow
 
 import android.content.Context
+import android.os.Parcelable
 import com.yourcompany.myagenticbrowser.utilities.Logger
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.builtins.ListSerializer
@@ -99,6 +101,7 @@ object WorkflowStorage {
     /**
      * Serialization classes
      */
+    @Parcelize
     @Serializable
-    data class WorkflowList(val workflows: List<WorkflowEngine.Workflow>)
+    data class WorkflowList(val workflows: List<WorkflowEngine.Workflow>) : Parcelable
 }

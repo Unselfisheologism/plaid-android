@@ -10,6 +10,7 @@ import com.yourcompany.myagenticbrowser.R
 import com.yourcompany.myagenticbrowser.agent.AiAgent
 import com.yourcompany.myagenticbrowser.agent.AgentService
 import com.yourcompany.myagenticbrowser.ai.puter.PuterClient
+import com.yourcompany.myagenticbrowser.ai.puter.PuterConfigManager
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.coroutines.*
 
@@ -26,6 +27,7 @@ class ChatPopupFragment : Fragment() {
     private lateinit var aiResponseTextView: TextView
     private lateinit var followUpInput: EditText
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private lateinit var configManager: PuterConfigManager
 
     override fun onCreateView(
         inflater: LayoutInflater,

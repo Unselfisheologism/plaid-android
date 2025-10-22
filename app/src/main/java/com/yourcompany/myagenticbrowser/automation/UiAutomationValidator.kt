@@ -46,7 +46,7 @@ object UiAutomationValidator {
         
         // Validate AutomationExecutor
         try {
-            val automationExecutor = AutomationExecutor(context)
+            val automationExecutor = AutomationExecutor(ScreenInteractionService.instance ?: throw IllegalStateException("ScreenInteractionService not available"))
             val executorDebugInfo = automationExecutor.getDebugInfo()
             val executorValid = executorDebugInfo.contains("initialized")
             results.add(
@@ -68,7 +68,7 @@ object UiAutomationValidator {
         
         // Validate OverlayManager
         try {
-            OverlayManager.show(context, "Test overlay")
+            OverlayManager.show(context)
             results.add(
                 ValidationResult.ComponentResult(
                     name = "OverlayManager",
@@ -76,8 +76,7 @@ object UiAutomationValidator {
                     message = "OverlayManager working properly"
                 )
             )
-            // Hide the test overlay
-            OverlayManager.hide(context)
+            // Overlay test completed
         } catch (e: Exception) {
             results.add(
                 ValidationResult.ComponentResult(

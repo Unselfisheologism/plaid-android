@@ -1,11 +1,13 @@
 package com.yourcompany.myagenticbrowser.workflow
 
 import android.content.Context
+import android.os.Parcelable
 import com.yourcompany.myagenticbrowser.ai.puter.PuterClient
 import com.yourcompany.myagenticbrowser.ai.puter.model.ChatModel
 import com.yourcompany.myagenticbrowser.browser.cookies.CookieManager
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.coroutines.*
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -161,21 +163,30 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
      * Workflow result types
      */
     sealed class WorkflowResult {
-        data class Success(val message: String) : WorkflowResult()
-        data class Failure(val errorMessage: String) : WorkflowResult()
+        data class Success(val message: String) : WorkflowResult() {
+            val success: Boolean = true
+        }
+        data class Failure(val errorMessage: String) : WorkflowResult() {
+            val success: Boolean = false
+        }
     }
     
     /**
      * Node result types
      */
     sealed class NodeResult {
-        data class Success(val message: String) : NodeResult()
-        data class Failure(val errorMessage: String) : NodeResult()
+        data class Success(val message: String) : NodeResult() {
+            val success: Boolean = true
+        }
+        data class Failure(val errorMessage: String) : NodeResult() {
+            val success: Boolean = false
+        }
     }
     
     /**
      * Workflow data class
      */
+    @Parcelize
     @Serializable
     data class Workflow(
         val id: String,
@@ -183,25 +194,29 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
         val description: String,
         val nodes: List<WorkflowNode>,
         val updatedAt: Long = System.currentTimeMillis()
-    )
+    ) : Parcelable
     
     /**
      * Base workflow node class
      */
+    @Parcelize
     @Serializable
-    sealed class WorkflowNode {
+    sealed class WorkflowNode : Parcelable {
+        @Parcelize
         @Serializable
         data class NotionNode(
             val action: String,
             val params: Map<String, String>
         ) : WorkflowNode()
         
+        @Parcelize
         @Serializable
         data class GmailNode(
             val action: String,
             val params: Map<String, String>
         ) : WorkflowNode()
         
+        @Parcelize
         @Serializable
         data class WebAutomationNode(
             val action: String,

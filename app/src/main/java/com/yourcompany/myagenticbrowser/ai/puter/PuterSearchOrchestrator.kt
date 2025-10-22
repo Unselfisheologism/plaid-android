@@ -1,8 +1,10 @@
 package com.yourcompany.myagenticbrowser.ai.puter
 
+import android.os.Parcelable
 import android.webkit.WebView
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.coroutines.*
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 
@@ -59,7 +61,7 @@ class PuterSearchOrchestrator(
             
             // Send the search query to the Perplexity Sonar model through Puter.js
             val searchResponse = puterClient.chat(
-                webView = null, // We're not using WebView for the search itself
+                webView = webView ?: throw IllegalArgumentException("WebView is required for chat operations"),
                 message = searchPrompt,
                 context = null, // Context is embedded in the prompt
                 model = model
@@ -89,7 +91,7 @@ class PuterSearchOrchestrator(
         
         return try {
             // Send the search query to the Perplexity Sonar model through Puter.js
-            val searchResponse = puterClient.search(
+            val searchResponse = puterClient.searchWithPerplexitySonar(
                 query = query,
                 model = model
             )
@@ -146,6 +148,7 @@ class PuterSearchOrchestrator(
      */
     suspend fun multiTurnSearch(
         conversation: List<SearchTurn>,
+        webView: WebView? = null,
         model: String = MODEL_SONAR_PRO
     ): List<SearchTurn> {
         Logger.logInfo("PuterSearchOrchestrator", "Performing multi-turn search conversation through Puter.js infrastructure with Perplexity Sonar model: $model")
@@ -158,7 +161,7 @@ class PuterSearchOrchestrator(
             
             // Send the conversation to the Perplexity Sonar model
             val response = puterClient.chat(
-                webView = null,
+                webView = webView ?: throw IllegalArgumentException("WebView is required for chat operations"),
                 message = conversationHistory,
                 context = null,
                 model = model
@@ -211,7 +214,7 @@ class PuterSearchOrchestrator(
  * Perform a natural language search using the Perplexity Sonar model through Puter.js infrastructure
  * This implements the intercommunication system where the main AI chat model communicates with search models using natural language only
  */
-suspend fun performNaturalLanguageSearch(query: String, context: String = ""): SearchResults {
+suspend fun PuterSearchOrchestrator.performNaturalLanguageSearch(query: String, context: String = ""): SearchResults {
     Logger.logInfo("PuterSearchOrchestrator", "Performing natural language search through Puter.js infrastructure: $query")
     
     return try {
@@ -239,33 +242,36 @@ suspend fun performNaturalLanguageSearch(query: String, context: String = ""): S
 /**
  * Data class representing a turn in a search conversation
  */
+@Parcelize
 @Serializable
 data class SearchTurn(
     val role: String, // "user" or "assistant"
     val content: String,
     val timestamp: Long = System.currentTimeMillis()
-)
+) : Parcelable
 
 /**
  * Data class representing search results
  */
+@Parcelize
 @Serializable
 data class SearchResults(
     val query: String,
     val results: String,
     val sources: List<SearchSource> = emptyList(),
     val timestamp: Long = System.currentTimeMillis()
-) {
+) : Parcelable {
     var error: String? = null
 }
 
 /**
  * Data class representing a search source
  */
+@Parcelize
 @Serializable
 data class SearchSource(
     val title: String,
     val url: String,
     val snippet: String
-)
+) : Parcelable
 }

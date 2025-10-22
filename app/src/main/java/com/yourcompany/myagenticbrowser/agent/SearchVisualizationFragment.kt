@@ -120,7 +120,7 @@ class SearchVisualizationFragment : Fragment() {
         activity?.runOnUiThread {
             val turnLayout = LinearLayout(context).apply {
                 orientation = LinearLayout.VERTICAL
-                setPadding(16, 16)
+                setPadding(16, 16, 16, 16)
             }
             
             val roleTextView = TextView(context).apply {

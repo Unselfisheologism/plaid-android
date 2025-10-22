@@ -16,7 +16,7 @@ object UiAutomationTestHelper {
         Logger.logInfo("UiAutomationTestHelper", "Starting comprehensive UI automation test")
         
         try {
-            val automationExecutor = AutomationExecutor(context)
+            val automationExecutor = AutomationExecutor(ScreenInteractionService.instance ?: throw IllegalStateException("ScreenInteractionService not available"))
             
             // Test 1: Basic click workflow
             val clickTestWorkflow = createClickTestWorkflow()

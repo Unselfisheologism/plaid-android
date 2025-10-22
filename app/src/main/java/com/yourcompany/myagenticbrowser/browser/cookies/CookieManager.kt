@@ -10,7 +10,11 @@ object CookieManager {
     init {
         cookieManager.setAcceptCookie(true)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            cookieManager.setAcceptThirdPartyCookies(WebView(null), true)
+            // We need a context to create a WebView, but we'll defer this to when we have a context
+            // For now, we'll just set accept third party cookies without a WebView reference
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                cookieManager.setAcceptThirdPartyCookies(null)
+            }
         }
     }
     
@@ -93,8 +97,10 @@ object CookieManager {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             cookieManager.flush()
         } else {
-            @Suppress("DEPRECATION")
-            cookieManager.removeExpiredCookies()
+            // On older Android versions, we just flush the cookies
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                cookieManager.flush()
+            }
         }
     }
     
