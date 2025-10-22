@@ -3,6 +3,7 @@ package com.yourcompany.myagenticbrowser.ui
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.yourcompany.myagenticbrowser.R

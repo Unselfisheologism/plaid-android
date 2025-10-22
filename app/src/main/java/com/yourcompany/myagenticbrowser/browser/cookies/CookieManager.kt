@@ -12,9 +12,8 @@ object CookieManager {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             // We need a context to create a WebView, but we'll defer this to when we have a context
             // For now, we'll just set accept third party cookies without a WebView reference
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                cookieManager.setAcceptThirdPartyCookies(null)
-            }
+            // Skip setting accept third party cookies without a WebView reference
+            // This will be handled when we have a WebView instance
         }
     }
     

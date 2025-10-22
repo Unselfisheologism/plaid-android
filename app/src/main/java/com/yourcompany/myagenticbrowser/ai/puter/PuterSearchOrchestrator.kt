@@ -206,8 +206,9 @@ class PuterSearchOrchestrator(
      * Cancel any ongoing search operations
      */
     fun cancel() {
-        scope.cancel()
-        Logger.logInfo("PuterSearchOrchestrator", "Cancelled search operations through Puter.js infrastructure")
+       scope.cancel()
+       Logger.logInfo("PuterSearchOrchestrator", "Cancelled search operations through Puter.js infrastructure")
+   }
 }
 
 /**
