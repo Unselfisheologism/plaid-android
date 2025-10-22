@@ -1,5 +1,5 @@
 @rem
-@rem Copyright © 2015 the original author or authors.
+@rem Copyright 2015 the original author or authors.
 @rem
 @rem Licensed under the Apache License, Version 2.0 (the "License");
 @rem you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 @if "%DEBUG%" == "" @echo off
 @rem ##########################################################################
 @rem
-@rem Gradle startup script for Windows
+@rem  Gradle startup script for Windows
 @rem
 @rem ##########################################################################
 

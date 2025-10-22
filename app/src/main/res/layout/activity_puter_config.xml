@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:text="Note: No API key is required. Puter.js handles authentication automatically through browser-based authentication when you use its features."
         android:textSize="14sp"
-        android:textColor="#66666"
+        android:textColor="#666666"
         android:layout_marginTop="16dp" />
 
 </LinearLayout>
