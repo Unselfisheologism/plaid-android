@@ -11,7 +11,6 @@ import com.yourcompany.myagenticbrowser.R
 import com.yourcompany.myagenticbrowser.agent.AiAgent
 import com.yourcompany.myagenticbrowser.agent.AgentService
 import com.yourcompany.myagenticbrowser.ai.puter.PuterClient
-import com.yourcompany.myagenticbrowser.ai.puter.PuterConfigManager
 import com.yourcompany.myagenticbrowser.browser.BrowserActivity
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.coroutines.*
@@ -22,7 +21,6 @@ import kotlinx.coroutines.*
  */
 class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var puterClient: PuterClient
-    private lateinit var configManager: PuterConfigManager
     private lateinit var chatMessagesContainer: LinearLayout
     private lateinit var userMessageTextView: TextView
     private lateinit var aiTitleTextView: TextView
@@ -39,7 +37,6 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
         val view = inflater.inflate(R.layout.chat_popup_layout, container, false)
 
         // Initialize Puter.js components
-        configManager = PuterConfigManager.getInstance(requireContext())
         puterClient = PuterClient()
 
         // Set up UI elements

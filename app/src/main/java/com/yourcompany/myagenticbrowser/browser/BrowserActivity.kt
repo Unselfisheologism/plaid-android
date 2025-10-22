@@ -9,12 +9,10 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.appbar.MaterialToolbar
 import com.yourcompany.myagenticbrowser.R
-import com.yourcompany.myagenticbrowser.ai.puter.PuterConfigActivity
 import com.yourcompany.myagenticbrowser.browser.tab.TabManager
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import com.yourcompany.myagenticbrowser.utilities.MemoryManager
 import com.yourcompany.myagenticbrowser.agent.AiAgent
-import com.yourcompany.myagenticbrowser.ai.puter.PuterConfigManager
 import com.yourcompany.myagenticbrowser.agent.AgentService
 import com.yourcompany.myagenticbrowser.agent.SearchVisualizationActivity
 import com.yourcompany.myagenticbrowser.ui.ChatBottomSheetFragment
@@ -25,7 +23,6 @@ class BrowserActivity : AppCompatActivity() {
     lateinit var tabManager: TabManager
     private lateinit var toolbar: MaterialToolbar
     private lateinit var aiAgent: AiAgent
-    private lateinit var puterConfigManager: PuterConfigManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +31,6 @@ class BrowserActivity : AppCompatActivity() {
         Logger.logInfo("BrowserActivity", "Creating BrowserActivity")
 
         // Initialize managers
-        puterConfigManager = PuterConfigManager.getInstance(this)
         
         // Initialize AI agent with context
         val agentContext = AiAgent.AgentContext()
@@ -144,7 +140,8 @@ class BrowserActivity : AppCompatActivity() {
                 true
             }
             R.id.action_puter_config -> {
-                startActivity(Intent(this, PuterConfigActivity::class.java))
+                // Removed PuterConfigActivity reference as it's no longer needed
+                // Puter.js handles authentication automatically
                 true
             }
             R.id.action_agent_home -> {

@@ -234,8 +234,9 @@ suspend fun PuterSearchOrchestrator.performNaturalLanguageSearch(query: String, 
             query = query,
             results = "",
             sources = emptyList(),
-            timestamp = System.currentTimeMillis()
-        ).apply { error = e.message }
+            timestamp = System.currentTimeMillis(),
+            error = e.message
+        )
     }
 }
 
@@ -259,9 +260,12 @@ data class SearchResults(
     val query: String,
     val results: String,
     val sources: List<SearchSource> = emptyList(),
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val error: String? = null
 ) : Parcelable {
-    var error: String? = null
+    
+    // Create a copy with error method to maintain immutability
+    fun copyWithError(error: String?) = copy(error = error)
 }
 
 /**

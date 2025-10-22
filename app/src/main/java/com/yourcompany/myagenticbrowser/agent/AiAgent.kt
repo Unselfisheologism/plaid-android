@@ -95,14 +95,13 @@ class AiAgent private constructor(
                     // Use the search orchestrator for natural language search through Puter.js infrastructure
                     // This implements the Perplexity Sonar model intercommunication system requirement
                     // where the main AI chat model communicates with search models using natural language only
-                    val searchResults = searchOrchestrator.performNaturalLanguageSearch(
+                    val searchResults = this@AiAgent.searchOrchestrator.performNaturalLanguageSearch(
                         command,
                         "Current context: ${context.activeTabTitle} at ${context.activeTabUrl}"
                     )
                     
-                    val error = searchResults.error
-                    if (error != null) {
-                        AgentResponse.Error(error)
+                    if (searchResults.error != null) {
+                        AgentResponse.Error(searchResults.error!!)
                     } else {
                         val formattedResults = formatSearchResults(searchResults)
                         AgentResponse.RequiresSearch(command, formattedResults)

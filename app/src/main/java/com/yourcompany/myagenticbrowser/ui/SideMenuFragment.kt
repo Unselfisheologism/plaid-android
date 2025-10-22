@@ -11,7 +11,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.yourcompany.myagenticbrowser.R
 import com.yourcompany.myagenticbrowser.agent.AgentHomePage
 import com.yourcompany.myagenticbrowser.agent.SearchVisualizationActivity
-import com.yourcompany.myagenticbrowser.ai.puter.PuterConfigActivity
 import com.yourcompany.myagenticbrowser.browser.BrowserActivity
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import com.yourcompany.myagenticbrowser.ui.WorkflowActivity
@@ -95,7 +94,8 @@ class SideMenuFragment : BottomSheetDialogFragment() {
 
     private fun openSettingsActivity() {
         // In a real implementation, this would open the settings activity
-        activity?.startActivity(Intent(context, PuterConfigActivity::class.java))
+        // Removed PuterConfigActivity reference as it's no longer needed
+        // Puter.js handles authentication automatically
         Logger.logInfo("SideMenuFragment", "Settings menu item selected")
     }
 

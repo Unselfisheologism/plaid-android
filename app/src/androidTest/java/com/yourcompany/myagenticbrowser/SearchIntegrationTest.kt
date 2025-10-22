@@ -3,7 +3,6 @@ package com.yourcompany.myagenticbrowser
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.yourcompany.myagenticbrowser.ai.puter.PuterClient
-import com.yourcompany.myagenticbrowser.ai.puter.PuterConfigManager
 import com.yourcompany.myagenticbrowser.ai.puter.PuterSearchOrchestrator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -71,10 +70,10 @@ class SearchIntegrationTest {
     fun testSearchOrchestratorInitialization() {
         // Context of the app under test
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+        assertEquals("com.yourcompany.myagenticbrowser", appContext.packageName)
         
         // Test that we can create a PuterSearchOrchestrator
-        val configManager = PuterConfigManager.getInstance(appContext)
-        val puterClient = PuterClient(configManager)
+        val puterClient = PuterClient()
         val searchOrchestrator = PuterSearchOrchestrator(puterClient)
         
         assertNotNull(searchOrchestrator)

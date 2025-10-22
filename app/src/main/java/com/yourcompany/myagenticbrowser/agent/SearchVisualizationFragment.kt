@@ -8,7 +8,6 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import com.yourcompany.myagenticbrowser.R
 import com.yourcompany.myagenticbrowser.ai.puter.PuterClient
-import com.yourcompany.myagenticbrowser.ai.puter.PuterConfigManager
 import com.yourcompany.myagenticbrowser.ai.puter.PuterSearchOrchestrator
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.coroutines.*
@@ -22,7 +21,6 @@ import kotlinx.coroutines.*
  */
 class SearchVisualizationFragment : Fragment() {
     private lateinit var puterClient: PuterClient
-    private lateinit var configManager: PuterConfigManager
     private lateinit var searchOrchestrator: PuterSearchOrchestrator
     private lateinit var conversationContainer: LinearLayout
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -35,7 +33,6 @@ class SearchVisualizationFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_search_visualization, container, false)
         
         // Initialize Puter.js components
-        configManager = PuterConfigManager.getInstance(requireContext())
         puterClient = PuterClient()
         searchOrchestrator = PuterSearchOrchestrator(puterClient)
         
