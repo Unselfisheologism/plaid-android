@@ -32,16 +32,20 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # Fix gradlew line endings and permissions
-      - name: Fix gradlew line endings and permissions
+      # Clean up any backup files that might interfere with the build
+      - name: Clean up backup files
         run: |
+          # Remove any backup files that might interfere with the build
+          find . -name "*.bak" -type f -delete || true
+          find . -name "*~" -type f -delete || true
+          
           # Fix any existing gradlew file to ensure proper Unix line endings
           sed -i 's/\r$//' gradlew
           chmod +x gradlew
 
-      # Compile the apk
-      - name: Generate Debug APK
-        run: ./gradlew assembleDebug
+      # Clean and compile the apk
+      - name: Clean and Generate Debug APK
+        run: ./gradlew clean assembleDebug
 
       # Upload the action artifact
       - name: Upload Debug APK (artifact)
@@ -52,7 +56,7 @@ jobs:
 
       # Generate Release APK (without signing for now)
       - name: Generate Release APK
-        run: ./gradlew assembleRelease
+        run: ./gradlew clean assembleRelease
 
       # Upload Release APK
       - name: Upload Release APK (artifact)
