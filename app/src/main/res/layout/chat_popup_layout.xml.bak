@@ -38,7 +38,7 @@
                 android:background="#E3F2FD"
                 android:padding="12dp"
                 android:layout_marginBottom="8dp"
-                android:text="USER &lt;- user's message to the AI"
+                android:text="USER <- user's message to the AI"
                 android:textSize="14sp" />
 
             <!-- AI response title -->
