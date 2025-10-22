@@ -190,39 +190,12 @@ then
     die "xargs is not available"
 fi
 
-# Use "xargs" to parse quoted args.
-#
-# With -n1 it outputs one arg per line, with the quotes and backslashes removed.
-#
-# In Bash we could simply go:
-#
-#   readarray ARGS < <( xargs -n1 <<<"$var" ) &&
-#   set -- "${ARGS[@]}" "$@"
-#
-# but POSIX shell has neither readarray nor <<<.
-#
-# In both Bash and POSIX shell, we could use xargs -n1 followed by a while loop
-# to read each arg one at a time, but that's slow.
-#
-# Instead, we convert spaces to newlines and then use "tr" to convert back to spaces.
-# This preserves quoted whitespace and backslashes, but splits on unquoted spaces.
-# We use "tr '\n' ' '" to convert newlines back to spaces.
-# Finally, we use "xargs printf '%s\n'" to remove any trailing newline.
-# This ensures that the final argument list is correctly formatted.
-#
-# Note: This approach assumes that the input does not contain any literal newlines.
-# If it does, those will be converted to spaces.
-#
-# Example:
-#   var="arg1 'arg 2' arg3"
-#   eval "set -- $( printf '%s\n' "$var" | xargs -n1 | tr '\n' ' ' | xargs printf '%s\n' ) \"$@\""
-#   echo "$#"  # Outputs: 4
-#   echo "$1"  # Outputs: arg1
-#   echo "$2"  # Outputs: arg 2
-#   echo "$3"  # Outputs: arg3
-#
-# This approach is used to ensure compatibility across different shells.
-
-eval "set -- $( printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" | xargs -n1 | tr '\n' ' ' | xargs printf '%s\n' ) \"$@\"" || die "Error processing JVM options"
+# Use bash arrays to parse JVM options safely. This requires bash; the script uses bash shebang.
+if [ -n "$DEFAULT_JVM_OPTS" ] || [ -n "$JAVA_OPTS" ] || [ -n "$GRADLE_OPTS" ] ; then
+    # read into array to split on whitespace while preserving quoting semantics
+    read -r -a JVM_OPTS_ARRAY <<< "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS"
+    # Prepend JVM options to the existing arguments
+    set -- "${JVM_OPTS_ARRAY[@]}" "$@"
+fi
 
 exec "$JAVACMD" "$@"
