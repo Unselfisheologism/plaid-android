@@ -82,7 +82,7 @@ nonstop=false
 case "$( uname )" in                #(
   CYGWIN* )         cygwin=true  ;; #(
   Darwin* )         darwin=true  ;; #(
- MSYS* | MINGW* ) msys=true    ;; #(
+  MSYS* | MINGW* )  msys=true    ;; #(
   NONSTOP* )        nonstop=true ;;
 esac
 
@@ -206,7 +206,7 @@ fi
 #
 # Instead, we convert spaces to newlines and then use "tr" to convert back to spaces.
 # This preserves quoted whitespace and backslashes, but splits on unquoted spaces.
-# We use "tr '\n' '" to convert newlines back to spaces.
+# We use "tr '\n' ' '" to convert newlines back to spaces.
 # Finally, we use "xargs printf '%s\n'" to remove any trailing newline.
 # This ensures that the final argument list is correctly formatted.
 #
