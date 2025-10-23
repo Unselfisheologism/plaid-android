@@ -301,12 +301,7 @@ class BrowserActivity : AppCompatActivity() {
     fun updateAgentContext() {
         val webViewFragment = getCurrentWebViewFragment()
         if (webViewFragment != null) {
-            val webView = webViewFragment.view?.findViewById<android.webkit.WebView>(R.id.webView)
-            val agentContext = com.yourcompany.myagenticbrowser.agent.AiAgent.AgentContext(
-                activeTabUrl = webViewFragment.getUrl(),
-                activeTabTitle = webView?.title ?: "",
-                webView = webView
-            )
+            val webView = webViewFragment.getWebView()
             // Update the AI agent with the new context
             AgentService.updateContext(this, webView)
         }
@@ -373,45 +368,4 @@ class BrowserActivity : AppCompatActivity() {
         sideMenuFragment.show(supportFragmentManager, "SideMenuBottomSheet")
     }
     
-    /**
-     * Check authentication with Puter.js and run the provided action
-     */
-    private fun checkAuthenticationAndRun(action: (Boolean) -> Unit) {
-        val webViewFragment = getCurrentWebViewFragment()
-        webViewFragment?.let { fragment ->
-            val webView = fragment.getWebView()
-            
-            // Check if user is authenticated with Puter.js
-            webView.evaluateJavascript(
-                "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
-            ) { result ->
-                val isAuthenticated = result.removeSurrounding("\"").toBoolean()
-                if (isAuthenticated) {
-                    action(true)
-                } else {
-                    // Try to authenticate
-                    webView.evaluateJavascript(
-                        "(async function() { " +
-                        "  try {" +
-                        "    if (window.puter && window.puter.auth) {" +
-                        "      await window.puter.auth.signIn();" +
-                        "      return await window.puter.auth.isSignedIn();" +
-                        "    }" +
-                        "    return false;" +
-                        "  } catch (e) {" +
-                        "    console.error('Sign-in error:', e);" +
-                        "    return false;" +
-                        " }" +
-                        "})();"
-                    ) { authResult ->
-                        val isAuthenticatedAfterSignIn = authResult.removeSurrounding("\"").toBoolean()
-                        action(isAuthenticatedAfterSignIn)
-                    }
-                }
-            }
-        } ?: run {
-            // No WebView available
-            action(false)
-        }
-    }
 }
