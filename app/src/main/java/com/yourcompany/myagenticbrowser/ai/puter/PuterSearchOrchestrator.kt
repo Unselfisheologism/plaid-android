@@ -253,4 +253,3 @@ data class SearchSource(
     val url: String,
     val snippet: String
 ) : Parcelable
-}
