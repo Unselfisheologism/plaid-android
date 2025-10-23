@@ -233,19 +233,27 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
             """.trimIndent()
             
             webView.evaluateJavascript(checkAuthJs, null)
+            
+            // Set a timeout in case authentication doesn't complete
+            val timeoutRunnable = Runnable {
+                if (continuation.isActive) {
+                    Logger.logInfo("ChatBottomSheetFragment", "Authentication timeout")
+                    continuation.resume(false)
+                }
+            }
+            
+            webView.handler.postDelayed(timeoutRunnable, 10000) // 10 second timeout
+            
+            // Handle cancellation
+            continuation.invokeOnCancellation { cause ->
+                webView.handler.removeCallbacks(timeoutRunnable)
+            }
+            
         } else {
             if (continuation.isActive) {
                 continuation.resume(false)
             }
         }
-        
-        // Set a timeout in case authentication doesn't complete
-        webView?.handler?.postDelayed({
-            if (continuation.isActive) {
-                Logger.logInfo("ChatBottomSheetFragment", "Authentication timeout")
-                continuation.resume(false)
-            }
-        }, 10000) // 10 second timeout
     }
 
     private suspend fun getAiResponse(message: String): String {

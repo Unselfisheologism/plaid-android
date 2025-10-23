@@ -286,15 +286,22 @@ class PuterClient {
             
             // Add the temporary interface to handle results
             webView.addJavascriptInterface(authInterface, "AndroidInterface")
-        }
-        
-        // Set a timeout in case authentication doesn't complete
-        webView.handler.postDelayed({
-            if (continuation.isActive) {
-                Logger.logInfo("PuterClient", "Authentication timeout - proceeding with available functionality")
-                continuation.resume(true) // Resume with true to allow partial functionality
+            
+            // Set a timeout in case authentication doesn't complete
+            val timeoutRunnable = Runnable {
+                if (continuation.isActive) {
+                    Logger.logInfo("PuterClient", "Authentication timeout - proceeding with available functionality")
+                    continuation.resume(true) // Resume with true to allow partial functionality
+                }
             }
-        }, 10000) // 10 second timeout
+            
+            webView.handler.postDelayed(timeoutRunnable, 10000) // 10 second timeout
+            
+            // Handle cancellation
+            continuation.invokeOnCancellation { cause ->
+                webView.handler.removeCallbacks(timeoutRunnable)
+            }
+        }
     }
 
     /**
