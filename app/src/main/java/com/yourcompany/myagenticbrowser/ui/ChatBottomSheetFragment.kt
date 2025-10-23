@@ -112,45 +112,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
                     if (authenticated) {
                         sendMessage(message)
                     } else {
-                        // Try to authenticate and then send message
-                        val webView = try {
-                            val parentActivity = activity
-                            if (parentActivity is BrowserActivity) {
-                                parentActivity.getCurrentWebViewFragment()?.getWebView()
-                            } else {
-                                null
-                            }
-                        } catch (e: Exception) {
-                            Logger.logError("ChatBottomSheetFragment", "Error getting WebView: ${e.message}", e)
-                            null
-                        }
-                        
-                        if (webView != null) {
-                            // Try to authenticate
-                            webView.evaluateJavascript(
-                                "(async function() { " +
-                                "  try {" +
-                                "    if (window.puter && window.puter.auth) {" +
-                                "      await window.puter.auth.signIn();" +
-                                "      return await window.puter.auth.isSignedIn();" +
-                                "    }" +
-                                "    return false;" +
-                                " } catch (e) {" +
-                                "    console.error('Sign-in error:', e);" +
-                                "    return false;" +
-                                " }" +
-                                "})();"
-                            ) { authResult ->
-                                val isAuthenticated = authResult.removeSurrounding("\"").toBoolean()
-                                if (isAuthenticated) {
-                                    sendMessage(message)
-                                } else {
-                                    addErrorMessage("Authentication required. Please sign in with Puter.js to use the AI chat feature.")
-                                }
-                            }
-                        } else {
-                            addErrorMessage("Unable to authenticate. No WebView available.")
-                        }
+                        addErrorMessage("Authentication required. Please sign in with Puter.js to use the AI chat feature.")
                     }
                 }
                 followUpInput.setText("")
@@ -166,45 +128,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
                     if (authenticated) {
                         sendMessage(message)
                     } else {
-                        // Try to authenticate and then send message
-                        val webView = try {
-                            val parentActivity = activity
-                            if (parentActivity is BrowserActivity) {
-                                parentActivity.getCurrentWebViewFragment()?.getWebView()
-                            } else {
-                                null
-                            }
-                        } catch (e: Exception) {
-                            Logger.logError("ChatBottomSheetFragment", "Error getting WebView: ${e.message}", e)
-                            null
-                        }
-                        
-                        if (webView != null) {
-                            // Try to authenticate
-                            webView.evaluateJavascript(
-                                "(async function() { " +
-                                "  try {" +
-                                "    if (window.puter && window.puter.auth) {" +
-                                "      await window.puter.auth.signIn();" +
-                                "      return await window.puter.auth.isSignedIn();" +
-                                "    }" +
-                                "    return false;" +
-                                " } catch (e) {" +
-                                "    console.error('Sign-in error:', e);" +
-                                "    return false;" +
-                                " }" +
-                                "})();"
-                            ) { authResult ->
-                                val isAuthenticated = authResult.removeSurrounding("\"").toBoolean()
-                                if (isAuthenticated) {
-                                    sendMessage(message)
-                                } else {
-                                    addErrorMessage("Authentication required. Please sign in with Puter.js to use the AI chat feature.")
-                                }
-                            }
-                        } else {
-                            addErrorMessage("Unable to authenticate. No WebView available.")
-                        }
+                        addErrorMessage("Authentication required. Please sign in with Puter.js to use the AI chat feature.")
                     }
                 }
                 followUpInput.setText("")
@@ -243,7 +167,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private suspend fun checkAuthentication(): Boolean {
+    private suspend fun checkAuthentication(): Boolean = suspendCancellableCoroutine { continuation ->
         // Try to get the current WebView from the parent activity
         val webView = try {
             val parentActivity = activity
@@ -257,63 +181,71 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
             null
         }
         
-        return if (webView != null) {
+        if (webView != null) {
             // Check if user is authenticated with Puter.js
             puterClient.loadPuterJS(webView)
-            // Give time for Puter.js to load
-            kotlinx.coroutines.delay(1000)
             
-            try {
-                val isAuth = puterClient.isPuterJSReady(webView)
-                if (isAuth) {
-                    // Check if user is signed in
-                    var isAuthenticated = false
-                    val latch = java.util.concurrent.CountDownLatch(1)
-                    
-                    webView.evaluateJavascript(
-                        "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
-                    ) { result ->
-                        isAuthenticated = result.removeSurrounding("\"").toBoolean()
-                        latch.countDown()
+            // Set up a JavaScript interface to handle the authentication result
+            val authInterface = object : Any() {
+                @android.webkit.JavascriptInterface
+                fun handleAuthResult(success: Boolean) {
+                    if (continuation.isActive) {
+                        continuation.resume(success)
                     }
-                    
-                    latch.await(2, java.util.concurrent.TimeUnit.SECONDS)
-                    
-                    // If not authenticated, try to authenticate
-                    if (!isAuthenticated) {
-                        val signInLatch = java.util.concurrent.CountDownLatch(1)
-                        webView.evaluateJavascript(
-                            "(async function() { " +
-                            "  try {" +
-                            "    if (window.puter && window.puter.auth) {" +
-                            "      await window.puter.auth.signIn();" +
-                            "      return await window.puter.auth.isSignedIn();" +
-                            "    }" +
-                            "    return false;" +
-                            " } catch (e) {" +
-                            "    console.error('Sign-in error:', e);" +
-                            "    return false;" +
-                            " }" +
-                            "})();"
-                        ) { signInResult ->
-                            isAuthenticated = signInResult.removeSurrounding("\"").toBoolean()
-                            signInLatch.countDown()
-                        }
-                        
-                        signInLatch.await(5, java.util.concurrent.TimeUnit.SECONDS)
-                    }
-                    
-                    isAuthenticated
-                } else {
-                    false
                 }
-            } catch (e: Exception) {
-                Logger.logError("ChatBottomSheetFragment", "Error checking authentication: ${e.message}", e)
-                false
             }
+            
+            // Add the temporary interface to handle results
+            webView.addJavascriptInterface(authInterface, "AndroidInterface")
+            
+            // Check authentication status using callback
+            val callback = "window._authCheckCallback = function(isSignedIn) { " +
+                "AndroidInterface.handleAuthResult(isSignedIn); " +
+                "};"
+            
+            // Add the callback to the WebView
+            webView.evaluateJavascript(callback, null)
+            
+            // Check authentication status
+            val checkAuthJs = """
+                (function() {
+                    if (window.puter && window.puter.auth) {
+                        const isSignedIn = window.puter.auth.isSignedIn();
+                        if (isSignedIn) {
+                            window._authCheckCallback(true);
+                        } else {
+                            // Try to sign in first
+                            (async function() {
+                                try {
+                                    await window.puter.auth.signIn();
+                                    const isSignedInAfterSignIn = window.puter.auth.isSignedIn();
+                                    window._authCheckCallback(isSignedInAfterSignIn);
+                                } catch (e) {
+                                    console.error('Sign-in error:', e);
+                                    window._authCheckCallback(false);
+                                }
+                            })();
+                        }
+                    } else {
+                        window._authCheckCallback(false);
+                    }
+                })();
+            """.trimIndent()
+            
+            webView.evaluateJavascript(checkAuthJs, null)
         } else {
-            false
+            if (continuation.isActive) {
+                continuation.resume(false)
+            }
         }
+        
+        // Set a timeout in case authentication doesn't complete
+        webView?.handler?.postDelayed({
+            if (continuation.isActive) {
+                Logger.logInfo("ChatBottomSheetFragment", "Authentication timeout")
+                continuation.resume(false)
+            }
+        }, 10000) // 10 second timeout
     }
 
     private suspend fun getAiResponse(message: String): String {
