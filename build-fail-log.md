@@ -27,9 +27,9 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:packageDebugResources
 > Task :app:mergeDebugResources
 > Task :app:parseDebugLocalResources
-> Task :app:mapDebugSourceSetPaths
 > Task :app:checkDebugAarMetadata
 > Task :app:dataBindingGenBaseClassesDebug
+> Task :app:mapDebugSourceSetPaths
 > Task :app:createDebugCompatibleScreenManifests
 > Task :app:extractDeepLinksDebug
 > Task :app:processDebugMainManifest
@@ -53,9 +53,8 @@ Unable to strip the following libraries, packaging them as they are: libimage_pr
 > Task :app:validateSigningDebug
 > Task :app:writeDebugAppMetadata
 > Task :app:writeDebugSigningConfigVersions
-> Task :app:compileDebugKotlin FAILED
+> Task :app:compileDebugKotlin
 e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ai/puter/PuterSearchOrchestrator.kt:253:1 Expecting a top level declaration
-31 actionable tasks: 30 executed, 1 up-to-date
 FAILURE: Build failed with an exception.
 * What went wrong:
 Execution failed for task ':app:compileDebugKotlin'.
@@ -66,5 +65,7 @@ Execution failed for task ':app:compileDebugKotlin'.
 > Run with --info or --debug option to get more log output.
 > Run with --scan to get full insights.
 > Get more help at https://help.gradle.org.
-BUILD FAILED in 2m 14s
+BUILD FAILED in 1m 55s
+> Task :app:compileDebugKotlin FAILED
+31 actionable tasks: 30 executed, 1 up-to-date
 Error: Process completed with exit code 1.

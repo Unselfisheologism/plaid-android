@@ -7,6 +7,9 @@ import kotlinx.coroutines.*
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
+import com.yourcompany.myagenticbrowser.ai.puter.PuterClient
+import com.yourcompany.myagenticbrowser.ai.puter.model.ChatModel
+import com.yourcompany.myagenticbrowser.ai.puter.model.SearchModel
 
 /**
  * PuterSearchOrchestrator - Orchestrates search queries through Perplexity Sonar models via Puter.js infrastructure
@@ -22,8 +25,8 @@ import kotlinx.serialization.json.*
  */
 class PuterSearchOrchestrator(
     private val puterClient: PuterClient,
-    private val chatModel: com.yourcompany.myagenticbrowser.ai.puter.model.ChatModel? = null,
-    private val searchModel: com.yourcompany.myagenticbrowser.ai.puter.model.SearchModel? = null
+    private val chatModel: ChatModel? = null,
+    private val searchModel: SearchModel? = null
 ) {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     
