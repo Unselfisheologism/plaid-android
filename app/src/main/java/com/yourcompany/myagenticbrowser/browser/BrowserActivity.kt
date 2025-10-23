@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -55,10 +56,33 @@ class BrowserActivity : AppCompatActivity() {
         findViewById<FloatingActionButton>(R.id.newTabButton).setOnClickListener {
             addNewTab()
         }
+        
+        // Add chat button
+        findViewById<FloatingActionButton>(R.id.chatButton).setOnClickListener {
+            showChatPopup()
+        }
+        
+        // Add tabs icon click listener
+        findViewById<ImageView>(R.id.tabsIcon).setOnClickListener {
+            val intent = Intent(this, com.yourcompany.myagenticbrowser.ui.TabPreviewActivity::class.java)
+            startActivity(intent)
+        }
+        
+        // Add bottom-arrow icon click listener (shows dropdown menu)
+        findViewById<ImageView>(R.id.bottomArrowIcon).setOnClickListener {
+            // Show dropdown menu with options like back, forward, refresh, etc.
+            showDropdownMenu()
+        }
+        
+        // Add wrench icon click listener (settings)
+        findViewById<ImageView>(R.id.wrenchIcon).setOnClickListener {
+            // Show settings
+            showSettings()
+        }
 
         // Add initial tab if none exist
         if (tabManager.getTabCount() == 0) {
-            addNewTab()
+            addAgentTab() // Use AI agent as default homepage per desire.md
         }
         tabAdapter.notifyDataSetChanged()
         
@@ -76,6 +100,25 @@ class BrowserActivity : AppCompatActivity() {
         updateToolbarTitle()
         
         Logger.logInfo("BrowserActivity", "Added new tab: $url, Owner: $owner, Total tabs: ${tabManager.getTabCount()}")
+    }
+    
+    /**
+     * Add a new AI agent tab as the default homepage
+     */
+    private fun addAgentTab() {
+        // For now, we'll load a local HTML page that initializes Puter.js
+        // In a real implementation, this would load the AI agent interface
+        val agentUrl = "file:///android_asset/agent_home.html"
+        tabManager.addTab(agentUrl, com.yourcompany.myagenticbrowser.browser.tab.TabOwner.USER)
+        tabAdapter.notifyItemInserted(tabManager.getTabCount() - 1)
+        
+        // Switch to the new tab
+        viewPager.currentItem = tabManager.getTabCount() - 1
+        
+        // Update toolbar title to reflect current tab
+        updateToolbarTitle()
+        
+        Logger.logInfo("BrowserActivity", "Added AI agent tab: $agentUrl, Owner: USER, Total tabs: ${tabManager.getTabCount()}")
     }
 
     fun updateToolbarTitle() {
@@ -139,18 +182,6 @@ class BrowserActivity : AppCompatActivity() {
                 showSideMenu()
                 true
             }
-            R.id.action_puter_config -> {
-                // Puter.js handles authentication automatically
-                true
-            }
-            R.id.action_agent_home -> {
-                startActivity(Intent(this, com.yourcompany.myagenticbrowser.agent.AgentHomePage::class.java))
-                true
-            }
-            R.id.action_search_visualization -> {
-                startActivity(Intent(this, com.yourcompany.myagenticbrowser.agent.SearchVisualizationActivity::class.java))
-                true
-            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -200,26 +231,57 @@ class BrowserActivity : AppCompatActivity() {
         chatBottomSheet.show(supportFragmentManager, "ChatBottomSheet")
     }
     
-    private var startY = 0f
+    // Removed the swipe-up gesture detection to prevent unwanted popup
     
-    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        ev?.let {
-            when (it.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    startY = it.y
-                }
-                MotionEvent.ACTION_UP -> {
-                    val endY = it.y
-                    val diffY = startY - endY
-                    
-                    // Check if it's a swipe up gesture from bottom of screen
-                    if (diffY > 10 && endY < resources.getDimension(R.dimen.swipe_trigger_height)) { // Swipe up with sufficient distance
-                        showChatPopup()
-                        return true
-                    }
-                }
+    /**
+     * Show dropdown menu with browser options like back, forward, refresh, etc.
+     */
+    private fun showDropdownMenu() {
+        // Get the current WebView fragment to access browser functionality
+        val webViewFragment = getCurrentWebViewFragment()
+        if (webViewFragment != null) {
+            // Show a popup menu with browser actions
+            val popup = android.widget.PopupMenu(this, findViewById(R.id.bottomArrowIcon))
+            popup.menuInflater.inflate(R.menu.browser_menu, popup.menu)
+            
+            // Add browser-specific actions
+            popup.menu.add("Back").setOnMenuItemClickListener {
+                webViewFragment.goBack()
+                true
             }
+            
+            popup.menu.add("Forward").setOnMenuItemClickListener {
+                if (webViewFragment.canGoForward()) {
+                    webViewFragment.goForward()
+                }
+                true
+            }
+            
+            popup.menu.add("Refresh").setOnMenuItemClickListener {
+                webViewFragment.reload()
+                true
+            }
+            
+            popup.show()
+        } else {
+            // If no WebView fragment is available, show a simple menu
+            val popup = android.widget.PopupMenu(this, findViewById(R.id.bottomArrowIcon))
+            popup.menu.add("Refresh").setOnMenuItemClickListener {
+                // Refresh current tab
+                val currentWebViewFragment = getCurrentWebViewFragment()
+                currentWebViewFragment?.reload()
+                true
+            }
+            popup.show()
         }
-        return super.dispatchTouchEvent(ev)
+    }
+    
+    /**
+     * Show settings
+     */
+    private fun showSettings() {
+        // Show a toast for now - in a real implementation, this would open settings
+        android.widget.Toast.makeText(this, "Settings functionality would be implemented here",
+            android.widget.Toast.LENGTH_SHORT).show()
     }
 }

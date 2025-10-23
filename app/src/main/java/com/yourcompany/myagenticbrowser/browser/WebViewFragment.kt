@@ -114,6 +114,9 @@ class WebViewFragment : Fragment() {
                 // Load Puter.js script into the page through Puter.js infrastructure
                 view?.evaluateJavascript(puterClient.getPuterJSScript(), null)
                 
+                // Check if Puter.js is authenticated, and if not, initiate authentication
+                checkAndAuthenticatePuter(view)
+                
                 // Update the tab title in the TabManager if we have a position
                 if (position >= 0) {
                     val activity = activity as? BrowserActivity
@@ -239,5 +242,37 @@ class WebViewFragment : Fragment() {
         super.onDestroy()
         
         MemoryManager.gc()
+    }
+    
+    /**
+     * Check if Puter.js is authenticated, and if not, initiate authentication
+     */
+    private fun checkAndAuthenticatePuter(webView: WebView?) {
+        webView?.let { view ->
+            // Check authentication status
+            view.evaluateJavascript(
+                "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
+            ) { result ->
+                val isAuthenticated = result.removeSurrounding("\"").toBoolean()
+                
+                if (!isAuthenticated) {
+                    // Show authentication prompt
+                    Logger.logInfo("WebViewFragment", "Puter.js not authenticated, showing authentication prompt")
+                    
+                    // In a real implementation, this would show an authentication UI
+                    // For now, we'll just log the need for authentication
+                    activity?.runOnUiThread {
+                        // Show a toast or dialog to inform the user about authentication
+                        android.widget.Toast.makeText(
+                            context,
+                            "Please authenticate with Puter.js to access AI features",
+                            android.widget.Toast.LENGTH_LONG
+                        ).show()
+                    }
+                } else {
+                    Logger.logInfo("WebViewFragment", "Puter.js is authenticated")
+                }
+            }
+        }
     }
 }

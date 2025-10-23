@@ -1,404 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@android:color/white">
+    android:background="@drawable/agent_tab_indicator"
+    android:padding="8dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Tab Indicator System"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="24dp" />
-
-    <!-- Six tabs arranged in two columns (three on each side) -->
+    <!-- Top indicators -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-        <!-- Left column -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginEnd="8dp">
+        <!-- Agent indicator (left) -->
+        <ImageView
+            android:id="@+id/agentIndicator"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="4dp"
+            android:src="@android:drawable/ic_menu_my_calendar"
+            android:contentDescription="Agent indicator" />
 
-            <!-- Tab 1 -->
-            <LinearLayout
-                android:id="@+id/tab1"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/node_background"
-                android:padding="8dp"
-                android:layout_marginBottom="8dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:src="@android:drawable/ic_menu_gallery"
-                    android:scaleType="centerCrop"
-                    android:layout_marginBottom="4dp"
-                    android:contentDescription="Tab 1 preview" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Google Search"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-
-                <!-- Tab indicator with owner icon -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="4dp">
-
-                    <!-- User tab indicator -->
-                    <ImageView
-                        android:id="@+id/tab1OwnerIcon"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/circle_shape"
-                        android:backgroundTint="#2196F3"
-                        android:layout_marginEnd="4dp"
-                        android:contentDescription="User tab indicator" />
-
-                    <TextView
-                        android:id="@+id/tab1Status"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Active"
-                        android:textSize="10sp"
-                        android:textColor="#4CAF50" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- Tab 2 -->
-            <LinearLayout
-                android:id="@+id/tab2"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/node_background"
-                android:padding="8dp"
-                android:layout_marginBottom="8dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:src="@android:drawable/ic_menu_my_calendar"
-                    android:scaleType="centerCrop"
-                    android:layout_marginBottom="4dp"
-                    android:contentDescription="Tab 2 preview" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Calendar"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-
-                <!-- Tab indicator with owner icon -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="4dp">
-
-                    <!-- Agent tab indicator -->
-                    <ImageView
-                        android:id="@+id/tab2OwnerIcon"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/circle_shape"
-                        android:backgroundTint="#4CAF50"
-                        android:layout_marginEnd="4dp"
-                        android:contentDescription="Agent tab indicator" />
-
-                    <TextView
-                        android:id="@+id/tab2Status"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Dormant"
-                        android:textSize="10sp"
-                        android:textColor="#FF9800" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- Tab 3 -->
-            <LinearLayout
-                android:id="@+id/tab3"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/node_background"
-                android:padding="8dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:src="@android:drawable/ic_menu_send"
-                    android:scaleType="centerCrop"
-                    android:layout_marginBottom="4dp"
-                    android:contentDescription="Tab 3 preview" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Email"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-
-                <!-- Tab indicator with owner icon -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="4dp">
-
-                    <!-- User tab indicator -->
-                    <ImageView
-                        android:id="@+id/tab3OwnerIcon"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/circle_shape"
-                        android:backgroundTint="#2196F3"
-                        android:layout_marginEnd="4dp"
-                        android:contentDescription="User tab indicator" />
-
-                    <TextView
-                        android:id="@+id/tab3Status"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Active"
-                        android:textSize="10sp"
-                        android:textColor="#4CAF50" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Right column -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="8dp">
-
-            <!-- Tab 4 -->
-            <LinearLayout
-                android:id="@+id/tab4"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/node_background"
-                android:padding="8dp"
-                android:layout_marginBottom="8dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:src="@android:drawable/ic_menu_slideshow"
-                    android:scaleType="centerCrop"
-                    android:layout_marginBottom="4dp"
-                    android:contentDescription="Tab 4 preview" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Video Streaming"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-
-                <!-- Tab indicator with owner icon -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="4dp">
-
-                    <!-- Agent tab indicator -->
-                    <ImageView
-                        android:id="@+id/tab4OwnerIcon"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/circle_shape"
-                        android:backgroundTint="#4CAF50"
-                        android:layout_marginEnd="4dp"
-                        android:contentDescription="Agent tab indicator" />
-
-                    <TextView
-                        android:id="@+id/tab4Status"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Dormant"
-                        android:textSize="10sp"
-                        android:textColor="#FF9800" />
-
-                </LinearLayout>
-            </LinearLayout>
-            
-            <!-- Tab 5 -->
-            <LinearLayout
-                android:id="@+id/tab5"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/node_background"
-                android:padding="8dp"
-                android:layout_marginBottom="8dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:src="@android:drawable/ic_menu_edit"
-                    android:scaleType="centerCrop"
-                    android:layout_marginBottom="4dp"
-                    android:contentDescription="Tab 5 preview" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Document Editor"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-
-                <!-- Tab indicator with owner icon -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="4dp">
-
-                    <!-- User tab indicator -->
-                    <ImageView
-                        android:id="@+id/tab5OwnerIcon"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/circle_shape"
-                        android:backgroundTint="#2196F3"
-                        android:layout_marginEnd="4dp"
-                        android:contentDescription="User tab indicator" />
-
-                    <TextView
-                        android:id="@+id/tab5Status"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Active"
-                        android:textSize="10sp"
-                        android:textColor="#4CAF50" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- Tab 6 -->
-            <LinearLayout
-                android:id="@+id/tab6"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/node_background"
-                android:padding="8dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:src="@android:drawable/ic_menu_info_details"
-                    android:scaleType="centerCrop"
-                    android:layout_marginBottom="4dp"
-                    android:contentDescription="Tab 6 preview" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="AI Assistant"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-
-                <!-- Tab indicator with owner icon -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="4dp">
-
-                    <!-- Agent tab indicator -->
-                    <ImageView
-                        android:id="@+id/tab6OwnerIcon"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/circle_shape"
-                        android:backgroundTint="#4CAF50"
-                        android:layout_marginEnd="4dp"
-                        android:contentDescription="Agent tab indicator" />
-
-                    <TextView
-                        android:id="@+id/tab6Status"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Dormant"
-                        android:textSize="10sp"
-                        android:textColor="#FF9800" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
+        <!-- Status indicator (right) -->
+        <ImageView
+            android:id="@+id/statusIndicator"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="4dp"
+            android:layout_gravity="end"
+            android:src="@android:drawable/presence_online"
+            android:contentDescription="Status indicator" />
 
     </LinearLayout>
+
+    <!-- Tab preview image -->
+    <ImageView
+        android:id="@+id/tabPreview"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="4dp"
+        android:scaleType="centerCrop"
+        android:background="#f0f0f0"
+        android:contentDescription="Tab preview" />
+
+    <!-- Tab title -->
+    <TextView
+        android:id="@+id/tabTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="12sp"
+        android:textColor="@android:color/black"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:text="Tab Title" />
 
 </LinearLayout>

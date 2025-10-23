@@ -8,22 +8,6 @@
         android:icon="@android:drawable/ic_menu_more"
         app:showAsAction="ifRoom" />
         
-    <item
-        android:id="@+id/action_puter_config"
-        android:title="AI Configuration"
-        android:icon="@android:drawable/ic_menu_manage"
-        app:showAsAction="ifRoom" />
-        
-    <item
-        android:id="@+id/action_agent_home"
-        android:title="AI Agent"
-        android:icon="@android:drawable/ic_menu_help"
-        app:showAsAction="ifRoom" />
-        
-    <item
-        android:id="@+id/action_search_visualization"
-        android:title="Search Visualization"
-        android:icon="@android:drawable/ic_menu_search"
-        app:showAsAction="ifRoom" />
+    <!-- Removed unwanted items per requirements -->
         
 </menu>

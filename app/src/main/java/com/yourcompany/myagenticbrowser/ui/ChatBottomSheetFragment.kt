@@ -144,11 +144,18 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
         }
         
         return if (webView != null) {
-            puterClient.chat(
-                webView = webView,
-                message = message,
-                context = "Current context for chat popup"
-            )
+            // Ensure Puter.js is loaded and authenticated before making chat request
+            puterClient.loadPuterJS(webView)
+            try {
+                puterClient.chat(
+                    webView = webView,
+                    message = message,
+                    context = "Current context for chat popup"
+                )
+            } catch (e: Exception) {
+                Logger.logError("ChatBottomSheetFragment", "Error in Puter.js chat: ${e.message}", e)
+                "Error: ${e.message}"
+            }
         } else {
             "Unable to get response - no WebView available"
         }

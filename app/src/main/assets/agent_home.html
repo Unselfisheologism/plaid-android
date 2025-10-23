@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyAgenticBrowser - AI Agent</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .agent-icon {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            background-color: #2196F3;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+        }
+        h1 {
+            color: #333;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+        }
+        .chat-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 20px 2px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+        .features {
+            margin: 30px 0;
+        }
+        .feature {
+            background-color: white;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="agent-icon">🤖</div>
+        <h1>Welcome to MyAgenticBrowser</h1>
+        <p>Your AI-powered browsing assistant</p>
+        
+        <div class="status">
+            <p>AI Agent Status: <span id="agentStatus">Ready</span></p>
+            <p>Powered by Puter.js infrastructure</p>
+        </div>
+        
+        <button class="chat-button" onclick="showChatPopup()">Chat with AI Agent</button>
+        
+        <div class="features">
+            <div class="feature">
+                <h3>AI Capabilities</h3>
+                <p>Web search, automation, workflow management</p>
+            </div>
+            <div class="feature">
+                <h3>Context Awareness</h3>
+                <p>Understands current page content and session cookies</p>
+            </div>
+            <div class="feature">
+                <h3>Puter.js Integration</h3>
+                <p>All AI features powered through Puter.js</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load Puter.js
+        function loadPuterJS() {
+            return new Promise((resolve, reject) => {
+                if (window.puter) {
+                    console.log('Puter.js already loaded');
+                    resolve();
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = 'https://js.puter.com/v2/';
+                script.onload = function() {
+                    console.log('Puter.js loaded successfully');
+                    // Wait a bit for Puter.js to fully initialize
+                    setTimeout(resolve, 1000);
+                };
+                script.onerror = function() {
+                    console.error('Failed to load Puter.js');
+                    reject(new Error('Failed to load Puter.js'));
+                };
+                document.head.appendChild(script);
+            });
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                await loadPuterJS();
+                document.getElementById('agentStatus').textContent = 'Ready';
+                console.log('Agent homepage initialized with Puter.js');
+            } catch (error) {
+                console.error('Error initializing Puter.js:', error);
+                document.getElementById('agentStatus').textContent = 'Error loading AI';
+            }
+        });
+        
+        // Function to show chat popup through Android interface
+        function showChatPopup() {
+            if (typeof Android !== 'undefined' && Android.showChatPopup) {
+                Android.showChatPopup();
+            } else {
+                console.log('Android interface not available, showing local message');
+                alert('Chat with AI Agent feature will be available when accessed through the app');
+            }
+        }
+    </script>
+</body>
+</html>

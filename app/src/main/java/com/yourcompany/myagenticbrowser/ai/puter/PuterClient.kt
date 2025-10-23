@@ -42,6 +42,9 @@ class PuterClient {
             // First verify authentication
             ensureAuthenticated(webView)
             
+            // Load Puter.js if not already loaded
+            loadPuterJS(webView)
+            
             val contextParam = if (context != null) ", context: '$context'" else ""
             val chatPromise = """new Promise((resolve, reject) => {
                |    try {
@@ -73,6 +76,12 @@ class PuterClient {
         Logger.logInfo("PuterClient", "Performing web search through Puter.js infrastructure with Perplexity Sonar model: $model. Query: $query. All AI capabilities route through Puter.js as required. No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used. Puter.js handles all AI provider endpoints and authentication internally.")
         
         try {
+            // First verify authentication
+            ensureAuthenticated(webView)
+            
+            // Load Puter.js if not already loaded
+            loadPuterJS(webView)
+            
             // Formulate the search query for the Perplexity Sonar model
             val searchPrompt = "Search the web for: $query"
             
@@ -110,6 +119,9 @@ class PuterClient {
             // First verify authentication
             ensureAuthenticated(webView)
             
+            // Load Puter.js if not already loaded
+            loadPuterJS(webView)
+            
             val txt2imgPromise = """new Promise((resolve, reject) => {
                |    try {
                |        puter.ai.txt2img('$prompt', { testMode: $testMode }).then(result => resolve(result)).catch(error => reject(error.message));
@@ -136,6 +148,9 @@ class PuterClient {
             // First verify authentication
             ensureAuthenticated(webView)
             
+            // Load Puter.js if not already loaded
+            loadPuterJS(webView)
+            
             val img2txtPromise = """new Promise((resolve, reject) => {
                |    try {
                |        puter.ai.img2txt('$imageUrl', { testMode: $testMode }).then(result => resolve(result)).catch(error => reject(error.message));
@@ -161,6 +176,9 @@ class PuterClient {
         if (webView != null) {
             // First verify authentication
             ensureAuthenticated(webView)
+            
+            // Load Puter.js if not already loaded
+            loadPuterJS(webView)
             
             val ttsPromise = """new Promise((resolve, reject) => {
                |    try {
