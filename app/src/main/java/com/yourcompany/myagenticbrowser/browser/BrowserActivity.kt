@@ -249,6 +249,122 @@ class BrowserActivity : AppCompatActivity() {
         webViewFragment?.let { fragment ->
             val webView = fragment.getWebView()
             
+            // Enable popup windows for Puter.js authentication
+            webView.settings.javaScriptCanOpenWindowsAutomatically = true
+            webView.settings.setSupportMultipleWindows(true)
+            
+            // Add JavaScript interface for authentication callbacks
+            webView.addJavascriptInterface(object : Any() {
+                @android.webkit.JavascriptInterface
+                fun handleAuthSuccess(userJson: String) {
+                    runOnUiThread {
+                        // Handle successful authentication
+                        // You can update UI or save authentication state here
+                    }
+                }
+                
+                @android.webkit.JavascriptInterface
+                fun handleAuthError(errorMessage: String) {
+                    runOnUiThread {
+                        // Handle authentication error
+                        // You can show error message to user here
+                        android.widget.Toast.makeText(
+                            this@BrowserActivity,
+                            "Authentication failed: $errorMessage",
+                            android.widget.Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }, "AndroidInterface")
+            
+            // Set up WebViewClient to handle popup windows
+            webView.webViewClient = object : android.webkit.WebViewClient() {
+                override fun onCreateWindow(
+                    view: android.webkit.WebView,
+                    isDialog: Boolean,
+                    isUserGesture: Boolean,
+                    resultMsg: android.os.Message
+                ): Boolean {
+                    val newWebView = android.webkit.WebView(this@BrowserActivity)
+                    newWebView.webViewClient = object : android.webkit.WebViewClient() {
+                        override fun shouldOverrideUrlLoading(view: android.webkit.WebView, url: String): Boolean {
+                            // Close the popup when authentication completes
+                            if (url.contains("puter.com/auth/callback")) {
+                                view.stopLoading()
+                                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                    // Notify main WebView that authentication completed
+                                    webView.evaluateJavascript(
+                                        "if (window.handleAuthPopupClose) window.handleAuthPopupClose();",
+                                        null
+                                    )
+                                    view.destroy()
+                                }
+                                return true
+                            }
+                            return false
+                        }
+                    }
+                    
+                    newWebView.settings.javaScriptEnabled = true
+                    newWebView.settings.domStorageEnabled = true
+                    newWebView.settings.javaScriptCanOpenWindowsAutomatically = true
+                    newWebView.settings.setSupportMultipleWindows(true)
+                    
+                    val transport = resultMsg.obj as android.webkit.WebView.WebViewTransport
+                    transport.webView = newWebView
+                    resultMsg.send()
+                    
+                    return true
+                }
+            }
+            
+            // Inject JavaScript to handle authentication popup completion
+            val jsCode = """
+                (function() {
+                    // Handle authentication popup completion
+                    window.handleAuthPopupClose = function() {
+                        // Check if signed in
+                        if (window.puter && window.puter.auth && window.puter.auth.isSignedIn()) {
+                            if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
+                                window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
+                            }
+                        } else {
+                            if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
+                                window.AndroidInterface.handleAuthError("Authentication failed or cancelled");
+                            }
+                        }
+                    };
+                    
+                    // Override signIn to handle popup flow
+                    if (window.puter && window.puter.auth) {
+                        const originalSignIn = window.puter.auth.signIn;
+                        window.puter.auth.signIn = function() {
+                            return new Promise((resolve, reject) => {
+                                // Set up listener for popup completion
+                                window.handleAuthPopupClose = function() {
+                                    if (window.puter.auth.isSignedIn()) {
+                                        if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
+                                            window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
+                                        }
+                                        resolve(window.puter.auth.getUser());
+                                    } else {
+                                        if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
+                                            window.AndroidInterface.handleAuthError("Authentication failed");
+                                        }
+                                        reject(new Error("Authentication failed"));
+                                    }
+                                };
+                                
+                                // Call original signIn
+                                originalSignIn().catch(reject);
+                            });
+                        };
+                    }
+                })();
+            """.trimIndent()
+            
+            webView.evaluateJavascript(jsCode, null)
+            
             // Check if user is authenticated with Puter.js
             webView.evaluateJavascript(
                 "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
