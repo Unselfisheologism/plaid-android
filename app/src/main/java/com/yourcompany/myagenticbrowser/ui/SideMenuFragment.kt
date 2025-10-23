@@ -94,8 +94,6 @@ class SideMenuFragment : BottomSheetDialogFragment() {
 
     private fun openSettingsActivity() {
         // In a real implementation, this would open the settings activity
-        // Removed PuterConfigActivity reference as it's no longer needed
-        // Puter.js handles authentication automatically
         Logger.logInfo("SideMenuFragment", "Settings menu item selected")
     }
 

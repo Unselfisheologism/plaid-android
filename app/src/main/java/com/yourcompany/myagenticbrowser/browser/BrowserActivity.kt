@@ -140,7 +140,6 @@ class BrowserActivity : AppCompatActivity() {
                 true
             }
             R.id.action_puter_config -> {
-                // Removed PuterConfigActivity reference as it's no longer needed
                 // Puter.js handles authentication automatically
                 true
             }

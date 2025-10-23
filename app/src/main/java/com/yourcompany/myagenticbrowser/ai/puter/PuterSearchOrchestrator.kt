@@ -78,7 +78,7 @@ class PuterSearchOrchestrator(
     /**
      * Perform a web search using the PuterClient search method through Puter.js infrastructure
      * This method directly uses the Perplexity Sonar models available through Puter.js
-     * 
+     *
      * @param query The natural language search query
      * @param model The Perplexity Sonar model to use (defaults to sonar-pro)
      * @return Search results as natural language response
@@ -86,7 +86,7 @@ class PuterSearchOrchestrator(
     suspend fun searchWithPerplexitySonar(
         query: String,
         model: String = MODEL_SONAR_PRO
-    ): String {
+    ): SearchResults {
         Logger.logInfo("PuterSearchOrchestrator", "Performing web search with Perplexity Sonar through Puter.js infrastructure with model: $model. Query: $query. All AI capabilities route through Puter.js as required. No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used. Puter.js handles all AI provider endpoints and authentication internally.")
         
         return try {
@@ -96,11 +96,11 @@ class PuterSearchOrchestrator(
                 model = model
             )
             
-            Logger.logInfo("PuterSearchOrchestrator", "Web search with Perplexity Sonar completed through Puter.js infrastructure. Response: $searchResponse")
+            Logger.logInfo("PuterSearchOrchestrator", "Web search with Perplexity Sonar completed through Puter.js infrastructure.")
             searchResponse
         } catch (e: Exception) {
             Logger.logError("PuterSearchOrchestrator", "Error performing web search with Perplexity Sonar through Puter.js infrastructure: ${e.message}", e)
-            throw e
+            SearchResults(query, "Error: ${e.message}", error = e.message)
         }
     }
     
@@ -211,35 +211,6 @@ class PuterSearchOrchestrator(
    }
 }
 
-/**
- * Perform a natural language search using the Perplexity Sonar model through Puter.js infrastructure
- * This implements the intercommunication system where the main AI chat model communicates with search models using natural language only
- */
-suspend fun PuterSearchOrchestrator.performNaturalLanguageSearch(query: String, context: String = ""): SearchResults {
-    Logger.logInfo("PuterSearchOrchestrator", "Performing natural language search through Puter.js infrastructure: $query")
-    
-    return try {
-        // Send the search query to the Perplexity Sonar model through Puter.js
-        val searchResponse = searchWithPerplexitySonar(query, MODEL_SONAR_PRO)
-        
-        SearchResults(
-            query = query,
-            results = searchResponse,
-            sources = emptyList(), // Sources would be extracted from the response in a real implementation
-            timestamp = System.currentTimeMillis()
-        )
-    } catch (e: Exception) {
-        Logger.logError("PuterSearchOrchestrator", "Error performing natural language search through Puter.js infrastructure: ${e.message}", e)
-        
-        SearchResults(
-            query = query,
-            results = "",
-            sources = emptyList(),
-            timestamp = System.currentTimeMillis(),
-            error = e.message
-        )
-    }
-}
 
 /**
  * Data class representing a turn in a search conversation

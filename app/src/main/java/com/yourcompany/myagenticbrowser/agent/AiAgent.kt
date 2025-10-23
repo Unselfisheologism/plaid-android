@@ -100,8 +100,10 @@ class AiAgent private constructor(
                         model = PuterSearchOrchestrator.MODEL_SONAR_PRO
                     )
                     
-                    if (searchResults.error != null) {
-                        AgentResponse.Error(searchResults.error!!)
+                    // Safely access the error property
+                    val error = searchResults.error
+                    if (error != null) {
+                        AgentResponse.Error(error)
                     } else {
                         val formattedResults = formatSearchResults(searchResults)
                         AgentResponse.RequiresSearch(command, formattedResults)

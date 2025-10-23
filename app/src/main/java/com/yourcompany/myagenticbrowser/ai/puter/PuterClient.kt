@@ -90,7 +90,7 @@ class PuterClient {
     }
     
     // New method that doesn't require a WebView directly (to be used by SearchModel)
-    suspend fun searchWithPerplexitySonar(query: String, model: String = PuterSearchOrchestrator.MODEL_SONAR_PRO): String = withContext(Dispatchers.Main) {
+    suspend fun searchWithPerplexitySonar(query: String, model: String = PuterSearchOrchestrator.MODEL_SONAR_PRO): PuterSearchOrchestrator.SearchResults = withContext(Dispatchers.Main) {
         Logger.logInfo("PuterClient", "Performing web search with Perplexity Sonar through Puter.js infrastructure with model: $model. Query: $query. All AI capabilities route through Puter.js as required. No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used. Puter.js handles all AI provider endpoints and authentication internally.")
         
         // This method is intended to be used when a WebView isn't directly available
