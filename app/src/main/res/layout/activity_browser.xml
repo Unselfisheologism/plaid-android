@@ -69,7 +69,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Menu" />
                 
-                <!-- Right bottom-arrow icon (second icon in menu bar) - shows dropdown of 8 ultra-fake dummy buttons -->
+                <!-- Three lines icon (hamburger menu) - shows middle-right screen wireframe functionality -->
                 <ImageView
                     android:id="@+id/rightBottomArrowIcon"
                     android:layout_width="wrap_content"
@@ -78,7 +78,7 @@
                     android:layout_marginEnd="8dp"
                     android:padding="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Options" />
+                    android:contentDescription="Menu" />
                 
                 <!-- Wrench icon (third icon in menu bar) -->
                 <ImageView

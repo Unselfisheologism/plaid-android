@@ -60,11 +60,18 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
         // Check for pre-injected prompt
         preInjectedPrompt = arguments?.getString("preInjectedPrompt")
         if (preInjectedPrompt != null) {
-            // Send the pre-injected prompt automatically
+            // Send the pre-injected prompt automatically after checking authentication
             scope.launch {
                 // Give a small delay to ensure UI is ready
                 kotlinx.coroutines.delay(500)
-                sendMessage(preInjectedPrompt!!)
+                
+                // Check authentication before sending pre-injected prompt
+                val authenticated = checkAuthentication()
+                if (authenticated) {
+                    sendMessage(preInjectedPrompt!!)
+                } else {
+                    addErrorMessage("Please authenticate with Puter.js to use the AI chat feature.")
+                }
             }
         }
     }
@@ -105,7 +112,45 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
                     if (authenticated) {
                         sendMessage(message)
                     } else {
-                        addErrorMessage("Please authenticate with Puter.js to use the AI chat feature.")
+                        // Try to authenticate and then send message
+                        val webView = try {
+                            val parentActivity = activity
+                            if (parentActivity is BrowserActivity) {
+                                parentActivity.getCurrentWebViewFragment()?.getWebView()
+                            } else {
+                                null
+                            }
+                        } catch (e: Exception) {
+                            Logger.logError("ChatBottomSheetFragment", "Error getting WebView: ${e.message}", e)
+                            null
+                        }
+                        
+                        if (webView != null) {
+                            // Try to authenticate
+                            webView.evaluateJavascript(
+                                "(async function() { " +
+                                "  try {" +
+                                "    if (window.puter && window.puter.auth) {" +
+                                "      await window.puter.auth.signIn();" +
+                                "      return await window.puter.auth.isSignedIn();" +
+                                "    }" +
+                                "    return false;" +
+                                " } catch (e) {" +
+                                "    console.error('Sign-in error:', e);" +
+                                "    return false;" +
+                                " }" +
+                                "})();"
+                            ) { authResult ->
+                                val isAuthenticated = authResult.removeSurrounding("\"").toBoolean()
+                                if (isAuthenticated) {
+                                    sendMessage(message)
+                                } else {
+                                    addErrorMessage("Authentication required. Please sign in with Puter.js to use the AI chat feature.")
+                                }
+                            }
+                        } else {
+                            addErrorMessage("Unable to authenticate. No WebView available.")
+                        }
                     }
                 }
                 followUpInput.setText("")
@@ -121,7 +166,45 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
                     if (authenticated) {
                         sendMessage(message)
                     } else {
-                        addErrorMessage("Please authenticate with Puter.js to use the AI chat feature.")
+                        // Try to authenticate and then send message
+                        val webView = try {
+                            val parentActivity = activity
+                            if (parentActivity is BrowserActivity) {
+                                parentActivity.getCurrentWebViewFragment()?.getWebView()
+                            } else {
+                                null
+                            }
+                        } catch (e: Exception) {
+                            Logger.logError("ChatBottomSheetFragment", "Error getting WebView: ${e.message}", e)
+                            null
+                        }
+                        
+                        if (webView != null) {
+                            // Try to authenticate
+                            webView.evaluateJavascript(
+                                "(async function() { " +
+                                "  try {" +
+                                "    if (window.puter && window.puter.auth) {" +
+                                "      await window.puter.auth.signIn();" +
+                                "      return await window.puter.auth.isSignedIn();" +
+                                "    }" +
+                                "    return false;" +
+                                " } catch (e) {" +
+                                "    console.error('Sign-in error:', e);" +
+                                "    return false;" +
+                                " }" +
+                                "})();"
+                            ) { authResult ->
+                                val isAuthenticated = authResult.removeSurrounding("\"").toBoolean()
+                                if (isAuthenticated) {
+                                    sendMessage(message)
+                                } else {
+                                    addErrorMessage("Authentication required. Please sign in with Puter.js to use the AI chat feature.")
+                                }
+                            }
+                        } else {
+                            addErrorMessage("Unable to authenticate. No WebView available.")
+                        }
                     }
                 }
                 followUpInput.setText("")
@@ -195,6 +278,31 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
                     }
                     
                     latch.await(2, java.util.concurrent.TimeUnit.SECONDS)
+                    
+                    // If not authenticated, try to authenticate
+                    if (!isAuthenticated) {
+                        val signInLatch = java.util.concurrent.CountDownLatch(1)
+                        webView.evaluateJavascript(
+                            "(async function() { " +
+                            "  try {" +
+                            "    if (window.puter && window.puter.auth) {" +
+                            "      await window.puter.auth.signIn();" +
+                            "      return await window.puter.auth.isSignedIn();" +
+                            "    }" +
+                            "    return false;" +
+                            " } catch (e) {" +
+                            "    console.error('Sign-in error:', e);" +
+                            "    return false;" +
+                            " }" +
+                            "})();"
+                        ) { signInResult ->
+                            isAuthenticated = signInResult.removeSurrounding("\"").toBoolean()
+                            signInLatch.countDown()
+                        }
+                        
+                        signInLatch.await(5, java.util.concurrent.TimeUnit.SECONDS)
+                    }
+                    
                     isAuthenticated
                 } else {
                     false

@@ -71,6 +71,10 @@
         <div class="status">
             <p>AI Agent Status: <span id="agentStatus">Ready</span></p>
             <p>Powered by Puter.js infrastructure</p>
+            <div id="authStatus" style="margin-top: 10px;">
+                <span>Status: <span id="authStatusText">Not authenticated</span></span>
+                <button id="authButton" onclick="toggleAuth()" style="margin-left: 10px; padding: 5px 10px; background-color: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer;">Login with Puter</button>
+            </div>
         </div>
         
         <button class="chat-button" onclick="showChatPopup()">Chat with AI Agent</button>
@@ -122,19 +126,154 @@
                 await loadPuterJS();
                 document.getElementById('agentStatus').textContent = 'Ready';
                 console.log('Agent homepage initialized with Puter.js');
+                
+                // Check authentication status on page load
+                checkAuthStatus();
+                
+                // Periodically check authentication status
+                setInterval(checkAuthStatus, 5000); // Check every 5 seconds
             } catch (error) {
                 console.error('Error initializing Puter.js:', error);
                 document.getElementById('agentStatus').textContent = 'Error loading AI';
             }
         });
         
+        // Function to check authentication status and update UI
+        async function checkAuthStatus() {
+            try {
+                if (window.puter && window.puter.auth) {
+                    const isSignedIn = await window.puter.auth.isSignedIn();
+                    document.getElementById('authStatusText').textContent = isSignedIn ? 'Authenticated' : 'Not authenticated';
+                    document.getElementById('authButton').textContent = isSignedIn ? 'Logout' : 'Login with Puter';
+                }
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+            }
+        }
+        
+        // Function to handle authentication toggle (login/logout)
+        async function toggleAuth() {
+            try {
+                if (window.puter && window.puter.auth) {
+                    const isSignedIn = await window.puter.auth.isSignedIn();
+                    if (isSignedIn) {
+                        // Logout
+                        await window.puter.auth.signOut();
+                        document.getElementById('authStatusText').textContent = 'Not authenticated';
+                        document.getElementById('authButton').textContent = 'Login with Puter';
+                    } else {
+                        // Login
+                        await window.puter.auth.signIn();
+                        const isSignedInAfter = await window.puter.auth.isSignedIn();
+                        if (isSignedInAfter) {
+                            document.getElementById('authStatusText').textContent = 'Authenticated';
+                            document.getElementById('authButton').textContent = 'Logout';
+                        } else {
+                            document.getElementById('authStatusText').textContent = 'Not authenticated';
+                            document.getElementById('authButton').textContent = 'Login with Puter';
+                        }
+                    }
+                    // Update auth status display
+                    checkAuthStatus();
+                } else {
+                    alert('Puter.js not loaded. Please refresh the page.');
+                }
+            } catch (error) {
+                console.error('Error in toggleAuth:', error);
+                alert('Error during authentication: ' + error.message);
+            }
+        }
+        
+        // Toggle authentication (login/logout)
+        async function toggleAuth() {
+            try {
+                if (window.puter && window.puter.auth) {
+                    const isSignedIn = await window.puter.auth.isSignedIn();
+                    if (isSignedIn) {
+                        // Logout
+                        window.puter.auth.signOut();
+                        document.getElementById('authStatusText').textContent = 'Not authenticated';
+                        document.getElementById('authButton').textContent = 'Login with Puter';
+                    } else {
+                        // Login
+                        await window.puter.auth.signIn();
+                        const isSignedInAfter = await window.puter.auth.isSignedIn();
+                        if (isSignedInAfter) {
+                            document.getElementById('authStatusText').textContent = 'Authenticated';
+                            document.getElementById('authButton').textContent = 'Logout';
+                        }
+                    }
+                } else {
+                    alert('Puter.js not loaded. Please refresh the page.');
+                }
+            } catch (error) {
+                console.error('Error in toggleAuth:', error);
+                alert('Error during authentication: ' + error.message);
+            }
+        }
+        
         // Function to show chat popup through Android interface
-        function showChatPopup() {
-            if (typeof Android !== 'undefined' && Android.showChatPopup) {
-                Android.showChatPopup();
-            } else {
-                console.log('Android interface not available, showing local message');
-                alert('Chat with AI Agent feature will be available when accessed through the app');
+        async function showChatPopup() {
+            try {
+                // Check if user is authenticated with Puter.js first
+                if (window.puter && window.puter.auth) {
+                    const isSignedIn = await window.puter.auth.isSignedIn();
+                    if (!isSignedIn) {
+                        // Try to sign in the user
+                        await window.puter.auth.signIn();
+                        const isSignedInAfter = await window.puter.auth.isSignedIn();
+                        if (!isSignedInAfter) {
+                            alert('Authentication required to use AI features. Please sign in with Puter.');
+                            // Update auth status display
+                            checkAuthStatus();
+                            return;
+                        }
+                    }
+                    
+                    // Update auth status display
+                    checkAuthStatus();
+                } else {
+                    alert('Puter.js not loaded. Please refresh the page.');
+                    return;
+                }
+                
+                if (typeof Android !== 'undefined' && Android.showChatPopup) {
+                    Android.showChatPopup();
+                } else {
+                    console.log('Android interface not available, showing local message');
+                    alert('Chat with AI Agent feature will be available when accessed through the app');
+                }
+            } catch (error) {
+                console.error('Error in showChatPopup:', error);
+                alert('Error accessing AI features: ' + error.message);
+            }
+        }
+        
+        // Function to handle Puter.js authentication
+        async function authenticateWithPuter() {
+            try {
+                if (window.puter && window.puter.auth) {
+                    const isSignedIn = await window.puter.auth.isSignedIn();
+                    if (isSignedIn) {
+                        alert('Already signed in to Puter!');
+                        return;
+                    }
+                    
+                    // Show sign in dialog
+                    await window.puter.auth.signIn();
+                    const isSignedInAfter = await window.puter.auth.isSignedIn();
+                    if (isSignedInAfter) {
+                        alert('Successfully signed in to Puter!');
+                        document.getElementById('authStatusText').textContent = 'Authenticated';
+                    } else {
+                        alert('Sign in was cancelled or failed.');
+                    }
+                } else {
+                    alert('Puter.js not loaded. Please refresh the page.');
+                }
+            } catch (error) {
+                console.error('Error in authenticateWithPuter:', error);
+                alert('Error during authentication: ' + error.message);
             }
         }
     </script>

@@ -234,22 +234,53 @@ class BrowserActivity : AppCompatActivity() {
     }
     
     /**
-     * Show the right menu with 8 ultra-fake dummy buttons that do nothing
+     * Show the right menu with proper side menu functionality
      */
     private fun showRightMenu() {
-        // Show a popup menu with 8 dummy buttons
-        val popup = PopupMenu(this, findViewById(R.id.rightBottomArrowIcon))
-        
-        // Add 8 ultra-fake dummy buttons that do nothing
-        for (i in 1..8) {
-            popup.menu.add("Dummy Button $i").setOnMenuItemClickListener {
-                // Do nothing - these are ultra-fake dummy buttons
-                android.widget.Toast.makeText(this, "Dummy button $i clicked - does nothing", android.widget.Toast.LENGTH_SHORT).show()
-                true
+        // Show the proper side menu instead of dummy buttons
+        showSideMenu()
+    }
+    
+    /**
+     * Check authentication before performing an action that requires Puter.js authentication
+     */
+    private fun checkAuthenticationAndRun(action: (Boolean) -> Unit) {
+        val webViewFragment = getCurrentWebViewFragment()
+        webViewFragment?.let { fragment ->
+            val webView = fragment.getWebView()
+            
+            // Check if user is authenticated with Puter.js
+            webView.evaluateJavascript(
+                "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
+            ) { result ->
+                val isAuthenticated = result.removeSurrounding("\"").toBoolean()
+                if (isAuthenticated) {
+                    action(true)
+                } else {
+                    // Try to authenticate
+                    webView.evaluateJavascript(
+                        "(async function() { " +
+                        "  try {" +
+                        "    if (window.puter && window.puter.auth) {" +
+                        "      await window.puter.auth.signIn();" +
+                        "      return await window.puter.auth.isSignedIn();" +
+                        "    }" +
+                        "    return false;" +
+                        "  } catch (e) {" +
+                        "    console.error('Sign-in error:', e);" +
+                        "    return false;" +
+                        " }" +
+                        "})();"
+                    ) { authResult ->
+                        val isAuthenticatedAfterSignIn = authResult.removeSurrounding("\"").toBoolean()
+                        action(isAuthenticatedAfterSignIn)
+                    }
+                }
             }
+        } ?: run {
+            // No WebView available
+            action(false)
         }
-        
-        popup.show()
     }
     
     /**
@@ -285,22 +316,46 @@ class BrowserActivity : AppCompatActivity() {
      * Show the chat popup as a bottom sheet
      */
     fun showChatPopup() {
-        val chatBottomSheet = ChatBottomSheetFragment()
-        chatBottomSheet.show(supportFragmentManager, "ChatBottomSheet")
+        // Check if user is authenticated with Puter.js before showing chat popup
+        checkAuthenticationAndRun { authenticated ->
+            if (authenticated) {
+                val chatBottomSheet = ChatBottomSheetFragment()
+                chatBottomSheet.show(supportFragmentManager, "ChatBottomSheet")
+            } else {
+                // Show error message if not authenticated
+                android.widget.Toast.makeText(
+                    this,
+                    "Please authenticate with Puter.js to use AI features",
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
     
     /**
      * Show the chat popup with a pre-injected prompt and WebView context
      */
     fun showChatPopupWithPreInjectedPrompt(prompt: String, webView: android.webkit.WebView?) {
-        val chatBottomSheet = ChatBottomSheetFragment()
-        // Pass the prompt and WebView context to the chat fragment
-        val bundle = Bundle()
-        bundle.putString("preInjectedPrompt", prompt)
-        // Pass WebView context - but WebView is not serializable, so we pass the URL instead
-        bundle.putString("webViewContextUrl", webView?.url)
-        chatBottomSheet.arguments = bundle
-        chatBottomSheet.show(supportFragmentManager, "ChatBottomSheet")
+        // Check if user is authenticated with Puter.js before showing chat popup
+        checkAuthenticationAndRun { authenticated ->
+            if (authenticated) {
+                val chatBottomSheet = ChatBottomSheetFragment()
+                // Pass the prompt and WebView context to the chat fragment
+                val bundle = Bundle()
+                bundle.putString("preInjectedPrompt", prompt)
+                // Pass WebView context - but WebView is not serializable, so we pass the URL instead
+                bundle.putString("webViewContextUrl", webView?.url)
+                chatBottomSheet.arguments = bundle
+                chatBottomSheet.show(supportFragmentManager, "ChatBottomSheet")
+            } else {
+                // Show error message if not authenticated
+                android.widget.Toast.makeText(
+                    this,
+                    "Please authenticate with Puter.js to use AI features",
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
     
     /**
@@ -316,5 +371,47 @@ class BrowserActivity : AppCompatActivity() {
     private fun showSideMenu() {
         val sideMenuFragment = com.yourcompany.myagenticbrowser.ui.SideMenuFragment()
         sideMenuFragment.show(supportFragmentManager, "SideMenuBottomSheet")
+    }
+    
+    /**
+     * Check authentication with Puter.js and run the provided action
+     */
+    private fun checkAuthenticationAndRun(action: (Boolean) -> Unit) {
+        val webViewFragment = getCurrentWebViewFragment()
+        webViewFragment?.let { fragment ->
+            val webView = fragment.getWebView()
+            
+            // Check if user is authenticated with Puter.js
+            webView.evaluateJavascript(
+                "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
+            ) { result ->
+                val isAuthenticated = result.removeSurrounding("\"").toBoolean()
+                if (isAuthenticated) {
+                    action(true)
+                } else {
+                    // Try to authenticate
+                    webView.evaluateJavascript(
+                        "(async function() { " +
+                        "  try {" +
+                        "    if (window.puter && window.puter.auth) {" +
+                        "      await window.puter.auth.signIn();" +
+                        "      return await window.puter.auth.isSignedIn();" +
+                        "    }" +
+                        "    return false;" +
+                        "  } catch (e) {" +
+                        "    console.error('Sign-in error:', e);" +
+                        "    return false;" +
+                        " }" +
+                        "})();"
+                    ) { authResult ->
+                        val isAuthenticatedAfterSignIn = authResult.removeSurrounding("\"").toBoolean()
+                        action(isAuthenticatedAfterSignIn)
+                    }
+                }
+            }
+        } ?: run {
+            // No WebView available
+            action(false)
+        }
     }
 }

@@ -49,42 +49,46 @@ class SideMenuFragment : BottomSheetDialogFragment() {
             dismiss()
         }
 
-        // Set up click listeners for each menu item by finding them by text content
-        setMenuItemClickListener(view, "Account") { openAccountActivity() }
-        setMenuItemClickListener(view, "Settings") { openSettingsActivity() }
-        setMenuItemClickListener(view, "Integrations") { openIntegrationsActivity() }
-        setMenuItemClickListener(view, "Workflows") { openWorkflowsActivity() }
-        setMenuItemClickListener(view, "Agents Experts") { openAgentsExpertsActivity() }
-        setMenuItemClickListener(view, "Support") { openSupportActivity() }
-        setMenuItemClickListener(view, "Summarize Page") { summarizeCurrentPage() }
-        setMenuItemClickListener(view, "Ask About Page") { askAboutCurrentPage() }
-    }
-
-    private fun setMenuItemClickListener(view: View, itemName: String, action: () -> Unit) {
-        // Find the TextView with the specific text and set its click listener
-        val textView = findTextViewByText(view, itemName)
-        textView?.setOnClickListener {
-            action()
-            // Close the menu after selection
+        // Set up click listeners for each menu item by finding them by ID
+        view.findViewById<View>(R.id.accountMenuItem).setOnClickListener {
+            openAccountActivity()
             dismiss()
         }
-    }
-
-    private fun findTextViewByText(view: View, text: String): android.widget.TextView? {
-        if (view is android.widget.TextView && view.text == text) {
-            return view
+        
+        view.findViewById<View>(R.id.settingsMenuItem).setOnClickListener {
+            openSettingsActivity()
+            dismiss()
         }
-
-        if (view is ViewGroup) {
-            for (i in 0 until view.childCount) {
-                val result = findTextViewByText(view.getChildAt(i), text)
-                if (result != null) {
-                    return result
-                }
-            }
+        
+        view.findViewById<View>(R.id.integrationsMenuItem).setOnClickListener {
+            openIntegrationsActivity()
+            dismiss()
         }
-
-        return null
+        
+        view.findViewById<View>(R.id.workflowsMenuItem).setOnClickListener {
+            openWorkflowsActivity()
+            dismiss()
+        }
+        
+        view.findViewById<View>(R.id.agentsExpertsMenuItem).setOnClickListener {
+            openAgentsExpertsActivity()
+            dismiss()
+        }
+        
+        view.findViewById<View>(R.id.supportMenuItem).setOnClickListener {
+            openSupportActivity()
+            dismiss()
+        }
+        
+        view.findViewById<View>(R.id.summarizePageMenuItem).setOnClickListener {
+            summarizeCurrentPage()
+            dismiss()
+        }
+        
+        view.findViewById<View>(R.id.askAboutPageMenuItem).setOnClickListener {
+            askAboutCurrentPage()
+            dismiss()
+        }
     }
 
     private fun openAccountActivity() {
@@ -129,14 +133,57 @@ class SideMenuFragment : BottomSheetDialogFragment() {
             
             Logger.logInfo("SideMenuFragment", "Summarizing page: $url")
             
-            // Start a new chat session with a pre-injected prompt
-            // The AI agent should have full context of the web page
-            val summaryPrompt = "Please summarize the content of this web page: $url\nTitle: $title"
-            
-            // Show the chat popup with the pre-injected prompt
-            browserActivity.showChatPopupWithPreInjectedPrompt(summaryPrompt, webView)
+            // First check if user is authenticated with Puter.js
+            checkAuthenticationAndRun(webView) { authenticated ->
+                if (authenticated) {
+                    // Start a new chat session with a pre-injected prompt
+                    // The AI agent should have full context of the web page
+                    val summaryPrompt = "Please summarize the content of this web page: $url\nTitle: $title"
+                    
+                    // Show the chat popup with the pre-injected prompt
+                    browserActivity.showChatPopupWithPreInjectedPrompt(summaryPrompt, webView)
+                } else {
+                    // Show error message if not authenticated
+                    android.widget.Toast.makeText(
+                        context,
+                        "Please authenticate with Puter.js to use AI features",
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
         }
         Logger.logInfo("SideMenuFragment", "Summarize Page menu item selected")
+    }
+    
+    private fun checkAuthenticationAndRun(webView: android.webkit.WebView?, onResult: (Boolean) -> Unit) {
+        // Check if user is authenticated with Puter.js
+        webView?.evaluateJavascript(
+            "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
+        ) { result ->
+            val isAuthenticated = result.removeSurrounding("\"").toBoolean()
+            if (isAuthenticated) {
+                onResult(true)
+            } else {
+                // Try to authenticate
+                webView.evaluateJavascript(
+                    "(async function() { " +
+                    "  try {" +
+                    "    if (window.puter && window.puter.auth) {" +
+                    "      await window.puter.auth.signIn();" +
+                    "      return await window.puter.auth.isSignedIn();" +
+                    "    }" +
+                    "    return false;" +
+                    "  } catch (e) {" +
+                    "    console.error('Sign-in error:', e);" +
+                    "    return false;" +
+                    " }" +
+                    "})();"
+                ) { authResult ->
+                    val isAuthenticatedAfterSignIn = authResult.removeSurrounding("\"").toBoolean()
+                    onResult(isAuthenticatedAfterSignIn)
+                }
+            }
+        }
     }
 
     private fun askAboutCurrentPage() {
@@ -149,12 +196,24 @@ class SideMenuFragment : BottomSheetDialogFragment() {
             
             Logger.logInfo("SideMenuFragment", "Asking about page: $url")
             
-            // Start a new chat session with a pre-injected prompt
-            // The AI agent should have full context of the web page
-            val askPrompt = "I have a question about this web page: $url\nTitle: $title\nPlease provide context about this page so I can ask questions about it."
-            
-            // Show the chat popup with the pre-injected prompt
-            browserActivity.showChatPopupWithPreInjectedPrompt(askPrompt, webView)
+            // First check if user is authenticated with Puter.js
+            checkAuthenticationAndRun(webView) { authenticated ->
+                if (authenticated) {
+                    // Start a new chat session with a pre-injected prompt
+                    // The AI agent should have full context of the web page
+                    val askPrompt = "I have a question about this web page: $url\nTitle: $title\nPlease provide context about this page so I can ask questions about it."
+                    
+                    // Show the chat popup with the pre-injected prompt
+                    browserActivity.showChatPopupWithPreInjectedPrompt(askPrompt, webView)
+                } else {
+                    // Show error message if not authenticated
+                    android.widget.Toast.makeText(
+                        context,
+                        "Please authenticate with Puter.js to use AI features",
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
         }
         Logger.logInfo("SideMenuFragment", "Ask About Page menu item selected")
     }
