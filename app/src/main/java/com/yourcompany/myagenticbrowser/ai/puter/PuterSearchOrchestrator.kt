@@ -211,7 +211,6 @@ class PuterSearchOrchestrator(
    }
 }
 
-
 /**
  * Data class representing a turn in a search conversation
  */
@@ -222,6 +221,7 @@ data class SearchTurn(
     val content: String,
     val timestamp: Long = System.currentTimeMillis()
 ) : Parcelable
+
 
 /**
  * Data class representing search results

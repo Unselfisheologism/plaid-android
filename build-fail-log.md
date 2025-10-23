@@ -1,16 +1,13 @@
 Run ./gradlew clean assembleDebug
+  
 Downloading https://services.gradle.org/distributions/gradle-8.2-bin.zip
 ............10%............20%............30%.............40%............50%............60%............70%.............80%............90%............100%
-
 Welcome to Gradle 8.2!
-
 Here are the highlights of this release:
  - Kotlin DSL: new reference documentation, assignment syntax by default
  - Kotlin DSL is now the default with Gradle init
  - Improved suggestions to resolve errors in console output
-
 For more details see https://docs.gradle.org/8.2/release-notes.html
-
 Starting a Gradle Daemon (subsequent builds will be faster)
 Checking the license for package Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/licenses
 License for package Android SDK Build-Tools 33.0.1 accepted.
@@ -30,9 +27,9 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:packageDebugResources
 > Task :app:mergeDebugResources
 > Task :app:parseDebugLocalResources
+> Task :app:mapDebugSourceSetPaths
 > Task :app:checkDebugAarMetadata
 > Task :app:dataBindingGenBaseClassesDebug
-> Task :app:mapDebugSourceSetPaths
 > Task :app:createDebugCompatibleScreenManifests
 > Task :app:extractDeepLinksDebug
 > Task :app:processDebugMainManifest
@@ -45,40 +42,29 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:compressDebugAssets
 > Task :app:desugarDebugFileDependencies
 > Task :app:mergeDebugJniLibFolders
-> Task :app:processDebugManifestForPackage
 > Task :app:checkDebugDuplicateClasses
-> Task :app:processDebugResources
-> Task :app:mergeExtDexDebug
-> Task :app:mergeLibDexDebug
 > Task :app:mergeDebugNativeLibs
+> Task :app:processDebugManifestForPackage
+> Task :app:mergeLibDexDebug
+> Task :app:mergeExtDexDebug
+> Task :app:stripDebugDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libimage_processing_util_jni.so.
+> Task :app:processDebugResources
 > Task :app:validateSigningDebug
 > Task :app:writeDebugAppMetadata
 > Task :app:writeDebugSigningConfigVersions
-
-> Task :app:stripDebugDebugSymbols
-Unable to strip the following libraries, packaging them as they are: libimage_processing_util_jni.so.
-
-> Task :app:compileDebugKotlin
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/agent/AiAgent.kt:196:70 Unresolved reference: SearchResults
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/agent/SearchVisualizationFragment.kt:91:58 Unresolved reference: SearchTurn
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ai/puter/PuterClient.kt:95:140 Unresolved reference: SearchResults
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ai/puter/PuterSearchOrchestrator.kt:253:1 Expecting a top level declaration
-
 > Task :app:compileDebugKotlin FAILED
-
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ai/puter/PuterSearchOrchestrator.kt:253:1 Expecting a top level declaration
+31 actionable tasks: 30 executed, 1 up-to-date
 FAILURE: Build failed with an exception.
-
 * What went wrong:
 Execution failed for task ':app:compileDebugKotlin'.
 > A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
    > Compilation error. See log for more details
-
 * Try:
 > Run with --stacktrace option to get the stack trace.
 > Run with --info or --debug option to get more log output.
 > Run with --scan to get full insights.
 > Get more help at https://help.gradle.org.
-
-BUILD FAILED in 2m 45s
-31 actionable tasks: 30 executed, 1 up-to-date
+BUILD FAILED in 2m 14s
 Error: Process completed with exit code 1.
