@@ -235,7 +235,7 @@ class PuterClient {
 
     /**
      * Execute JavaScript in the WebView and return the result as a string
-     */
+    */
     private suspend fun executeJavaScriptWithResult(webView: WebView, jsCode: String): String {
         return suspendCancellableCoroutine { continuation ->
             webView.evaluateJavascript(jsCode, ValueCallback<String> { result ->
@@ -250,10 +250,6 @@ class PuterClient {
         }
     }
 
-    /**
-     * Get the JavaScript code to initialize Puter.js in the WebView
-     * This includes proper result handling for communication with Android
-     */
     fun getPuterJSScript(): String {
         return """
             // Ensure Puter.js is loaded
