@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.widget.ImageView
+import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -68,10 +69,14 @@ class BrowserActivity : AppCompatActivity() {
             startActivity(intent)
         }
         
-        // Add bottom-arrow icon click listener (shows dropdown menu)
-        findViewById<ImageView>(R.id.bottomArrowIcon).setOnClickListener {
-            // Show dropdown menu with options like back, forward, refresh, etc.
-            showDropdownMenu()
+        // Add left bottom-arrow icon click listener (shows menu, back, forward, refresh options)
+        findViewById<ImageView>(R.id.leftBottomArrowIcon).setOnClickListener {
+            showLeftMenu()
+        }
+        
+        // Add right bottom-arrow icon click listener (shows dropdown of 8 ultra-fake dummy buttons)
+        findViewById<ImageView>(R.id.rightBottomArrowIcon).setOnClickListener {
+            showRightMenu()
         }
         
         // Add wrench icon click listener (settings)
@@ -179,7 +184,7 @@ class BrowserActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_menu -> {
-                showSideMenu()
+                showLeftMenu()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -187,11 +192,70 @@ class BrowserActivity : AppCompatActivity() {
     }
     
     /**
-     * Show the side menu as a bottom sheet fragment
+     * Show the left menu with browser options like back, forward, refresh, etc.
      */
-    private fun showSideMenu() {
-        val sideMenuFragment = com.yourcompany.myagenticbrowser.ui.SideMenuFragment()
-        sideMenuFragment.show(supportFragmentManager, "SideMenuBottomSheet")
+    private fun showLeftMenu() {
+        // Get the current WebView fragment to access browser functionality
+        val webViewFragment = getCurrentWebViewFragment()
+        if (webViewFragment != null) {
+            // Show a popup menu with browser actions
+            val popup = PopupMenu(this, findViewById(R.id.leftBottomArrowIcon))
+            
+            // Add browser-specific actions
+            popup.menu.add("Back").setOnMenuItemClickListener {
+                webViewFragment.goBack()
+                true
+            }
+            
+            popup.menu.add("Forward").setOnMenuItemClickListener {
+                if (webViewFragment.canGoForward()) {
+                    webViewFragment.goForward()
+                }
+                true
+            }
+            
+            popup.menu.add("Refresh").setOnMenuItemClickListener {
+                webViewFragment.reload()
+                true
+            }
+            
+            popup.menu.add("Home").setOnMenuItemClickListener {
+                // Navigate to the AI agent homepage
+                webViewFragment.loadUrl("file:///android_asset/agent_home.html")
+                true
+            }
+            
+            popup.show()
+        } else {
+            // If no WebView fragment is available, show a simple menu
+            val popup = PopupMenu(this, findViewById(R.id.leftBottomArrowIcon))
+            popup.menu.add("Refresh").setOnMenuItemClickListener {
+                // Refresh current tab
+                val currentWebViewFragment = getCurrentWebViewFragment()
+                currentWebViewFragment?.reload()
+                true
+            }
+            popup.show()
+        }
+    }
+    
+    /**
+     * Show the right menu with 8 ultra-fake dummy buttons that do nothing
+     */
+    private fun showRightMenu() {
+        // Show a popup menu with 8 dummy buttons
+        val popup = PopupMenu(this, findViewById(R.id.rightBottomArrowIcon))
+        
+        // Add 8 ultra-fake dummy buttons that do nothing
+        for (i in 1..8) {
+            popup.menu.add("Dummy Button $i").setOnMenuItemClickListener {
+                // Do nothing - these are ultra-fake dummy buttons
+                android.widget.Toast.makeText(this, "Dummy button $i clicked - does nothing", android.widget.Toast.LENGTH_SHORT).show()
+                true
+            }
+        }
+        
+        popup.show()
     }
     
     /**
@@ -231,57 +295,31 @@ class BrowserActivity : AppCompatActivity() {
         chatBottomSheet.show(supportFragmentManager, "ChatBottomSheet")
     }
     
-    // Removed the swipe-up gesture detection to prevent unwanted popup
-    
     /**
-     * Show dropdown menu with browser options like back, forward, refresh, etc.
+     * Show the chat popup with a pre-injected prompt and WebView context
      */
-    private fun showDropdownMenu() {
-        // Get the current WebView fragment to access browser functionality
-        val webViewFragment = getCurrentWebViewFragment()
-        if (webViewFragment != null) {
-            // Show a popup menu with browser actions
-            val popup = android.widget.PopupMenu(this, findViewById(R.id.bottomArrowIcon))
-            popup.menuInflater.inflate(R.menu.browser_menu, popup.menu)
-            
-            // Add browser-specific actions
-            popup.menu.add("Back").setOnMenuItemClickListener {
-                webViewFragment.goBack()
-                true
-            }
-            
-            popup.menu.add("Forward").setOnMenuItemClickListener {
-                if (webViewFragment.canGoForward()) {
-                    webViewFragment.goForward()
-                }
-                true
-            }
-            
-            popup.menu.add("Refresh").setOnMenuItemClickListener {
-                webViewFragment.reload()
-                true
-            }
-            
-            popup.show()
-        } else {
-            // If no WebView fragment is available, show a simple menu
-            val popup = android.widget.PopupMenu(this, findViewById(R.id.bottomArrowIcon))
-            popup.menu.add("Refresh").setOnMenuItemClickListener {
-                // Refresh current tab
-                val currentWebViewFragment = getCurrentWebViewFragment()
-                currentWebViewFragment?.reload()
-                true
-            }
-            popup.show()
-        }
+    fun showChatPopupWithPreInjectedPrompt(prompt: String, webView: android.webkit.WebView?) {
+        val chatBottomSheet = ChatBottomSheetFragment()
+        // Pass the prompt and WebView context to the chat fragment
+        val bundle = Bundle()
+        bundle.putString("preInjectedPrompt", prompt)
+        bundle.putSerializable("webViewContext", webView)
+        chatBottomSheet.arguments = bundle
+        chatBottomSheet.show(supportFragmentManager, "ChatBottomSheet")
     }
     
     /**
-     * Show settings
+     * Show settings - opens the side menu instead of a separate settings menu
      */
     private fun showSettings() {
-        // Show a toast for now - in a real implementation, this would open settings
-        android.widget.Toast.makeText(this, "Settings functionality would be implemented here",
-            android.widget.Toast.LENGTH_SHORT).show()
+        showSideMenu()
+    }
+    
+    /**
+     * Show the side menu as a bottom sheet fragment
+     */
+    private fun showSideMenu() {
+        val sideMenuFragment = com.yourcompany.myagenticbrowser.ui.SideMenuFragment()
+        sideMenuFragment.show(supportFragmentManager, "SideMenuBottomSheet")
     }
 }

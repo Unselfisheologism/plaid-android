@@ -120,27 +120,41 @@ class SideMenuFragment : BottomSheetDialogFragment() {
     }
 
     private fun summarizeCurrentPage() {
-        // In a real implementation, this would summarize the current page
-        // Try to get the current page content from the browser activity
+        // Get the current page content from the browser activity
         val browserActivity = activity as? BrowserActivity
         browserActivity?.getCurrentWebViewFragment()?.let { webViewFragment ->
             val webView = webViewFragment.getWebView()
             val url = webViewFragment.getUrl()
+            val title = webView?.title ?: ""
+            
             Logger.logInfo("SideMenuFragment", "Summarizing page: $url")
-            // In a real implementation, we would send this to the AI agent for summarization
+            
+            // Start a new chat session with a pre-injected prompt
+            // The AI agent should have full context of the web page
+            val summaryPrompt = "Please summarize the content of this web page: $url\nTitle: $title"
+            
+            // Show the chat popup with the pre-injected prompt
+            browserActivity.showChatPopupWithPreInjectedPrompt(summaryPrompt, webView)
         }
         Logger.logInfo("SideMenuFragment", "Summarize Page menu item selected")
     }
 
     private fun askAboutCurrentPage() {
-        // In a real implementation, this would ask about the current page
-        // Try to get the current page content from the browser activity
+        // Get the current page content from the browser activity
         val browserActivity = activity as? BrowserActivity
         browserActivity?.getCurrentWebViewFragment()?.let { webViewFragment ->
             val webView = webViewFragment.getWebView()
             val url = webViewFragment.getUrl()
+            val title = webView?.title ?: ""
+            
             Logger.logInfo("SideMenuFragment", "Asking about page: $url")
-            // In a real implementation, we would send this to the AI agent for analysis
+            
+            // Start a new chat session with a pre-injected prompt
+            // The AI agent should have full context of the web page
+            val askPrompt = "I have a question about this web page: $url\nTitle: $title\nPlease provide context about this page so I can ask questions about it."
+            
+            // Show the chat popup with the pre-injected prompt
+            browserActivity.showChatPopupWithPreInjectedPrompt(askPrompt, webView)
         }
         Logger.logInfo("SideMenuFragment", "Ask About Page menu item selected")
     }

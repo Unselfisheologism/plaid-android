@@ -1,4 +1,4 @@
-package com.yourcompany.myagenticbrowser.workflow
+qpackage com.yourcompany.myagenticbrowser.workflow
 
 import android.content.Context
 import android.os.Parcelable
@@ -24,21 +24,29 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     
     /**
-     * Execute a workflow with the provided cookies
+     * Execute a workflow with the provided cookies and UI context
      */
-    suspend fun execute(workflow: Workflow, cookies: Map<String, String>, webView: android.webkit.WebView): WorkflowResult {
-        Logger.logInfo("WorkflowEngine", "Executing workflow: ${workflow.name} through Puter.js infrastructure. All AI capabilities route through Puter.js as required. No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used. Puter.js handles all AI provider endpoints and authentication internally.")
+    suspend fun execute(workflow: Workflow, cookies: Map<String, String>, webView: android.webkit.WebView, uiContext: String? = null): WorkflowResult {
+        Logger.logInfo("WorkflowEngine", "Executing workflow: ${workflow.name} through Puter.js infrastructure with UI context. All AI capabilities route through Puter.js as required. No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used. Puter.js handles all AI provider endpoints and authentication internally.")
         
         return try {
+            // First ensure Puter.js is loaded and authenticated
+            puterClient.loadPuterJS(webView)
+            // Verify authentication before executing workflow
+            puterClient.chat(webView, "Verify authentication for workflow execution", "Authentication check", "gpt-5-nano")
+            
             // Execute each node in the workflow
             for (node in workflow.nodes) {
-                val result = executeNode(node, cookies, webView)
+                val result = executeNode(node, cookies, webView, uiContext)
                 if (result is NodeResult.Failure) {
                     return WorkflowResult.Failure("Failed to execute node: ${result.errorMessage}")
                 }
             }
             
             WorkflowResult.Success("Workflow executed successfully through Puter.js infrastructure")
+        } catch (e: SecurityException) {
+            Logger.logError("WorkflowEngine", "Authentication error during workflow execution: ${e.message}", e)
+            WorkflowResult.Failure("Authentication required: ${e.message}")
         } catch (e: Exception) {
             Logger.logError("WorkflowEngine", "Error executing workflow through Puter.js infrastructure: ${e.message}", e)
             WorkflowResult.Failure("Error executing workflow: ${e.message}")
@@ -48,11 +56,11 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
     /**
      * Execute a single workflow node
      */
-    private suspend fun executeNode(node: WorkflowNode, cookies: Map<String, String>, webView: android.webkit.WebView): NodeResult {
+    private suspend fun executeNode(node: WorkflowNode, cookies: Map<String, String>, webView: android.webkit.WebView, uiContext: String? = null): NodeResult {
         return when (node) {
-            is WorkflowNode.NotionNode -> executeNotionNode(node, cookies, webView)
-            is WorkflowNode.GmailNode -> executeGmailNode(node, cookies, webView)
-            is WorkflowNode.WebAutomationNode -> executeWebAutomationNode(node, cookies, webView)
+            is WorkflowNode.NotionNode -> executeNotionNode(node, cookies, webView, uiContext)
+            is WorkflowNode.GmailNode -> executeGmailNode(node, cookies, webView, uiContext)
+            is WorkflowNode.WebAutomationNode -> executeWebAutomationNode(node, cookies, webView, uiContext)
             else -> NodeResult.Failure("Unsupported node type through Puter.js infrastructure")
         }
     }
@@ -60,13 +68,13 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
     /**
      * Execute a Notion node
      */
-    private suspend fun executeNotionNode(node: WorkflowNode.NotionNode, cookies: Map<String, String>, webView: android.webkit.WebView): NodeResult {
-        Logger.logInfo("WorkflowEngine", "Executing Notion node: ${node.action} through Puter.js infrastructure")
+    private suspend fun executeNotionNode(node: WorkflowNode.NotionNode, cookies: Map<String, String>, webView: android.webkit.WebView, uiContext: String? = null): NodeResult {
+        Logger.logInfo("WorkflowEngine", "Executing Notion node: ${node.action} through Puter.js infrastructure with UI context")
         
         return try {
             // Use Puter.js to execute the Notion action
-            val prompt = buildNotionPrompt(node, cookies)
-            val result = puterClient.chat(webView, prompt, null, "gpt-5-nano")
+            val prompt = buildNotionPrompt(node, cookies, uiContext)
+            val result = puterClient.chat(webView, prompt, uiContext, "gpt-5-nano")
             
             NodeResult.Success("Executed Notion action: ${node.action} through Puter.js infrastructure")
         } catch (e: Exception) {
@@ -78,13 +86,13 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
     /**
      * Execute a Gmail node
      */
-    private suspend fun executeGmailNode(node: WorkflowNode.GmailNode, cookies: Map<String, String>, webView: android.webkit.WebView): NodeResult {
-        Logger.logInfo("WorkflowEngine", "Executing Gmail node: ${node.action} through Puter.js infrastructure")
+    private suspend fun executeGmailNode(node: WorkflowNode.GmailNode, cookies: Map<String, String>, webView: android.webkit.WebView, uiContext: String? = null): NodeResult {
+        Logger.logInfo("WorkflowEngine", "Executing Gmail node: ${node.action} through Puter.js infrastructure with UI context")
         
         return try {
             // Use Puter.js to execute the Gmail action
-            val prompt = buildGmailPrompt(node, cookies)
-            val result = puterClient.chat(webView, prompt, null, "gpt-5-nano")
+            val prompt = buildGmailPrompt(node, cookies, uiContext)
+            val result = puterClient.chat(webView, prompt, uiContext, "gpt-5-nano")
             
             NodeResult.Success("Executed Gmail action: ${node.action} through Puter.js infrastructure")
         } catch (e: Exception) {
@@ -96,13 +104,13 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
     /**
      * Execute a web automation node
      */
-    private suspend fun executeWebAutomationNode(node: WorkflowNode.WebAutomationNode, cookies: Map<String, String>, webView: android.webkit.WebView): NodeResult {
-        Logger.logInfo("WorkflowEngine", "Executing web automation node: ${node.action} through Puter.js infrastructure")
+    private suspend fun executeWebAutomationNode(node: WorkflowNode.WebAutomationNode, cookies: Map<String, String>, webView: android.webkit.WebView, uiContext: String? = null): NodeResult {
+        Logger.logInfo("WorkflowEngine", "Executing web automation node: ${node.action} through Puter.js infrastructure with UI context")
         
         return try {
             // Use Puter.js to execute the web automation action
-            val prompt = buildWebAutomationPrompt(node, cookies)
-            val result = puterClient.chat(webView, prompt, null, "gpt-5-nano")
+            val prompt = buildWebAutomationPrompt(node, cookies, uiContext)
+            val result = puterClient.chat(webView, prompt, uiContext, "gpt-5-nano")
             
             NodeResult.Success("Executed web automation action: ${node.action} through Puter.js infrastructure")
         } catch (e: Exception) {
@@ -114,8 +122,10 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
     /**
      * Build a prompt for Notion actions
      */
-    private fun buildNotionPrompt(node: WorkflowNode.NotionNode, cookies: Map<String, String>): String {
+    private fun buildNotionPrompt(node: WorkflowNode.NotionNode, cookies: Map<String, String>, uiContext: String? = null): String {
+        val contextInfo = if (!uiContext.isNullOrBlank()) "Current UI context: $uiContext\n" else ""
         return """
+            $contextInfo
             You are an AI assistant that can interact with Notion through the user's browser session.
             The user wants to perform the following action: ${node.action}
             Parameters: ${node.params.entries.joinToString(", ") { "${it.key}: ${it.value}" }}
@@ -130,8 +140,10 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
     /**
      * Build a prompt for Gmail actions
      */
-    private fun buildGmailPrompt(node: WorkflowNode.GmailNode, cookies: Map<String, String>): String {
+    private fun buildGmailPrompt(node: WorkflowNode.GmailNode, cookies: Map<String, String>, uiContext: String? = null): String {
+        val contextInfo = if (!uiContext.isNullOrBlank()) "Current UI context: $uiContext\n" else ""
         return """
+            $contextInfo
             You are an AI assistant that can interact with Gmail through the user's browser session.
             The user wants to perform the following action: ${node.action}
             Parameters: ${node.params.entries.joinToString(", ") { "${it.key}: ${it.value}" }}
@@ -146,8 +158,10 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
     /**
      * Build a prompt for web automation actions
      */
-    private fun buildWebAutomationPrompt(node: WorkflowNode.WebAutomationNode, cookies: Map<String, String>): String {
+    private fun buildWebAutomationPrompt(node: WorkflowNode.WebAutomationNode, cookies: Map<String, String>, uiContext: String? = null): String {
+        val contextInfo = if (!uiContext.isNullOrBlank()) "Current UI context: $uiContext\n" else ""
         return """
+            $contextInfo
             You are an AI assistant that can perform web automation tasks.
             The user wants to perform the following action: ${node.action}
             Parameters: ${node.params.entries.joinToString(", ") { "${it.key}: ${it.value}" }}

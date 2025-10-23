@@ -58,9 +58,9 @@
                 android:gravity="end"
                 android:paddingEnd="16dp">
                 
-                <!-- Bottom-arrow icon (first icon in menu bar) -->
+                <!-- Left bottom-arrow icon (first icon in menu bar) - shows menu, back, forward, refresh options -->
                 <ImageView
-                    android:id="@+id/bottomArrowIcon"
+                    android:id="@+id/leftBottomArrowIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@android:drawable/ic_menu_more"
@@ -69,7 +69,18 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Menu" />
                 
-                <!-- Wrench icon (second icon in menu bar) -->
+                <!-- Right bottom-arrow icon (second icon in menu bar) - shows dropdown of 8 ultra-fake dummy buttons -->
+                <ImageView
+                    android:id="@+id/rightBottomArrowIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@android:drawable/ic_menu_more"
+                    android:layout_marginEnd="8dp"
+                    android:padding="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Options" />
+                
+                <!-- Wrench icon (third icon in menu bar) -->
                 <ImageView
                     android:id="@+id/wrenchIcon"
                     android:layout_width="wrap_content"

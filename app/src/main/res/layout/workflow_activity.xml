@@ -6,14 +6,69 @@
     android:padding="16dp"
     android:background="@android:color/white">
 
-    <TextView
+    <!-- Workflow name and description inputs -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Workflow Interface"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="24dp" />
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp">
+
+        <EditText
+            android:id="@+id/workflowName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Workflow Name"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:padding="12dp"
+            android:background="@drawable/node_background"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/workflowDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Workflow Description"
+            android:textSize="14sp"
+            android:padding="12dp"
+            android:background="@drawable/node_background"
+            android:minLines="2" />
+
+    </LinearLayout>
+
+    <!-- Add node buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/addNotionNodeButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add Notion Node"
+            android:layout_marginEnd="4dp" />
+
+        <Button
+            android:id="@+id/addGmailNodeButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add Gmail Node"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp" />
+
+        <Button
+            android:id="@+id/addWebAutomationNodeButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add Web Node"
+            android:layout_marginStart="4dp" />
+
+    </LinearLayout>
 
     <!-- Vertical workflow nodes container -->
     <ScrollView
@@ -27,104 +82,36 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Example workflow nodes - these will be populated programmatically -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical">
-
-                <View
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:background="@drawable/circle_shape"
-                    android:layout_marginEnd="16dp"
-                    android:backgroundTint="#4CAF50" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Node 1: Initial Setup"
-                    android:padding="12dp"
-                    android:background="@drawable/node_background"
-                    android:textSize="16sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical">
-
-                <View
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:background="@drawable/circle_shape"
-                    android:layout_marginEnd="16dp"
-                    android:backgroundTint="#2196F3" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Node 2: Data Processing"
-                    android:padding="12dp"
-                    android:background="@drawable/node_background"
-                    android:textSize="16sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical">
-
-                <View
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:background="@drawable/circle_shape"
-                    android:layout_marginEnd="16dp"
-                    android:backgroundTint="#FF9800" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Node 3: Output Generation"
-                    android:padding="12dp"
-                    android:background="@drawable/node_background"
-                    android:textSize="16sp" />
-
-            </LinearLayout>
+            <!-- Nodes will be populated programmatically -->
 
         </LinearLayout>
 
     </ScrollView>
 
-    <!-- Oval shape at the bottom (as mentioned in UI description) -->
+    <!-- Action buttons at the bottom -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@drawable/oval_shape"
-        android:padding="16dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="#E3F2FD">
+        android:layout_marginTop="16dp">
 
-        <TextView
+        <Button
+            android:id="@+id/saveWorkflowButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="AI Agent Controls"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:text="Save Workflow"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="#4CAF50" />
+
+        <Button
+            android:id="@+id/runWorkflowButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Run Workflow"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="#2196F3" />
 
     </LinearLayout>
 

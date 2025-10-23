@@ -47,6 +47,11 @@
             android:theme="@style/Theme.MyAgenticBrowser" />
             
         <activity
+            android:name=".ui.WorkflowBuilderActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyAgenticBrowser" />
+            
+        <activity
             android:name=".ui.CanvasActivity"
             android:exported="false"
             android:theme="@style/Theme.MyAgenticBrowser" />

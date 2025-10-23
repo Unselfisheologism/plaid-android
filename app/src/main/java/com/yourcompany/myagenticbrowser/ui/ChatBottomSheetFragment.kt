@@ -28,6 +28,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var aiResponseTextView: TextView
     private lateinit var followUpInput: EditText
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private var preInjectedPrompt: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,6 +51,21 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return super.onCreateDialog(savedInstanceState).apply {
             // Customize the dialog if needed
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        
+        // Check for pre-injected prompt
+        preInjectedPrompt = arguments?.getString("preInjectedPrompt")
+        if (preInjectedPrompt != null) {
+            // Send the pre-injected prompt automatically
+            scope.launch {
+                // Give a small delay to ensure UI is ready
+                kotlinx.coroutines.delay(500)
+                sendMessage(preInjectedPrompt!!)
+            }
         }
     }
 
@@ -83,7 +99,15 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
         sendButton.setOnClickListener {
             val message = followUpInput.text.toString().trim()
             if (message.isNotEmpty()) {
-                sendMessage(message)
+                // Check authentication before sending message
+                scope.launch {
+                    val authenticated = checkAuthentication()
+                    if (authenticated) {
+                        sendMessage(message)
+                    } else {
+                        addErrorMessage("Please authenticate with Puter.js to use the AI chat feature.")
+                    }
+                }
                 followUpInput.setText("")
             }
         }
@@ -92,7 +116,14 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
         followUpInput.setOnEditorActionListener { _, _, _ ->
             val message = followUpInput.text.toString().trim()
             if (message.isNotEmpty()) {
-                sendMessage(message)
+                scope.launch {
+                    val authenticated = checkAuthentication()
+                    if (authenticated) {
+                        sendMessage(message)
+                    } else {
+                        addErrorMessage("Please authenticate with Puter.js to use the AI chat feature.")
+                    }
+                }
                 followUpInput.setText("")
             }
             true
@@ -129,6 +160,54 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
+    private suspend fun checkAuthentication(): Boolean {
+        // Try to get the current WebView from the parent activity
+        val webView = try {
+            val parentActivity = activity
+            if (parentActivity is BrowserActivity) {
+                parentActivity.getCurrentWebViewFragment()?.getWebView()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Logger.logError("ChatBottomSheetFragment", "Error getting WebView: ${e.message}", e)
+            null
+        }
+        
+        return if (webView != null) {
+            // Check if user is authenticated with Puter.js
+            puterClient.loadPuterJS(webView)
+            // Give time for Puter.js to load
+            kotlinx.coroutines.delay(1000)
+            
+            try {
+                val isAuth = puterClient.isPuterJSReady(webView)
+                if (isAuth) {
+                    // Check if user is signed in
+                    var isAuthenticated = false
+                    val latch = java.util.concurrent.CountDownLatch(1)
+                    
+                    webView.evaluateJavascript(
+                        "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
+                    ) { result ->
+                        isAuthenticated = result.removeSurrounding("\"").toBoolean()
+                        latch.countDown()
+                    }
+                    
+                    latch.await(2, java.util.concurrent.TimeUnit.SECONDS)
+                    isAuthenticated
+                } else {
+                    false
+                }
+            } catch (e: Exception) {
+                Logger.logError("ChatBottomSheetFragment", "Error checking authentication: ${e.message}", e)
+                false
+            }
+        } else {
+            false
+        }
+    }
+
     private suspend fun getAiResponse(message: String): String {
         // Try to get the current WebView from the parent activity
         val webView = try {
@@ -146,6 +225,8 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
         return if (webView != null) {
             // Ensure Puter.js is loaded and authenticated before making chat request
             puterClient.loadPuterJS(webView)
+            // Give time for Puter.js to load
+            kotlinx.coroutines.delay(1000)
             try {
                 puterClient.chat(
                     webView = webView,
@@ -154,7 +235,11 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
                 )
             } catch (e: Exception) {
                 Logger.logError("ChatBottomSheetFragment", "Error in Puter.js chat: ${e.message}", e)
-                "Error: ${e.message}"
+                if (e is SecurityException || e.message?.contains("Authentication") == true) {
+                    "Authentication required. Please authenticate with Puter.js to access AI features."
+                } else {
+                    "Error: ${e.message}"
+                }
             }
         } else {
             "Unable to get response - no WebView available"
