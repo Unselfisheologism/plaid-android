@@ -2,6 +2,7 @@ package com.yourcompany.myagenticbrowser.ai.puter
 
 import android.webkit.ValueCallback
 import android.webkit.WebView
+import com.yourcompany.myagenticbrowser.ai.puter.PuterSearchOrchestrator
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

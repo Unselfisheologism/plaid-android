@@ -53,18 +53,12 @@ Unable to strip the following libraries, packaging them as they are: libimage_pr
 > Task :app:writeDebugSigningConfigVersions
 > Task :app:processDebugResources
 > Task :app:compileDebugKotlin FAILED
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/agent/AiAgent.kt:103:39 Unresolved reference: error
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/agent/AiAgent.kt:104:59 Unresolved reference: error
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/agent/AiAgent.kt:193:70 Unresolved reference: SearchResults
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/agent/AiAgent.kt:195:70 Unresolved reference: SearchResults
 e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/agent/SearchVisualizationFragment.kt:90:58 Unresolved reference: SearchTurn
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ai/puter/PuterSearchOrchestrator.kt:282:1 Expecting a top level declaration
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ai/puter/PuterSearchOrchestrator.kt:223:63 Unresolved reference: MODEL_SONAR_PRO
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ai/puter/PuterClient.kt:93:140 Unresolved reference: SearchResults
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ai/puter/PuterSearchOrchestrator.kt:253:1 Expecting a top level declaration
 e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:36:29 Unresolved reference: success
 e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:37:85 Unresolved reference: errorMessage
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowStorage.kt:36:44 Type mismatch: inferred type is WorkflowStorage.WorkflowList but SerializationStrategy<TypeVariable(T)> was expected
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowStorage.kt:36:44 No value passed for parameter 'value'
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowStorage.kt:92:44 Type mismatch: inferred type is WorkflowStorage.WorkflowList but SerializationStrategy<TypeVariable(T)> was expected
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowStorage.kt:92:44 No value passed for parameter 'value'
 FAILURE: Build failed with an exception.
 * What went wrong:
 Execution failed for task ':app:compileDebugKotlin'.
