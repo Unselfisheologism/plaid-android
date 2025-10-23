@@ -193,7 +193,7 @@ class AiAgent private constructor(
     /**
      * Format search results for display
      */
-    private fun formatSearchResults(results: PuterSearchOrchestrator.SearchResults): String {
+    private fun formatSearchResults(results: SearchResults): String {
         if (results.results.isEmpty()) {
             return "No search results found."
         }

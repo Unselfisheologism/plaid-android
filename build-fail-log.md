@@ -59,12 +59,10 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 Unable to strip the following libraries, packaging them as they are: libimage_processing_util_jni.so.
 
 > Task :app:compileDebugKotlin
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/agent/AiAgent.kt:195:70 Unresolved reference: SearchResults
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/agent/SearchVisualizationFragment.kt:90:58 Unresolved reference: SearchTurn
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ai/puter/PuterClient.kt:94:140 Unresolved reference: SearchResults
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/agent/AiAgent.kt:196:70 Unresolved reference: SearchResults
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/agent/SearchVisualizationFragment.kt:91:58 Unresolved reference: SearchTurn
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ai/puter/PuterClient.kt:95:140 Unresolved reference: SearchResults
 e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ai/puter/PuterSearchOrchestrator.kt:253:1 Expecting a top level declaration
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:36:29 Unresolved reference: success
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:37:85 Unresolved reference: errorMessage
 
 > Task :app:compileDebugKotlin FAILED
 

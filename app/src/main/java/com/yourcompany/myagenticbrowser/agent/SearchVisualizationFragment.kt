@@ -88,7 +88,7 @@ class SearchVisualizationFragment : Fragment() {
                 addConversationTurn("System", "Searching the web through Perplexity Sonar models via Puter.js infrastructure...")
                 
                 // Perform search through Puter.js infrastructure using Perplexity Sonar models
-                val searchTurn = PuterSearchOrchestrator.SearchTurn(
+                val searchTurn = SearchTurn(
                     role = "user",
                     content = "Search the web for: $query"
                 )
