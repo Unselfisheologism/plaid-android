@@ -313,7 +313,7 @@ class BrowserActivity : AppCompatActivity() {
                     
                     val transport = resultMsg.obj as android.webkit.WebView.WebViewTransport
                     transport.webView = newWebView
-                    resultMsg.send()
+                    resultMsg.sendToTarget()
                     
                     return true
                 }
