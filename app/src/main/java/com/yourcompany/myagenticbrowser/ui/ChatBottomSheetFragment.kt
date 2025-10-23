@@ -198,7 +198,11 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
                 latch.countDown()
             }
             
-            latch.await(2, java.util.concurrent.TimeUnit.SECONDS)
+            try {
+                latch.await(2, java.util.concurrent.TimeUnit.SECONDS)
+            } catch (e: InterruptedException) {
+                // Handle interruption
+            }
             
             if (!isAuthenticated) {
                 // Try to sign in
@@ -211,7 +215,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
                     "      return await window.puter.auth.isSignedIn();" +
                     "    }" +
                     "    return false;" +
-                    "  } catch (e) {" +
+                    " } catch (e) {" +
                     "    console.error('Sign-in error:', e);" +
                     "    return false;" +
                     " }" +
@@ -221,7 +225,11 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
                     signInLatch.countDown()
                 }
                 
-                signInLatch.await(5, java.util.concurrent.TimeUnit.SECONDS)
+                try {
+                    signInLatch.await(5, java.util.concurrent.TimeUnit.SECONDS)
+                } catch (e: InterruptedException) {
+                    // Handle interruption
+                }
             }
             
             isAuthenticated
