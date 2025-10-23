@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import com.yourcompany.myagenticbrowser.R
 import com.yourcompany.myagenticbrowser.ai.puter.PuterClient
 import com.yourcompany.myagenticbrowser.ai.puter.PuterSearchOrchestrator
+import com.yourcompany.myagenticbrowser.ai.puter.SearchTurn
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.coroutines.*
 

@@ -33,7 +33,7 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
             // Execute each node in the workflow
             for (node in workflow.nodes) {
                 val result = executeNode(node, cookies, webView)
-                if (!result.success) {
+                if (result is NodeResult.Failure) {
                     return WorkflowResult.Failure("Failed to execute node: ${result.errorMessage}")
                 }
             }

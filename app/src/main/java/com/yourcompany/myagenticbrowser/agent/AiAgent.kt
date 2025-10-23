@@ -5,6 +5,7 @@ import com.yourcompany.myagenticbrowser.ai.puter.PuterClient
 import com.yourcompany.myagenticbrowser.ai.puter.PuterSearchOrchestrator
 import com.yourcompany.myagenticbrowser.ai.puter.model.ChatModel
 import com.yourcompany.myagenticbrowser.ai.puter.model.SearchModel
+import com.yourcompany.myagenticbrowser.ai.puter.SearchResults
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.coroutines.*
 
