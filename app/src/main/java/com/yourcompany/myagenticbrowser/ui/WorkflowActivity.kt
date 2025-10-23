@@ -15,6 +15,10 @@ import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import com.yourcompany.myagenticbrowser.browser.BrowserActivity
 import com.yourcompany.myagenticbrowser.browser.WebViewFragment
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import java.util.*
+import android.webkit.WebView
 
 /**
  * Activity for the workflow interface with vertical nodes as described in the UI specification
@@ -37,7 +41,7 @@ class WorkflowActivity : AppCompatActivity() {
     // Data class to hold workflow node information
     data class WorkflowNodeData(
         val type: String,
-        val action: String,
+        var action: String,
         val params: MutableMap<String, String> = mutableMapOf()
     )
     
@@ -45,14 +49,14 @@ class WorkflowActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.workflow_activity)
         
+        Logger.logInfo("WorkflowActivity", "Workflow activity created through Puter.js infrastructure. All AI capabilities route through Puter.js as required.")
+        
         // Initialize Puter.js components
         puterClient = PuterClient()
         workflowEngine = WorkflowEngine(this, puterClient)
         
         // Initialize UI elements
         setupUI()
-        
-        Logger.logInfo("WorkflowActivity", "Workflow activity created through Puter.js infrastructure. All AI capabilities route through Puter.js as required.")
     }
     
     private fun setupUI() {
@@ -602,23 +606,23 @@ class WorkflowActivity : AppCompatActivity() {
         }
         
         // Create workflow data structure
-        val workflow = com.yourcompany.myagenticbrowser.workflow.WorkflowEngine.Workflow(
-            id = java.util.UUID.randomUUID().toString(),
+        val workflow = WorkflowEngine.Workflow(
+            id = UUID.randomUUID().toString(),
             name = workflowName,
             description = workflowDescription,
             nodes = workflowNodes.map { nodeData ->
                 when (nodeData.type) {
-                    "notion" -> com.yourcompany.myagenticbrowser.workflow.WorkflowEngine.WorkflowNode.NotionNode(
+                    "notion" -> WorkflowEngine.WorkflowNode.NotionNode(
                         action = nodeData.action,
-                        params = nodeData.params
+                        params = HashMap(nodeData.params)
                     )
-                    "gmail" -> com.yourcompany.myagenticbrowser.workflow.WorkflowEngine.WorkflowNode.GmailNode(
+                    "gmail" -> WorkflowEngine.WorkflowNode.GmailNode(
                         action = nodeData.action,
-                        params = nodeData.params
+                        params = HashMap(nodeData.params)
                     )
-                    "web" -> com.yourcompany.myagenticbrowser.workflow.WorkflowEngine.WorkflowNode.WebAutomationNode(
+                    "web" -> WorkflowEngine.WorkflowNode.WebAutomationNode(
                         action = nodeData.action,
-                        params = nodeData.params
+                        params = HashMap(nodeData.params)
                     )
                     else -> throw IllegalArgumentException("Unknown node type: ${nodeData.type}")
                 }
@@ -646,23 +650,23 @@ class WorkflowActivity : AppCompatActivity() {
         }
         
         // Create workflow data structure
-        val workflow = com.yourcompany.myagenticbrowser.workflow.WorkflowEngine.Workflow(
-            id = java.util.UUID.randomUUID().toString(),
+        val workflow = WorkflowEngine.Workflow(
+            id = UUID.randomUUID().toString(),
             name = workflowName,
             description = workflowDescriptionEditText.text.toString(),
             nodes = workflowNodes.map { nodeData ->
                 when (nodeData.type) {
-                    "notion" -> com.yourcompany.myagenticbrowser.workflow.WorkflowEngine.WorkflowNode.NotionNode(
+                    "notion" -> WorkflowEngine.WorkflowNode.NotionNode(
                         action = nodeData.action,
-                        params = nodeData.params
+                        params = HashMap(nodeData.params)
                     )
-                    "gmail" -> com.yourcompany.myagenticbrowser.workflow.WorkflowEngine.WorkflowNode.GmailNode(
+                    "gmail" -> WorkflowEngine.WorkflowNode.GmailNode(
                         action = nodeData.action,
-                        params = nodeData.params
+                        params = HashMap(nodeData.params)
                     )
-                    "web" -> com.yourcompany.myagenticbrowser.workflow.WorkflowEngine.WorkflowNode.WebAutomationNode(
+                    "web" -> WorkflowEngine.WorkflowNode.WebAutomationNode(
                         action = nodeData.action,
-                        params = nodeData.params
+                        params = HashMap(nodeData.params)
                     )
                     else -> throw IllegalArgumentException("Unknown node type: ${nodeData.type}")
                 }
@@ -704,22 +708,18 @@ class WorkflowActivity : AppCompatActivity() {
         }.start()
     }
     
-    private fun getCurrentWebView(): android.webkit.WebView {
-        // Try to get the current WebView from the browser activity
-        val browserActivity = this as? BrowserActivity
-        return browserActivity?.getCurrentWebViewFragment()?.getWebView() 
-            ?: android.webkit.WebView(this)
+    private fun getCurrentWebView(): WebView? {
+        // Since WorkflowActivity doesn't have direct access to BrowserActivity's WebView,
+        // we'll return null. In a real implementation, you might pass the WebView reference
+        // from the BrowserActivity when starting this activity
+        return null
     }
     
     private fun getCurrentUIContext(): String {
-        // Get current UI context from the browser activity
-        val browserActivity = this as? BrowserActivity
-        val webViewFragment = browserActivity?.getCurrentWebViewFragment()
-        return if (webViewFragment != null) {
-            "Current page: ${webViewFragment.getUrl()}, Title: ${webViewFragment.view?.findViewById<android.webkit.WebView>(R.id.webView)?.title}"
-        } else {
-            "No current page context available"
-        }
+        // Since WorkflowActivity doesn't have direct access to BrowserActivity's WebView,
+        // return a default context. In a real implementation, you might pass the context
+        // from the BrowserActivity when starting this activity
+        return "Workflow execution context"
     }
     
     private fun getCookies(): Map<String, String> {

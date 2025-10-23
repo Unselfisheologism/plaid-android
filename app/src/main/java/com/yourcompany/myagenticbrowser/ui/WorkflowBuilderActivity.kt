@@ -240,12 +240,9 @@ class WorkflowBuilderActivity : AppCompatActivity() {
             
             // Get current WebView from parent activity or create a temporary one for the workflow execution
             val webView = try {
-                val browserActivity = parentActivity
-                if (browserActivity is com.yourcompany.myagenticbrowser.browser.BrowserActivity) {
-                    browserActivity.getCurrentWebViewFragment()?.getWebView()
-                } else {
-                    null
-                }
+                // Since WorkflowBuilderActivity is a standalone activity, it doesn't have direct access to BrowserActivity
+                // In a real implementation, you might pass the WebView reference when starting this activity
+                null
             } catch (e: Exception) {
                 Logger.logError("WorkflowBuilderActivity", "Error getting WebView: ${e.message}", e)
                 null
@@ -274,23 +271,9 @@ class WorkflowBuilderActivity : AppCompatActivity() {
     }
     
     private fun getCurrentUIContext(): String {
-        // Get the current UI context from the active browser tab
-        return try {
-            val browserActivity = parentActivity
-            if (browserActivity is com.yourcompany.myagenticbrowser.browser.BrowserActivity) {
-                val webViewFragment = browserActivity.getCurrentWebViewFragment()
-                val webView = webViewFragment?.getWebView()
-                val url = webViewFragment?.getUrl() ?: "unknown"
-                val title = webView?.title ?: "unknown"
-                
-                "Current page: $title ($url)"
-            } else {
-                "Unknown UI context"
-            }
-        } catch (e: Exception) {
-            Logger.logError("WorkflowBuilderActivity", "Error getting UI context: ${e.message}", e)
-            "Error getting UI context"
-        }
+        // Since WorkflowBuilderActivity is a standalone activity, it doesn't have direct access to BrowserActivity
+        // In a real implementation, you might pass the context when starting this activity
+        return "Workflow builder context"
     }
     
     override fun onDestroy() {

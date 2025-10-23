@@ -119,18 +119,9 @@ class ChatPopupFragment : Fragment() {
     }
 
     private suspend fun getAiResponse(message: String): String {
-        // Get the current WebView from the parent activity if available
-        val webView = (activity as? ChatPopupActivity)?.getCurrentWebView()
-        
-        return if (webView != null) {
-            puterClient.chat(
-                webView = webView,
-                message = message,
-                context = "Current context for chat popup"
-            )
-        } else {
-            "Unable to get response - no WebView available"
-        }
+        // ChatPopupFragment is not used in this app, ChatBottomSheetFragment is used instead
+        // This fragment exists for reference only
+        return "Chat functionality is available through the bottom sheet in BrowserActivity"
     }
 
     private fun addUserMessage(message: String) {

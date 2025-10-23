@@ -24,8 +24,7 @@ class BrowserActivity : AppCompatActivity() {
     private lateinit var tabAdapter: TabAdapter
     lateinit var tabManager: TabManager
     private lateinit var toolbar: MaterialToolbar
-    private lateinit var aiAgent: AiAgent
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
@@ -34,17 +33,12 @@ class BrowserActivity : AppCompatActivity() {
 
         // Initialize managers
         
-        // Initialize AI agent with context
-        val agentContext = AiAgent.AgentContext()
-        aiAgent = AiAgent.create(agentContext)
-
-        // Initialize views
-        viewPager = findViewById(R.id.viewPager)
-        toolbar = findViewById(R.id.toolbar)
-        
         // Initialize tab management
         tabManager = TabManager(this)
         tabAdapter = TabAdapter(this, tabManager)
+        
+        viewPager = findViewById(R.id.viewPager)
+        toolbar = findViewById(R.id.toolbar)
         
         viewPager.adapter = tabAdapter
         viewPager.offscreenPageLimit = 2 // Keep 3 tabs active maximum
@@ -221,7 +215,7 @@ class BrowserActivity : AppCompatActivity() {
             
             popup.menu.add("Home").setOnMenuItemClickListener {
                 // Navigate to the AI agent homepage
-                webViewFragment.loadUrl("file:///android_asset/agent_home.html")
+                webViewFragment.getWebView().loadUrl("file:///android_asset/agent_home.html")
                 true
             }
             
@@ -277,7 +271,7 @@ class BrowserActivity : AppCompatActivity() {
         val webViewFragment = getCurrentWebViewFragment()
         if (webViewFragment != null) {
             val webView = webViewFragment.view?.findViewById<android.webkit.WebView>(R.id.webView)
-            val agentContext = AiAgent.AgentContext(
+            val agentContext = com.yourcompany.myagenticbrowser.agent.AiAgent.AgentContext(
                 activeTabUrl = webViewFragment.getUrl(),
                 activeTabTitle = webView?.title ?: "",
                 webView = webView
@@ -303,7 +297,8 @@ class BrowserActivity : AppCompatActivity() {
         // Pass the prompt and WebView context to the chat fragment
         val bundle = Bundle()
         bundle.putString("preInjectedPrompt", prompt)
-        bundle.putSerializable("webViewContext", webView)
+        // Pass WebView context - but WebView is not serializable, so we pass the URL instead
+        bundle.putString("webViewContextUrl", webView?.url)
         chatBottomSheet.arguments = bundle
         chatBottomSheet.show(supportFragmentManager, "ChatBottomSheet")
     }

@@ -1,13 +1,14 @@
 Run ./gradlew clean assembleDebug
-  
-Downloading https://services.gradle.org/distributions/gradle-8.2-bin.zip
-............10%............20%............30%.............40%............50%............60%............70%.............80%............90%............100%
+
 Welcome to Gradle 8.2!
+
 Here are the highlights of this release:
  - Kotlin DSL: new reference documentation, assignment syntax by default
  - Kotlin DSL is now the default with Gradle init
  - Improved suggestions to resolve errors in console output
+
 For more details see https://docs.gradle.org/8.2/release-notes.html
+
 Starting a Gradle Daemon (subsequent builds will be faster)
 Checking the license for package Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/licenses
 License for package Android SDK Build-Tools 33.0.1 accepted.
@@ -21,15 +22,15 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:preBuild UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
 > Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
-> Task :app:dataBindingMergeDependencyArtifactsDebug
 > Task :app:generateDebugResValues
 > Task :app:generateDebugResources
+> Task :app:dataBindingMergeDependencyArtifactsDebug
 > Task :app:packageDebugResources
 > Task :app:mergeDebugResources
 > Task :app:parseDebugLocalResources
 > Task :app:checkDebugAarMetadata
-> Task :app:dataBindingGenBaseClassesDebug
 > Task :app:mapDebugSourceSetPaths
+> Task :app:dataBindingGenBaseClassesDebug
 > Task :app:createDebugCompatibleScreenManifests
 > Task :app:extractDeepLinksDebug
 > Task :app:processDebugMainManifest
@@ -39,33 +40,71 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
+> Task :app:processDebugManifestForPackage
 > Task :app:compressDebugAssets
 > Task :app:desugarDebugFileDependencies
 > Task :app:mergeDebugJniLibFolders
 > Task :app:checkDebugDuplicateClasses
 > Task :app:mergeDebugNativeLibs
-> Task :app:processDebugManifestForPackage
 > Task :app:mergeLibDexDebug
-> Task :app:mergeExtDexDebug
+
 > Task :app:stripDebugDebugSymbols
 Unable to strip the following libraries, packaging them as they are: libimage_processing_util_jni.so.
+
 > Task :app:processDebugResources
 > Task :app:validateSigningDebug
 > Task :app:writeDebugAppMetadata
 > Task :app:writeDebugSigningConfigVersions
-> Task :app:compileDebugKotlin
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ai/puter/PuterSearchOrchestrator.kt:253:1 Expecting a top level declaration
+> Task :app:mergeExtDexDebug
+
+> Task :app:compileDebugKotlin FAILED
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/browser/BrowserActivity.kt:224:33 Unresolved reference: loadUrl
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/browser/BrowserActivity.kt:306:50 Type mismatch: inferred type is WebView? but Serializable? was expected
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/ChatPopupFragment.kt:123:57 Unresolved reference: getCurrentWebView
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:8:50 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:33:42 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:50:26 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:154:17 Val cannot be reassigned
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:282:17 Val cannot be reassigned
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:438:17 Val cannot be reassigned
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:605:66 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:611:75 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:615:74 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:619:72 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:649:66 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:655:75 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:659:74 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:663:72 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:8:50 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:19:42 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:38:26 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:167:66 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:234:70 Unresolved reference: WorkflowEngine
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:243:39 Unresolved reference: parentActivity
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:279:35 Unresolved reference: parentActivity
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:1 Expecting a top level declaration
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:10 Expecting a top level declaration
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:13 Expecting a top level declaration
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:14 Expecting a top level declaration
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:25 Expecting a top level declaration
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:26 Expecting a top level declaration
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:42 Expecting a top level declaration
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:43 Expecting a top level declaration
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:51 imports are only allowed in the beginning of file
+
 FAILURE: Build failed with an exception.
+
 * What went wrong:
 Execution failed for task ':app:compileDebugKotlin'.
 > A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+31 actionable tasks: 30 executed, 1 up-to-date
    > Compilation error. See log for more details
+
 * Try:
 > Run with --stacktrace option to get the stack trace.
 > Run with --info or --debug option to get more log output.
 > Run with --scan to get full insights.
 > Get more help at https://help.gradle.org.
-BUILD FAILED in 1m 55s
-> Task :app:compileDebugKotlin FAILED
-31 actionable tasks: 30 executed, 1 up-to-date
+
+BUILD FAILED in 43s
 Error: Process completed with exit code 1.

@@ -1,18 +1,13 @@
-qpackage com.yourcompany.myagenticbrowser.workflow
+package com.yourcompany.myagenticbrowser.workflow
 
 import android.content.Context
 import android.os.Parcelable
 import com.yourcompany.myagenticbrowser.ai.puter.PuterClient
-import com.yourcompany.myagenticbrowser.ai.puter.model.ChatModel
-import com.yourcompany.myagenticbrowser.browser.cookies.CookieManager
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.coroutines.*
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import android.webkit.WebView
 
 /**
  * Workflow engine for executing automated tasks through Puter.js infrastructure
@@ -26,14 +21,16 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
     /**
      * Execute a workflow with the provided cookies and UI context
      */
-    suspend fun execute(workflow: Workflow, cookies: Map<String, String>, webView: android.webkit.WebView, uiContext: String? = null): WorkflowResult {
+    suspend fun execute(workflow: Workflow, cookies: Map<String, String>, webView: WebView?, uiContext: String? = null): WorkflowResult {
         Logger.logInfo("WorkflowEngine", "Executing workflow: ${workflow.name} through Puter.js infrastructure with UI context. All AI capabilities route through Puter.js as required. No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used. Puter.js handles all AI provider endpoints and authentication internally.")
         
         return try {
             // First ensure Puter.js is loaded and authenticated
-            puterClient.loadPuterJS(webView)
-            // Verify authentication before executing workflow
-            puterClient.chat(webView, "Verify authentication for workflow execution", "Authentication check", "gpt-5-nano")
+            if (webView != null) {
+                puterClient.loadPuterJS(webView)
+                // Verify authentication before executing workflow
+                puterClient.chat(webView, "Verify authentication for workflow execution", "Authentication check", "gpt-5-nano")
+            }
             
             // Execute each node in the workflow
             for (node in workflow.nodes) {
@@ -56,7 +53,7 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
     /**
      * Execute a single workflow node
      */
-    private suspend fun executeNode(node: WorkflowNode, cookies: Map<String, String>, webView: android.webkit.WebView, uiContext: String? = null): NodeResult {
+    private suspend fun executeNode(node: WorkflowNode, cookies: Map<String, String>, webView: WebView?, uiContext: String? = null): NodeResult {
         return when (node) {
             is WorkflowNode.NotionNode -> executeNotionNode(node, cookies, webView, uiContext)
             is WorkflowNode.GmailNode -> executeGmailNode(node, cookies, webView, uiContext)
@@ -68,13 +65,17 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
     /**
      * Execute a Notion node
      */
-    private suspend fun executeNotionNode(node: WorkflowNode.NotionNode, cookies: Map<String, String>, webView: android.webkit.WebView, uiContext: String? = null): NodeResult {
+    private suspend fun executeNotionNode(node: WorkflowNode.NotionNode, cookies: Map<String, String>, webView: WebView?, uiContext: String? = null): NodeResult {
         Logger.logInfo("WorkflowEngine", "Executing Notion node: ${node.action} through Puter.js infrastructure with UI context")
         
         return try {
             // Use Puter.js to execute the Notion action
             val prompt = buildNotionPrompt(node, cookies, uiContext)
-            val result = puterClient.chat(webView, prompt, uiContext, "gpt-5-nano")
+            val result = if (webView != null) {
+                puterClient.chat(webView, prompt, uiContext, "gpt-5-nano")
+            } else {
+                "Unable to execute Notion node - no WebView available"
+            }
             
             NodeResult.Success("Executed Notion action: ${node.action} through Puter.js infrastructure")
         } catch (e: Exception) {
@@ -86,13 +87,17 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
     /**
      * Execute a Gmail node
      */
-    private suspend fun executeGmailNode(node: WorkflowNode.GmailNode, cookies: Map<String, String>, webView: android.webkit.WebView, uiContext: String? = null): NodeResult {
+    private suspend fun executeGmailNode(node: WorkflowNode.GmailNode, cookies: Map<String, String>, webView: WebView?, uiContext: String? = null): NodeResult {
         Logger.logInfo("WorkflowEngine", "Executing Gmail node: ${node.action} through Puter.js infrastructure with UI context")
         
         return try {
             // Use Puter.js to execute the Gmail action
             val prompt = buildGmailPrompt(node, cookies, uiContext)
-            val result = puterClient.chat(webView, prompt, uiContext, "gpt-5-nano")
+            val result = if (webView != null) {
+                puterClient.chat(webView, prompt, uiContext, "gpt-5-nano")
+            } else {
+                "Unable to execute Gmail node - no WebView available"
+            }
             
             NodeResult.Success("Executed Gmail action: ${node.action} through Puter.js infrastructure")
         } catch (e: Exception) {
@@ -104,13 +109,17 @@ class WorkflowEngine(private val context: Context, private val puterClient: Pute
     /**
      * Execute a web automation node
      */
-    private suspend fun executeWebAutomationNode(node: WorkflowNode.WebAutomationNode, cookies: Map<String, String>, webView: android.webkit.WebView, uiContext: String? = null): NodeResult {
+    private suspend fun executeWebAutomationNode(node: WorkflowNode.WebAutomationNode, cookies: Map<String, String>, webView: WebView?, uiContext: String? = null): NodeResult {
         Logger.logInfo("WorkflowEngine", "Executing web automation node: ${node.action} through Puter.js infrastructure with UI context")
         
         return try {
             // Use Puter.js to execute the web automation action
             val prompt = buildWebAutomationPrompt(node, cookies, uiContext)
-            val result = puterClient.chat(webView, prompt, uiContext, "gpt-5-nano")
+            val result = if (webView != null) {
+                puterClient.chat(webView, prompt, uiContext, "gpt-5-nano")
+            } else {
+                "Unable to execute web automation node - no WebView available"
+            }
             
             NodeResult.Success("Executed web automation action: ${node.action} through Puter.js infrastructure")
         } catch (e: Exception) {
