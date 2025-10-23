@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.webkit.WebChromeClient
 import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
@@ -278,7 +279,7 @@ class BrowserActivity : AppCompatActivity() {
             }, "AndroidInterface")
             
             // Set up WebViewClient to handle popup windows
-            webView.webViewClient = object : android.webkit.WebViewClient() {
+            webView.webChromeClient = object : android.webkit.WebChromeClient() {
                 override fun onCreateWindow(
                     view: android.webkit.WebView,
                     isDialog: Boolean,
