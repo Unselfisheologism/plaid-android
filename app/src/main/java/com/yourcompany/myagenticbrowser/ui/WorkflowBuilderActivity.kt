@@ -255,9 +255,9 @@ class WorkflowBuilderActivity : AppCompatActivity() {
                 
                 try {
                     val result = workflowEngine.execute(workflow, cookies, webView, uiContext)
-                    if (result.success) {
+                    if (result is com.yourcompany.myagenticbrowser.workflow.WorkflowEngine.WorkflowResult.Success) {
                         Toast.makeText(this@WorkflowBuilderActivity, "Workflow executed successfully", Toast.LENGTH_SHORT).show()
-                    } else {
+                    } else if (result is com.yourcompany.myagenticbrowser.workflow.WorkflowEngine.WorkflowResult.Failure) {
                         Toast.makeText(this@WorkflowBuilderActivity, "Workflow execution failed: ${result.errorMessage}", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {

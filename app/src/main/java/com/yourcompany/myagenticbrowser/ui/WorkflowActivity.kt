@@ -677,14 +677,16 @@ class WorkflowActivity : AppCompatActivity() {
         val webView = getCurrentWebView()
         val uiContext = getCurrentUIContext()
         
-        // Run workflow asynchronously
+        // Run workflow asynchronously using coroutines
         Thread {
             try {
                 // Get cookies for the workflow
                 val cookies = getCookies()
                 
-                // Execute workflow through Puter.js infrastructure
-                val result = workflowEngine.execute(workflow, cookies, webView, uiContext)
+                // Execute workflow through Puter.js infrastructure using runBlocking to call suspend function
+                val result = kotlinx.coroutines.runBlocking {
+                    workflowEngine.execute(workflow, cookies, webView, uiContext)
+                }
                 
                 // Show result on UI thread
                 runOnUiThread {

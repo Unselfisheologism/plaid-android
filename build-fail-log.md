@@ -58,39 +58,9 @@ Unable to strip the following libraries, packaging them as they are: libimage_pr
 > Task :app:mergeExtDexDebug
 
 > Task :app:compileDebugKotlin FAILED
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/browser/BrowserActivity.kt:224:33 Unresolved reference: loadUrl
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/browser/BrowserActivity.kt:306:50 Type mismatch: inferred type is WebView? but Serializable? was expected
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/ChatPopupFragment.kt:123:57 Unresolved reference: getCurrentWebView
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:8:50 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:33:42 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:50:26 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:154:17 Val cannot be reassigned
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:282:17 Val cannot be reassigned
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:438:17 Val cannot be reassigned
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:605:66 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:611:75 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:615:74 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:619:72 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:649:66 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:655:75 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:659:74 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:663:72 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:8:50 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:19:42 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:38:26 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:167:66 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:234:70 Unresolved reference: WorkflowEngine
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:243:39 Unresolved reference: parentActivity
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:279:35 Unresolved reference: parentActivity
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:1 Expecting a top level declaration
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:10 Expecting a top level declaration
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:13 Expecting a top level declaration
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:14 Expecting a top level declaration
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:25 Expecting a top level declaration
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:26 Expecting a top level declaration
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:42 Expecting a top level declaration
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:43 Expecting a top level declaration
-e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/workflow/WorkflowEngine.kt:1:51 imports are only allowed in the beginning of file
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowActivity.kt:687:45 Suspend function 'execute' should be called only from a coroutine or another suspend function
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:258:32 Unresolved reference: success
+e: file:///home/runner/work/plaid-android/plaid-android/app/src/main/java/com/yourcompany/myagenticbrowser/ui/WorkflowBuilderActivity.kt:261:107 Unresolved reference: errorMessage
 
 FAILURE: Build failed with an exception.
 
