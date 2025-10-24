@@ -29,6 +29,7 @@ class PuterClient {
      * This uses the actual Puter.js JavaScript library loaded in the WebView
      * According to requirements, Puter.js handles all AI provider endpoints and authentication internally
      * No direct API keys for OpenAI, Anthropic, Google, etc. should be stored or used
+     * Puter.js handles all AI provider endpoints and authentication internally as required
      */
     suspend fun chat(
         webView: WebView,
@@ -304,54 +305,6 @@ class PuterClient {
         }
     }
         
-        // Inject JavaScript to handle authentication popup completion
-        val jsCode = """
-            (function() {
-                // Handle authentication popup completion
-                window.handleAuthPopupClose = function() {
-                    // Check if signed in
-                    if (window.puter && window.puter.auth && window.puter.auth.isSignedIn()) {
-                        if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
-                            window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
-                        }
-                    } else {
-                        if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
-                            window.AndroidInterface.handleAuthError("Authentication failed or cancelled");
-                        }
-                    }
-                };
-                
-                // Override signIn to handle popup flow
-                if (window.puter && window.puter.auth) {
-                    const originalSignIn = window.puter.auth.signIn;
-                    window.puter.auth.signIn = function() {
-                        return new Promise((resolve, reject) => {
-                            // Set up listener for popup completion
-                            window.handleAuthPopupClose = function() {
-                                if (window.puter.auth.isSignedIn()) {
-                                    if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
-                                        window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
-                                    }
-                                    resolve(window.puter.auth.getUser());
-                                } else {
-                                    if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
-                                        window.AndroidInterface.handleAuthError("Authentication failed");
-                                    }
-                                    reject(new Error("Authentication failed"));
-                                }
-                            };
-                            
-                            // Call original signIn
-                            originalSignIn().catch(reject);
-                        });
-                    };
-                }
-            })();
-        """.trimIndent()
-        
-        webView.evaluateJavascript(jsCode, null)
-    }
-
     /**
      * Execute JavaScript in the WebView and return the result as a string
     */
@@ -407,7 +360,7 @@ class PuterClient {
                     }
                 };
             }
-        """.trimIndent()
+        """
     }
 
     /**

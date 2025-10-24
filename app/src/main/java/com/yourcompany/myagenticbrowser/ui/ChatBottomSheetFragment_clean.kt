@@ -245,7 +245,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
             false
         }
     }
-
+            
     private suspend fun getAiResponse(message: String): String {
         // Try to get the current WebView from the parent activity
         val webView = try {
