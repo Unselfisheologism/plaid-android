@@ -137,4 +137,53 @@ class PuterJSInterface(
             puterClient.loadPuterJS(webView)
         }
     }
+    
+    /**
+     * Launch Puter authentication using Chrome Custom Tabs
+     * This replaces the old webview-based authentication
+     */
+    @JavascriptInterface
+    fun launchPuterAuth() {
+        scope.launch {
+            try {
+                val activity = webView.context as? BrowserActivity
+                activity?.let { browserActivity ->
+                    browserActivity.puterAuthHelper.launchAuthentication()
+                }
+            } catch (e: Exception) {
+                Logger.logError("PuterJSInterface", "Error launching Puter auth: ${e.message}", e)
+            }
+        }
+    }
+    
+    /**
+     * Check if user is authenticated with Puter
+     * This uses the new Chrome Custom Tabs authentication approach
+     */
+    @JavascriptInterface
+    fun isPuterAuthenticated(): Boolean {
+        return try {
+            val activity = webView.context as? BrowserActivity
+            activity?.puterAuthHelper?.isAuthenticated() ?: false
+        } catch (e: Exception) {
+            Logger.logError("PuterJSInterface", "Error checking Puter auth status: ${e.message}", e)
+            false
+        }
+    }
+    
+    /**
+     * Show chat popup from JavaScript
+     * This method is called from the agent_home.html page
+     */
+    @JavascriptInterface
+    fun showChatPopup() {
+        scope.launch {
+            try {
+                val activity = webView.context as? BrowserActivity
+                activity?.showChatPopup()
+            } catch (e: Exception) {
+                Logger.logError("PuterJSInterface", "Error showing chat popup: ${e.message}", e)
+            }
+        }
+    }
 }

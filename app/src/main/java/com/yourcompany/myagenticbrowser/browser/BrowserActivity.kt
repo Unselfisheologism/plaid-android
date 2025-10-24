@@ -1,6 +1,9 @@
 package com.yourcompany.myagenticbrowser.browser
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -19,12 +22,23 @@ import com.yourcompany.myagenticbrowser.agent.AiAgent
 import com.yourcompany.myagenticbrowser.agent.AgentService
 import com.yourcompany.myagenticbrowser.agent.SearchVisualizationActivity
 import com.yourcompany.myagenticbrowser.ui.ChatBottomSheetFragment
+import com.yourcompany.myagenticbrowser.ai.puter.auth.PuterAuthHelper
 
 class BrowserActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
     private lateinit var tabAdapter: TabAdapter
-    lateinit var tabManager: TabManager
+    private lateinit var tabManager: TabManager
     private lateinit var toolbar: MaterialToolbar
+    private lateinit var puterAuthHelper: PuterAuthHelper
+    
+    private val authStatusReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "com.yourcompany.myagenticbrowser.AUTH_STATUS_CHANGED") {
+                val isAuthenticated = intent.getBooleanExtra("is_authenticated", false)
+                updateAuthStatus(isAuthenticated)
+            }
+        }
+    }
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +51,9 @@ class BrowserActivity : AppCompatActivity() {
         // Initialize tab management
         tabManager = TabManager(this)
         tabAdapter = TabAdapter(this, tabManager)
+        
+        // Initialize Puter authentication helper
+        puterAuthHelper = PuterAuthHelper(this)
         
         viewPager = findViewById(R.id.viewPager)
         toolbar = findViewById(R.id.toolbar)
@@ -85,6 +102,10 @@ class BrowserActivity : AppCompatActivity() {
             addAgentTab() // Use AI agent as default homepage per desire.md
         }
         tabAdapter.notifyDataSetChanged()
+        
+        // Register the authentication status receiver
+        val filter = IntentFilter("com.yourcompany.myagenticbrowser.AUTH_STATUS_CHANGED")
+        registerReceiver(authStatusReceiver, filter)
         
         MemoryManager.logMemoryUsage()
     }
@@ -170,6 +191,15 @@ class BrowserActivity : AppCompatActivity() {
         MemoryManager.gc()
     }
     
+    override fun onDestroy() {
+        try {
+            unregisterReceiver(authStatusReceiver)
+        } catch (e: IllegalArgumentException) {
+            // Receiver was not registered, ignore
+        }
+        super.onDestroy()
+    }
+    
     override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
         menuInflater.inflate(R.menu.browser_menu, menu)
         return true
@@ -241,86 +271,6 @@ class BrowserActivity : AppCompatActivity() {
         showSideMenu()
     }
     
-    /**
-     * Check authentication before performing an action that requires Puter.js authentication
-     */
-    private fun checkAuthenticationAndRun(action: (Boolean) -> Unit) {
-        val webViewFragment = getCurrentWebViewFragment()
-        webViewFragment?.let { fragment ->
-            val webView = fragment.getWebView()
-            
-            // Enable popup windows for Puter.js authentication
-            webView.settings.javaScriptCanOpenWindowsAutomatically = true
-            webView.settings.setSupportMultipleWindows(true)
-            
-            // Set up WebViewClient to handle authentication in a new tab instead of popup
-            webView.webChromeClient = object : android.webkit.WebChromeClient() {
-                override fun onCreateWindow(
-                    view: android.webkit.WebView,
-                    isDialog: Boolean,
-                    isUserGesture: Boolean,
-                    resultMsg: android.os.Message
-                ): Boolean {
-                    // Get the URL that would be loaded in the popup
-                    val transport = resultMsg.obj as android.webkit.WebView.WebViewTransport
-                    val newWebView = android.webkit.WebView(this@BrowserActivity)
-                    
-                    // Set up the new WebView to detect when the authentication page loads
-                    newWebView.webViewClient = object : android.webkit.WebViewClient() {
-                        override fun onPageStarted(view: android.webkit.WebView?, url: String?, favicon: android.graphics.Bitmap?) {
-                            super.onPageStarted(view, url, favicon)
-                            if (url?.contains("puter.com/auth") == true) {
-                                // This is an authentication page, so we'll open it in a new tab
-                                runOnUiThread {
-                                    // Create a new tab with this URL
-                                    addNewTab(url, com.yourcompany.myagenticbrowser.browser.tab.TabOwner.USER)
-                                }
-                                
-                                // Close the temporary WebView and send the result
-                                view?.destroy()
-                                resultMsg.sendToTarget()
-                            }
-                        }
-                    }
-                    
-                    newWebView.loadUrl("about:blank") // Load a blank page to trigger the client
-                    return true
-                }
-            }
-            
-            // Check if user is authenticated with Puter.js
-            webView.evaluateJavascript(
-                "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
-            ) { result ->
-                val isAuthenticated = result.removeSurrounding("\"").toBoolean()
-                if (isAuthenticated) {
-                    action(true)
-                } else {
-                    // Try to authenticate - this will open in a new tab
-                    webView.evaluateJavascript(
-                        "(async function() { " +
-                        "  try {" +
-                        "    if (window.puter && window.puter.auth) {" +
-                        "      await window.puter.auth.signIn();" +
-                        "      return await window.puter.auth.isSignedIn();" +
-                        "    }" +
-                        "    return false;" +
-                        "  } catch (e) {" +
-                        "    console.error('Sign-in error:', e);" +
-                        "    return false;" +
-                        " }" +
-                        "})();"
-                    ) { authResult ->
-                        val isAuthenticatedAfterSignIn = authResult.removeSurrounding("\"").toBoolean()
-                        action(isAuthenticatedAfterSignIn)
-                    }
-                }
-            }
-        } ?: run {
-            // No WebView available
-            action(false)
-        }
-    }
     
     /**
      * Get the current active WebView if available
@@ -351,18 +301,17 @@ class BrowserActivity : AppCompatActivity() {
      */
     fun showChatPopup() {
         // Check if user is authenticated with Puter.js before showing chat popup
-        checkAuthenticationAndRun { authenticated ->
-            if (authenticated) {
-                val chatBottomSheet = ChatBottomSheetFragment()
-                chatBottomSheet.show(supportFragmentManager, "ChatBottomSheet")
-            } else {
-                // Show error message if not authenticated
-                android.widget.Toast.makeText(
-                    this,
-                    "Please authenticate with Puter.js to use AI features",
-                    android.widget.Toast.LENGTH_LONG
-                ).show()
-            }
+        if (puterAuthHelper.isAuthenticated()) {
+            val chatBottomSheet = ChatBottomSheetFragment()
+            chatBottomSheet.show(supportFragmentManager, "ChatBottomSheet")
+        } else {
+            // Show error message if not authenticated and prompt for authentication
+            android.widget.Toast.makeText(
+                this,
+                "Please authenticate with Puter.js to use AI features. Starting authentication...",
+                android.widget.Toast.LENGTH_LONG
+            ).show()
+            puterAuthHelper.launchAuthentication()
         }
     }
     
@@ -371,23 +320,48 @@ class BrowserActivity : AppCompatActivity() {
      */
     fun showChatPopupWithPreInjectedPrompt(prompt: String, webView: android.webkit.WebView?) {
         // Check if user is authenticated with Puter.js before showing chat popup
-        checkAuthenticationAndRun { authenticated ->
-            if (authenticated) {
-                val chatBottomSheet = ChatBottomSheetFragment()
-                // Pass the prompt and WebView context to the chat fragment
-                val bundle = Bundle()
-                bundle.putString("preInjectedPrompt", prompt)
-                // Pass WebView context - but WebView is not serializable, so we pass the URL instead
-                bundle.putString("webViewContextUrl", webView?.url)
-                chatBottomSheet.arguments = bundle
-                chatBottomSheet.show(supportFragmentManager, "ChatBottomSheet")
-            } else {
-                // Show error message if not authenticated
-                android.widget.Toast.makeText(
-                    this,
-                    "Please authenticate with Puter.js to use AI features",
-                    android.widget.Toast.LENGTH_LONG
-                ).show()
+        if (puterAuthHelper.isAuthenticated()) {
+            val chatBottomSheet = ChatBottomSheetFragment()
+            // Pass the prompt and WebView context to the chat fragment
+            val bundle = Bundle()
+            bundle.putString("preInjectedPrompt", prompt)
+            // Pass WebView context - but WebView is not serializable, so we pass the URL instead
+            bundle.putString("webViewContextUrl", webView?.url)
+            chatBottomSheet.arguments = bundle
+            chatBottomSheet.show(supportFragmentManager, "ChatBottomSheet")
+        } else {
+            // Show error message if not authenticated and prompt for authentication
+            android.widget.Toast.makeText(
+                this,
+                "Please authenticate with Puter.js to use AI features. Starting authentication...",
+                android.widget.Toast.LENGTH_LONG
+            ).show()
+            puterAuthHelper.launchAuthentication()
+        }
+        
+        /**
+         * Update authentication status and notify all tabs
+         * Called when authentication status changes
+         */
+        fun updateAuthStatus(isAuthenticated: Boolean) {
+            // Update the authentication status in shared preferences
+            val prefs = getSharedPreferences("puter_auth_prefs", MODE_PRIVATE)
+            prefs.edit()
+                .putBoolean("is_authenticated", isAuthenticated)
+                .apply()
+                
+            // Notify all WebView fragments about the authentication status change
+            for (i in 0 until tabManager.getTabCount()) {
+                val fragment = supportFragmentManager.findFragmentByTag("f$i")
+                if (fragment is WebViewFragment) {
+                    val webView = fragment.getWebView()
+                    webView.post {
+                        webView.evaluateJavascript(
+                            "if (typeof updateAuthStatus === 'function') updateAuthStatus($isAuthenticated);",
+                            null
+                        )
+                    }
+                }
             }
         }
     }

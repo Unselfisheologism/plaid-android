@@ -75,6 +75,17 @@
             android:name=".ui.TabPreviewActivity"
             android:exported="false"
             android:theme="@style/Theme.MyAgenticBrowser" />
+            
+        <activity
+            android:name=".ai.puter.auth.AuthActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="myagenticbrowser" android:host="auth" />
+            </intent-filter>
+        </activity>
 
         <service
             android:name=".agent.AgentService"
