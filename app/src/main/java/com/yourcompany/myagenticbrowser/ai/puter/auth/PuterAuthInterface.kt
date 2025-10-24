@@ -31,6 +31,47 @@ class PuterAuthInterface(
     fun signInUser() {
         Logger.logInfo("PuterAuthInterface", "Sign in requested")
         webView.post {
+            // Set up WebViewClient to handle authentication in a new tab instead of popup
+            val activity = webView.context as? com.yourcompany.myagenticbrowser.browser.BrowserActivity
+            if (activity != null) {
+                // Override the window creation to open in a new tab instead of a popup
+                webView.webChromeClient = object : android.webkit.WebChromeClient() {
+                    override fun onCreateWindow(
+                        view: android.webkit.WebView,
+                        isDialog: Boolean,
+                        isUserGesture: Boolean,
+                        resultMsg: android.os.Message
+                    ): Boolean {
+                        // Instead of creating a popup, open in a new tab
+                        // We'll get the URL that would be loaded in the popup
+                        val transport = resultMsg.obj as android.webkit.WebView.WebViewTransport
+                        val newWebView = android.webkit.WebView(activity)
+                        
+                        // Set up the new WebView to detect when the authentication page loads
+                        newWebView.webViewClient = object : android.webkit.WebViewClient() {
+                            override fun onPageStarted(view: android.webkit.WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                                super.onPageStarted(view, url, favicon)
+                                if (url?.contains("puter.com/auth") == true) {
+                                    // This is an authentication page, so we'll open it in a new tab
+                                    activity.runOnUiThread {
+                                        // Create a new tab with this URL
+                                        activity.addNewTab(url, com.yourcompany.myagenticbrowser.browser.tab.TabOwner.USER)
+                                    }
+                                    
+                                    // Close the temporary WebView and send the result
+                                    view?.destroy()
+                                    resultMsg.sendToTarget()
+                                }
+                            }
+                        }
+                        
+                        newWebView.loadUrl("about:blank") // Load a blank page to trigger the client
+                        return true
+                    }
+                }
+            }
+            
+            // Inject JavaScript to handle authentication
             val jsCode = """
                 (async function() {
                     try {
@@ -38,7 +79,7 @@ class PuterAuthInterface(
                             await window.puter.auth.signIn();
                             const isSignedIn = window.puter.auth.isSignedIn();
                             const userInfo = isSignedIn ? await window.puter.auth.getUser() : null;
-                            AndroidInterface.handleAuthResult(isSignedIn, JSON.stringify(userInfo));
+                            AndroidInterface.handleAuthResult(isSignedIn, JSON.stringify(userInfo), null);
                         } else {
                             AndroidInterface.handleAuthResult(false, null, "Puter not initialized");
                         }

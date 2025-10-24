@@ -89,7 +89,7 @@ class BrowserActivity : AppCompatActivity() {
         MemoryManager.logMemoryUsage()
     }
 
-    private fun addNewTab(url: String = "https://www.google.com", owner: com.yourcompany.myagenticbrowser.browser.tab.TabOwner = com.yourcompany.myagenticbrowser.browser.tab.TabOwner.USER) {
+    fun addNewTab(url: String = "https://www.google.com", owner: com.yourcompany.myagenticbrowser.browser.tab.TabOwner = com.yourcompany.myagenticbrowser.browser.tab.TabOwner.USER) {
         tabManager.addTab(url, owner)
         tabAdapter.notifyItemInserted(tabManager.getTabCount() - 1)
         

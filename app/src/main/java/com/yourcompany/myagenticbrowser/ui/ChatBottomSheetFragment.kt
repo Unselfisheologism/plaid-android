@@ -187,52 +187,157 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
             // Give time for Puter.js to load
             delay(100)
             
-            // First check if already signed in
-            var isAuthenticated = false
-            val latch = java.util.concurrent.CountDownLatch(1)
+            // Enable popup windows for Puter.js authentication
+            webView.settings.javaScriptCanOpenWindowsAutomatically = true
+            webView.settings.setSupportMultipleWindows(true)
             
-            webView.evaluateJavascript(
-                "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
-            ) { result ->
-                isAuthenticated = result.removeSurrounding("\"").toBoolean()
-                latch.countDown()
+            // Set up WebViewClient to handle authentication in a new tab instead of popup
+            if (webView.webChromeClient == null || webView.webChromeClient !is PuterClient.CustomWebChromeClient) {
+                webView.webChromeClient = PuterClient.CustomWebChromeClient(webView)
             }
             
-            try {
-                latch.await(2, java.util.concurrent.TimeUnit.SECONDS)
-            } catch (e: InterruptedException) {
-                // Handle interruption
-            }
-            
-            if (!isAuthenticated) {
-                // Try to sign in
-                val signInLatch = java.util.concurrent.CountDownLatch(1)
-                webView.evaluateJavascript(
-                    "(async function() { " +
-                    "  try {" +
-                    "    if (window.puter && window.puter.auth) {" +
-                    "      await window.puter.auth.signIn();" +
-                    "      return await window.puter.auth.isSignedIn();" +
-                    "    }" +
-                    "    return false;" +
-                    " } catch (e) {" +
-                    "    console.error('Sign-in error:', e);" +
-                    "    return false;" +
-                    " }" +
-                    "})();"
-                ) { result ->
-                    isAuthenticated = result.removeSurrounding("\"").toBoolean()
-                    signInLatch.countDown()
+            // Add JavaScript interface for authentication callbacks
+            webView.addJavascriptInterface(object : Any() {
+                @android.webkit.JavascriptInterface
+                fun handleAuthSuccess(userJson: String) {
+                    // Authentication successful
                 }
                 
-                try {
-                    signInLatch.await(5, java.util.concurrent.TimeUnit.SECONDS)
-                } catch (e: InterruptedException) {
-                    // Handle interruption
+                @android.webkit.JavascriptInterface
+                fun handleAuthError(errorMessage: String) {
+                    // Authentication failed
+                }
+            }, "AndroidInterface")
+            
+            // Check if user is authenticated with Puter.js
+            val authCheckResult = suspendCancellableCoroutine<Boolean> { continuation ->
+                webView.evaluateJavascript(
+                    "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
+                ) { result ->
+                    val isSignedIn = result.removeSurrounding("\"").toBoolean()
+                    if (isSignedIn) {
+                        continuation.resume(true)
+                    } else {
+                        // Try to sign in
+                        webView.evaluateJavascript(
+                            "(async function() { " +
+                            "  try {" +
+                            "    if (window.puter && window.puter.auth) {" +
+                            "      await window.puter.auth.signIn();" +
+                            "      return await window.puter.auth.isSignedIn();" +
+                            "    }" +
+                            "    return false;" +
+                            "  } catch (e) {" +
+                            "    console.error('Sign-in error:', e);" +
+                            "    return false;" +
+                            " }" +
+                            "})();"
+                        ) { signInResult ->
+                            val isSignedInAfterSignIn = signInResult.removeSurrounding("\"").toBoolean()
+                            continuation.resume(isSignedInAfterSignIn)
+                        }
+                    }
                 }
             }
             
-            isAuthenticated
+            authCheckResult
+        } else {
+            false
+        }
+    }
+            
+            // Inject JavaScript to handle authentication popup completion
+            val jsCode = """
+                (function() {
+                    // Handle authentication popup completion
+                    window.handleAuthPopupClose = function() {
+                        // Check if signed in
+                        if (window.puter && window.puter.auth && window.puter.auth.isSignedIn()) {
+                            if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
+                                window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
+                            }
+                        } else {
+                            if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
+                                window.AndroidInterface.handleAuthError("Authentication failed or cancelled");
+                            }
+                        }
+                    };
+                    
+                    // Override signIn to handle popup flow
+                    if (window.puter && window.puter.auth) {
+                        const originalSignIn = window.puter.auth.signIn;
+                        window.puter.auth.signIn = function() {
+                            return new Promise((resolve, reject) => {
+                                // Set up listener for popup completion
+                                window.handleAuthPopupClose = function() {
+                                    if (window.puter.auth.isSignedIn()) {
+                                        if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
+                                            window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
+                                        }
+                                        resolve(window.puter.auth.getUser());
+                                    } else {
+                                        if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
+                                            window.AndroidInterface.handleAuthError("Authentication failed");
+                                        }
+                                        reject(new Error("Authentication failed"));
+                                    }
+                                };
+                                
+                                // Call original signIn
+                                originalSignIn().catch(reject);
+                            });
+                        };
+                    }
+                })();
+            """.trimIndent()
+            
+            webView.evaluateJavascript(jsCode, null)
+            
+            // Add JavaScript interface for authentication callbacks
+            webView.addJavascriptInterface(object : Any() {
+                @android.webkit.JavascriptInterface
+                fun handleAuthSuccess(userJson: String) {
+                    // Authentication successful
+                }
+                
+                @android.webkit.JavascriptInterface
+                fun handleAuthError(errorMessage: String) {
+                    // Authentication failed
+                }
+            }, "AndroidInterface")
+            
+            // Check if user is authenticated with Puter.js
+            val authCheckResult = suspendCancellableCoroutine<Boolean> { continuation ->
+                webView.evaluateJavascript(
+                    "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
+                ) { result ->
+                    val isSignedIn = result.removeSurrounding("\"").toBoolean()
+                    if (isSignedIn) {
+                        continuation.resume(true)
+                    } else {
+                        // Try to sign in
+                        webView.evaluateJavascript(
+                            "(async function() { " +
+                            "  try {" +
+                            "    if (window.puter && window.puter.auth) {" +
+                            "      await window.puter.auth.signIn();" +
+                            "      return await window.puter.auth.isSignedIn();" +
+                            "    }" +
+                            "    return false;" +
+                            "  } catch (e) {" +
+                            "    console.error('Sign-in error:', e);" +
+                            "    return false;" +
+                            " }" +
+                            "})();"
+                        ) { signInResult ->
+                            val isSignedInAfterSignIn = signInResult.removeSurrounding("\"").toBoolean()
+                            continuation.resume(isSignedInAfterSignIn)
+                        }
+                    }
+                }
+            }
+            
+            authCheckResult
         } else {
             false
         }

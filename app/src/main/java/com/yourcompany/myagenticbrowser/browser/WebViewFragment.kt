@@ -206,6 +206,46 @@ class WebViewFragment : Fragment() {
                     }
                 }
             }
+            
+            override fun onCreateWindow(
+                view: WebView,
+                isDialog: Boolean,
+                isUserGesture: Boolean,
+                resultMsg: android.os.Message
+            ): Boolean {
+                // Get the BrowserActivity to handle tab creation
+                val browserActivity = activity as? com.yourcompany.myagenticbrowser.browser.BrowserActivity
+                if (browserActivity != null) {
+                    // Instead of creating a popup, open in a new tab
+                    // We'll get the URL that would be loaded in the popup
+                    val transport = resultMsg.obj as WebView.WebViewTransport
+                    val newWebView = WebView(browserActivity)
+                    
+                    // Set up the new WebView to detect when the authentication page loads
+                    newWebView.webViewClient = object : WebViewClient() {
+                        override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                            super.onPageStarted(view, url, favicon)
+                            if (url?.contains("puter.com/auth") == true) {
+                                // This is an authentication page, so we'll open it in a new tab
+                                browserActivity.runOnUiThread {
+                                    // Create a new tab with this URL
+                                    browserActivity.addNewTab(url, com.yourcompany.myagenticbrowser.browser.tab.TabOwner.USER)
+                                }
+                                
+                                // Close the temporary WebView and send the result
+                                view?.destroy()
+                                resultMsg.sendToTarget()
+                            }
+                        }
+                    }
+                    
+                    newWebView.loadUrl("about:blank") // Load a blank page to trigger the client
+                    return true
+                }
+                
+                // If we can't get the activity, fall back to default behavior
+                return false
+            }
         }
     }
     

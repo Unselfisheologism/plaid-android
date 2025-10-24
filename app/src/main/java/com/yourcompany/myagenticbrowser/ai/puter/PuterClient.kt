@@ -202,42 +202,202 @@ class PuterClient {
     private suspend fun ensureAuthenticated(webView: WebView): Boolean = withContext(Dispatchers.Main) {
         // First check if already signed in
         var isAuthenticated = false
-        val latch = CountDownLatch(1)
         
-        webView.evaluateJavascript(
-            "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
-        ) { result ->
-            isAuthenticated = result.removeSurrounding("\"").toBoolean()
-            latch.countDown()
+        // Enable popup windows for Puter.js authentication
+        webView.settings.javaScriptCanOpenWindowsAutomatically = true
+        webView.settings.setSupportMultipleWindows(true)
+        
+        // Set up WebViewClient to handle authentication in a new tab instead of popup
+        if (webView.webChromeClient == null || webView.webChromeClient !is CustomWebChromeClient) {
+            webView.webChromeClient = CustomWebChromeClient(webView)
         }
         
-        latch.await(2, TimeUnit.SECONDS)
-        
-        if (!isAuthenticated) {
-            // Try to sign in
-            val signInLatch = CountDownLatch(1)
-            webView.evaluateJavascript(
-                "(async function() { " +
-                "  try {" +
-                "    if (window.puter && window.puter.auth) {" +
-                "      await window.puter.auth.signIn();" +
-                "      return await window.puter.auth.isSignedIn();" +
-                "    }" +
-                "    return false;" +
-                " } catch (e) {" +
-                "    console.error('Sign-in error:', e);" +
-                "    return false;" +
-                " }" +
-                "})();"
-            ) { result ->
-                isAuthenticated = result.removeSurrounding("\"").toBoolean()
-                signInLatch.countDown()
+        // Add JavaScript interface for authentication callbacks
+        webView.addJavascriptInterface(object : Any() {
+            @android.webkit.JavascriptInterface
+            fun handleAuthSuccess(userJson: String) {
+                isAuthenticated = true
             }
             
-            signInLatch.await(5, TimeUnit.SECONDS)
+            @android.webkit.JavascriptInterface
+            fun handleAuthError(errorMessage: String) {
+                isAuthenticated = false
+            }
+        }, "AndroidInterface")
+        
+        // Check if user is authenticated with Puter.js
+        val authCheckResult = suspendCancellableCoroutine<Boolean> { continuation ->
+            webView.evaluateJavascript(
+                "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
+            ) { result ->
+                val isSignedIn = result.removeSurrounding("\"").toBoolean()
+                if (isSignedIn) {
+                    isAuthenticated = true
+                    continuation.resume(true)
+                } else {
+                    // Try to sign in
+                    webView.evaluateJavascript(
+                        "(async function() { " +
+                        "  try {" +
+                        "    if (window.puter && window.puter.auth) {" +
+                        "      await window.puter.auth.signIn();" +
+                        "      return await window.puter.auth.isSignedIn();" +
+                        "    }" +
+                        "    return false;" +
+                        "  } catch (e) {" +
+                        "    console.error('Sign-in error:', e);" +
+                        "    return false;" +
+                        " }" +
+                        "})();"
+                    ) { signInResult ->
+                        val isSignedInAfterSignIn = signInResult.removeSurrounding("\"").toBoolean()
+                        isAuthenticated = isSignedInAfterSignIn
+                        continuation.resume(isSignedInAfterSignIn)
+                    }
+                }
+            }
         }
         
-        isAuthenticated
+        authCheckResult
+    }
+    
+    // Custom WebChromeClient to handle authentication in tabs
+    class CustomWebChromeClient(private val mainWebView: WebView) : android.webkit.WebChromeClient() {
+        override fun onCreateWindow(
+            view: android.webkit.WebView,
+            isDialog: Boolean,
+            isUserGesture: Boolean,
+            resultMsg: android.os.Message
+        ): Boolean {
+            // Get the BrowserActivity to handle tab creation
+            val activity = mainWebView.context as? com.yourcompany.myagenticbrowser.browser.BrowserActivity
+            if (activity != null) {
+                // Instead of creating a popup, open in a new tab
+                // We'll get the URL that would be loaded in the popup
+                val transport = resultMsg.obj as android.webkit.WebView.WebViewTransport
+                val newWebView = android.webkit.WebView(activity)
+                
+                // Set up the new WebView to detect when the authentication page loads
+                newWebView.webViewClient = object : android.webkit.WebViewClient() {
+                    override fun onPageStarted(view: android.webkit.WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                        super.onPageStarted(view, url, favicon)
+                        if (url?.contains("puter.com/auth") == true) {
+                            // This is an authentication page, so we'll open it in a new tab
+                            activity.runOnUiThread {
+                                // Create a new tab with this URL
+                                activity.addNewTab(url, com.yourcompany.myagenticbrowser.browser.tab.TabOwner.USER)
+                            }
+                            
+                            // Close the temporary WebView and send the result
+                            view?.destroy()
+                            resultMsg.sendToTarget()
+                        }
+                    }
+                }
+                
+                newWebView.loadUrl("about:blank") // Load a blank page to trigger the client
+                return true
+            }
+            
+            // If we can't get the activity, fall back to default behavior
+            return false
+        }
+    }
+        
+        // Inject JavaScript to handle authentication popup completion
+        val jsCode = """
+            (function() {
+                // Handle authentication popup completion
+                window.handleAuthPopupClose = function() {
+                    // Check if signed in
+                    if (window.puter && window.puter.auth && window.puter.auth.isSignedIn()) {
+                        if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
+                            window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
+                        }
+                    } else {
+                        if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
+                            window.AndroidInterface.handleAuthError("Authentication failed or cancelled");
+                        }
+                    }
+                };
+                
+                // Override signIn to handle popup flow
+                if (window.puter && window.puter.auth) {
+                    const originalSignIn = window.puter.auth.signIn;
+                    window.puter.auth.signIn = function() {
+                        return new Promise((resolve, reject) => {
+                            // Set up listener for popup completion
+                            window.handleAuthPopupClose = function() {
+                                if (window.puter.auth.isSignedIn()) {
+                                    if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
+                                        window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
+                                    }
+                                    resolve(window.puter.auth.getUser());
+                                } else {
+                                    if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
+                                        window.AndroidInterface.handleAuthError("Authentication failed");
+                                    }
+                                    reject(new Error("Authentication failed"));
+                                }
+                            };
+                            
+                            // Call original signIn
+                            originalSignIn().catch(reject);
+                        });
+                    };
+                }
+            })();
+        """.trimIndent()
+        
+        webView.evaluateJavascript(jsCode, null)
+        
+        // Add JavaScript interface for authentication callbacks
+        webView.addJavascriptInterface(object : Any() {
+            @android.webkit.JavascriptInterface
+            fun handleAuthSuccess(userJson: String) {
+                isAuthenticated = true
+            }
+            
+            @android.webkit.JavascriptInterface
+            fun handleAuthError(errorMessage: String) {
+                isAuthenticated = false
+            }
+        }, "AndroidInterface")
+        
+        // Check if user is authenticated with Puter.js
+        val authCheckResult = suspendCancellableCoroutine<Boolean> { continuation ->
+            webView.evaluateJavascript(
+                "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
+            ) { result ->
+                val isSignedIn = result.removeSurrounding("\"").toBoolean()
+                if (isSignedIn) {
+                    isAuthenticated = true
+                    continuation.resume(true)
+                } else {
+                    // Try to sign in
+                    webView.evaluateJavascript(
+                        "(async function() { " +
+                        "  try {" +
+                        "    if (window.puter && window.puter.auth) {" +
+                        "      await window.puter.auth.signIn();" +
+                        "      return await window.puter.auth.isSignedIn();" +
+                        "    }" +
+                        "    return false;" +
+                        "  } catch (e) {" +
+                        "    console.error('Sign-in error:', e);" +
+                        "    return false;" +
+                        " }" +
+                        "})();"
+                    ) { signInResult ->
+                        val isSignedInAfterSignIn = signInResult.removeSurrounding("\"").toBoolean()
+                        isAuthenticated = isSignedInAfterSignIn
+                        continuation.resume(isSignedInAfterSignIn)
+                    }
+                }
+            }
+        }
+        
+        authCheckResult
     }
 
     /**
