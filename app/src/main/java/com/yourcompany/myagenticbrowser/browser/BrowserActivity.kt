@@ -23,6 +23,7 @@ import com.yourcompany.myagenticbrowser.agent.AgentService
 import com.yourcompany.myagenticbrowser.agent.SearchVisualizationActivity
 import com.yourcompany.myagenticbrowser.ui.ChatBottomSheetFragment
 import com.yourcompany.myagenticbrowser.ai.puter.auth.PuterAuthHelper
+import com.yourcompany.myagenticbrowser.ai.puter.auth.TokenManager
 
 class BrowserActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
