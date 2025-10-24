@@ -3,12 +3,16 @@ package com.yourcompany.myagenticbrowser.ai.puter.auth
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.yourcompany.myagenticbrowser.R
 import java.security.GeneralSecurityException
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.IOException
 
 class PuterAuthHelper(private val context: Context) {
     private val sharedPreferences: SharedPreferences
@@ -50,16 +54,18 @@ class PuterAuthHelper(private val context: Context) {
 
         val customTabsIntent = CustomTabsIntent.Builder()
             .setToolbarColor(context.getColor(R.color.purple_500))
-            .setCloseButtonIcon(
-                // Use a proper close button icon from your resources
-                getCloseButtonIcon()
-            )
+            .apply {
+                // Use a proper close button icon from your resources if available
+                getCloseButtonIcon()?.let { icon ->
+                    setCloseButtonIcon(icon)
+                }
+            }
             .build()
         
         customTabsIntent.launchUrl(context, Uri.parse(authUrl))
     }
     
-    private fun getCloseButtonIcon(): android.graphics.Bitmap? {
+    private fun getCloseButtonIcon(): Bitmap? {
         // In a real implementation, you'd load an actual icon from resources
         return null
     }
