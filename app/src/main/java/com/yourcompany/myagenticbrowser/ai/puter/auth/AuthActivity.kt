@@ -11,7 +11,9 @@ import okhttp3.Request
 import okhttp3.Callback
 import okhttp3.Call
 import okhttp3.Response
+import okhttp3.OkHttpClient
 import org.json.JSONObject
+import org.json.JSONException
 import java.io.IOException
 
 class AuthActivity : AppCompatActivity() {
@@ -73,7 +75,7 @@ class AuthActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         try {
                             val responseBody = response.body?.string()
-                            val json = JSONObject(responseBody)
+                            val json = if (responseBody != null) JSONObject(responseBody) else throw JSONException("Response body is null")
                             val token = json.getString("access_token")
                             saveToken(token)
                             Toast.makeText(this@AuthActivity, "Authentication successful!", Toast.LENGTH_SHORT).show()
