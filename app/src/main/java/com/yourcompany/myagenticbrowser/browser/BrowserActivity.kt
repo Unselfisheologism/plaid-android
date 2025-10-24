@@ -106,19 +106,18 @@ class BrowserActivity : AppCompatActivity() {
      * Add a new AI agent tab as the default homepage
      */
     private fun addAgentTab() {
-        // For now, we'll load a local HTML page that initializes Puter.js
-        // In a real implementation, this would load the AI agent interface
+        // Load the agent homepage as a new tab and make it the default
         val agentUrl = "file:///android_asset/agent_home.html"
         tabManager.addTab(agentUrl, com.yourcompany.myagenticbrowser.browser.tab.TabOwner.USER)
         tabAdapter.notifyItemInserted(tabManager.getTabCount() - 1)
         
-        // Switch to the new tab
+        // Switch to the new tab (making it the default)
         viewPager.currentItem = tabManager.getTabCount() - 1
         
         // Update toolbar title to reflect current tab
         updateToolbarTitle()
         
-        Logger.logInfo("BrowserActivity", "Added AI agent tab: $agentUrl, Owner: USER, Total tabs: ${tabManager.getTabCount()}")
+        Logger.logInfo("BrowserActivity", "Added AI agent tab as homepage: $agentUrl, Owner: USER, Total tabs: ${tabManager.getTabCount()}")
     }
 
     fun updateToolbarTitle() {

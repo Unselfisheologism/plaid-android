@@ -300,44 +300,7 @@ class WebViewFragment : Fragment() {
                 
                 if (!isAuthenticated) {
                     // Try to authenticate automatically
-                    Logger.logInfo("WebViewFragment", "Puter.js not authenticated, attempting automatic authentication")
-                    
-                    view.evaluateJavascript(
-                        "(async function() { " +
-                        "  try {" +
-                        "    if (window.puter && window.puter.auth) {" +
-                        "      await window.puter.auth.signIn();" +
-                        "      return await window.puter.auth.isSignedIn();" +
-                        "    }" +
-                        "    return false;" +
-                        "  } catch (e) {" +
-                        "    console.error('Automatic sign-in error:', e);" +
-                        "    return false;" +
-                        " }" +
-                        "})();"
-                    ) { authResult ->
-                        val isAuthenticatedAfterSignIn = authResult.removeSurrounding("\"").toBoolean()
-                        if (isAuthenticatedAfterSignIn) {
-                            Logger.logInfo("WebViewFragment", "Puter.js automatically authenticated")
-                            activity?.runOnUiThread {
-                                android.widget.Toast.makeText(
-                                    context,
-                                    "Successfully authenticated with Puter.js",
-                                    android.widget.Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        } else {
-                            Logger.logInfo("WebViewFragment", "Puter.js authentication failed or cancelled")
-                            activity?.runOnUiThread {
-                                // Show a toast or dialog to inform the user about authentication
-                                android.widget.Toast.makeText(
-                                    context,
-                                    "Please authenticate with Puter.js to access AI features",
-                                    android.widget.Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
-                    }
+                    Logger.logInfo("WebViewFragment", "Puter.js not authenticated, authentication will be available through the UI")
                 } else {
                     Logger.logInfo("WebViewFragment", "Puter.js is authenticated")
                 }

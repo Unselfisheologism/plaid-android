@@ -153,24 +153,31 @@
         
         // Function to handle authentication toggle (login/logout)
         async function toggleAuth() {
+            const authButton = document.getElementById('authButton');
+            const authStatusText = document.getElementById('authStatusText');
+            
             try {
                 if (window.puter && window.puter.auth) {
                     const isSignedIn = await window.puter.auth.isSignedIn();
                     if (isSignedIn) {
                         // Logout
                         await window.puter.auth.signOut();
-                        document.getElementById('authStatusText').textContent = 'Not authenticated';
-                        document.getElementById('authButton').textContent = 'Login with Puter';
+                        authStatusText.textContent = 'Not authenticated';
+                        authButton.textContent = 'Login with Puter';
                     } else {
+                        // Update UI to show signing in state
+                        authButton.textContent = 'Signing in...';
+                        authButton.disabled = true;
+                        
                         // Login
                         await window.puter.auth.signIn();
                         const isSignedInAfter = await window.puter.auth.isSignedIn();
                         if (isSignedInAfter) {
-                            document.getElementById('authStatusText').textContent = 'Authenticated';
-                            document.getElementById('authButton').textContent = 'Logout';
+                            authStatusText.textContent = 'Authenticated';
+                            authButton.textContent = 'Logout';
                         } else {
-                            document.getElementById('authStatusText').textContent = 'Not authenticated';
-                            document.getElementById('authButton').textContent = 'Login with Puter';
+                            authStatusText.textContent = 'Not authenticated';
+                            authButton.textContent = 'Login with Puter';
                         }
                     }
                     // Update auth status display
@@ -180,35 +187,17 @@
                 }
             } catch (error) {
                 console.error('Error in toggleAuth:', error);
-                alert('Error during authentication: ' + error.message);
-            }
-        }
-        
-        // Toggle authentication (login/logout)
-        async function toggleAuth() {
-            try {
-                if (window.puter && window.puter.auth) {
-                    const isSignedIn = await window.puter.auth.isSignedIn();
-                    if (isSignedIn) {
-                        // Logout
-                        window.puter.auth.signOut();
-                        document.getElementById('authStatusText').textContent = 'Not authenticated';
-                        document.getElementById('authButton').textContent = 'Login with Puter';
-                    } else {
-                        // Login
-                        await window.puter.auth.signIn();
-                        const isSignedInAfter = await window.puter.auth.isSignedIn();
-                        if (isSignedInAfter) {
-                            document.getElementById('authStatusText').textContent = 'Authenticated';
-                            document.getElementById('authButton').textContent = 'Logout';
-                        }
-                    }
+                // Reset button state in case of error
+                if (!await window.puter.auth.isSignedIn()) {
+                    authButton.textContent = 'Login with Puter';
                 } else {
-                    alert('Puter.js not loaded. Please refresh the page.');
+                    authButton.textContent = 'Logout';
                 }
-            } catch (error) {
-                console.error('Error in toggleAuth:', error);
+                authButton.disabled = false;
                 alert('Error during authentication: ' + error.message);
+            } finally {
+                // Ensure button is enabled after operation completes
+                authButton.disabled = false;
             }
         }
         
