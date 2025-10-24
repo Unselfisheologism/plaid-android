@@ -342,22 +342,27 @@ class BrowserActivity : AppCompatActivity() {
      * Called when authentication status changes
      */
     fun updateAuthStatus(isAuthenticated: Boolean) {
-        // Update the authentication status in shared preferences
-        val tokenManager = TokenManager(this)
-        tokenManager.setAuthStatus(isAuthenticated)
+        try {
+            // Update the authentication status in shared preferences
+            val tokenManager = TokenManager(this)
+            tokenManager.setAuthStatus(isAuthenticated)
             
-        // Notify all WebView fragments about the authentication status change
-        for (i in 0 until tabManager.getTabCount()) {
-            val fragment = supportFragmentManager.findFragmentByTag("f$i")
-            if (fragment is WebViewFragment) {
-                val webView = fragment.getWebView()
-                webView.post {
-                    webView.evaluateJavascript(
-                        "if (typeof updateAuthStatus === 'function') updateAuthStatus($isAuthenticated);",
-                        null
-                    )
+            // Notify all WebView fragments about the authentication status change
+            for (i in 0 until tabManager.getTabCount()) {
+                val fragment = supportFragmentManager.findFragmentByTag("f$i")
+                if (fragment is WebViewFragment) {
+                    val webView = fragment.getWebView()
+                    webView.post {
+                        webView.evaluateJavascript(
+                            "if (typeof updateAuthStatus === 'function') updateAuthStatus($isAuthenticated);",
+                            null
+                        )
+                    }
                 }
             }
+        } catch (e: Exception) {
+            // If updating auth status fails, log the error
+            android.util.Log.e("BrowserActivity", "Failed to update authentication status", e)
         }
     }
     

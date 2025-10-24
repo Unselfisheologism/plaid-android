@@ -3,11 +3,28 @@ package com.yourcompany.myagenticbrowser.ai.puter.auth
 
 import android.content.Context
 import android.content.SharedPreferences
-import java.time.Instant
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
+import java.security.GeneralSecurityException
 
 class TokenManager(private val context: Context) {
     private val sharedPreferences: SharedPreferences by lazy {
-        context.getSharedPreferences("secure_puter_auth_prefs", Context.MODE_PRIVATE)
+        try {
+            val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+            EncryptedSharedPreferences.create(
+                context,
+                "secure_puter_auth_prefs",
+                masterKeyAlias,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        } catch (e: GeneralSecurityException) {
+            // Fallback to regular SharedPreferences if encryption fails
+            context.getSharedPreferences("secure_puter_auth_prefs", Context.MODE_PRIVATE)
+        } catch (e: IOException) {
+            // Fallback to regular SharedPreferences if encryption fails
+            context.getSharedPreferences("secure_puter_auth_prefs", Context.MODE_PRIVATE)
+        }
     }
     
     companion object {
@@ -23,22 +40,51 @@ class TokenManager(private val context: Context) {
     fun saveToken(accessToken: String, expiresIn: Long = 3600) {
         val expiryTime = System.currentTimeMillis() + (expiresIn * 1000)
         
-        sharedPreferences.edit()
-            .putString(ACCESS_TOKEN_KEY, accessToken)
-            .putLong(TOKEN_EXPIRY_KEY, expiryTime)
-            .apply()
+        try {
+            sharedPreferences.edit()
+                .putString(ACCESS_TOKEN_KEY, accessToken)
+                .putLong(TOKEN_EXPIRY_KEY, expiryTime)
+                .apply()
+        } catch (e: Exception) {
+            // If saving to encrypted preferences fails, log the error
+            android.util.Log.e("TokenManager", "Failed to save token to encrypted preferences", e)
+        }
+    }
+
+    /**
+     * Saves the authentication token, refresh token and its expiry time
+     */
+    fun saveTokenWithRefresh(accessToken: String, refreshToken: String, expiresIn: Long = 3600) {
+        val expiryTime = System.currentTimeMillis() + (expiresIn * 1000)
+        
+        try {
+            sharedPreferences.edit()
+                .putString(ACCESS_TOKEN_KEY, accessToken)
+                .putString(REFRESH_TOKEN_KEY, refreshToken)
+                .putLong(TOKEN_EXPIRY_KEY, expiryTime)
+                .apply()
+        } catch (e: Exception) {
+            // If saving to encrypted preferences fails, log the error
+            android.util.Log.e("TokenManager", "Failed to save token with refresh to encrypted preferences", e)
+        }
     }
 
     /**
      * Gets the current access token if it's still valid
      */
     fun getValidToken(): String? {
-        val token = sharedPreferences.getString(ACCESS_TOKEN_KEY, null)
-        val expiryTime = sharedPreferences.getLong(TOKEN_EXPIRY_KEY, 0)
-        
-        return if (token != null && System.currentTimeMillis() < expiryTime) {
-            token
-        } else {
+        return try {
+            val token = sharedPreferences.getString(ACCESS_TOKEN_KEY, null)
+            val expiryTime = sharedPreferences.getLong(TOKEN_EXPIRY_KEY, 0)
+            
+            if (token != null && System.currentTimeMillis() < expiryTime) {
+                token
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            // If reading from encrypted preferences fails, log the error and return null
+            android.util.Log.e("TokenManager", "Failed to read token from encrypted preferences", e)
             null
         }
     }
@@ -47,38 +93,107 @@ class TokenManager(private val context: Context) {
      * Checks if a valid token exists
      */
     fun hasValidToken(): Boolean {
-        return getValidToken() != null
+        return try {
+            getValidToken() != null
+        } catch (e: Exception) {
+            // If checking token validity fails, log the error and return false
+            android.util.Log.e("TokenManager", "Failed to check token validity", e)
+            false
+        }
     }
 
     /**
      * Clears all authentication tokens
      */
     fun clearTokens() {
-        sharedPreferences.edit()
-            .remove(ACCESS_TOKEN_KEY)
-            .remove(TOKEN_EXPIRY_KEY)
-            .remove(REFRESH_TOKEN_KEY)
-            .apply()
+        try {
+            sharedPreferences.edit()
+                .remove(ACCESS_TOKEN_KEY)
+                .remove(TOKEN_EXPIRY_KEY)
+                .remove(REFRESH_TOKEN_KEY)
+                .apply()
+        } catch (e: Exception) {
+            // If clearing tokens fails, log the error
+            android.util.Log.e("TokenManager", "Failed to clear tokens from encrypted preferences", e)
+        }
     }
 
     /**
      * Returns the SharedPreferences editor for direct access if needed
      */
-    fun getPreferencesEditor() = sharedPreferences.edit()
+    fun getPreferencesEditor() = try {
+        sharedPreferences.edit()
+    } catch (e: Exception) {
+        // If getting editor fails, log the error and return null
+        android.util.Log.e("TokenManager", "Failed to get editor from encrypted preferences", e)
+        null
+    }
     
     /**
      * Sets the authentication status
      */
     fun setAuthStatus(isAuthenticated: Boolean) {
-        sharedPreferences.edit()
-            .putBoolean(AUTH_STATUS_KEY, isAuthenticated)
-            .apply()
+        try {
+            sharedPreferences.edit()
+                .putBoolean(AUTH_STATUS_KEY, isAuthenticated)
+                .apply()
+        } catch (e: Exception) {
+            // If setting auth status fails, log the error
+            android.util.Log.e("TokenManager", "Failed to set auth status in encrypted preferences", e)
+        }
     }
     
     /**
      * Gets the authentication status
      */
     fun getAuthStatus(): Boolean {
-        return sharedPreferences.getBoolean(AUTH_STATUS_KEY, false)
+        return try {
+            sharedPreferences.getBoolean(AUTH_STATUS_KEY, false)
+        } catch (e: Exception) {
+            // If getting auth status fails, log the error and return false
+            android.util.Log.e("TokenManager", "Failed to get auth status from encrypted preferences", e)
+            false
+        }
+    }
+
+    /**
+     * Gets the refresh token
+     */
+    fun getRefreshToken(): String? {
+        return try {
+            sharedPreferences.getString(REFRESH_TOKEN_KEY, null)
+        } catch (e: Exception) {
+            // If getting refresh token fails, log the error and return null
+            android.util.Log.e("TokenManager", "Failed to get refresh token from encrypted preferences", e)
+            null
+        }
+    }
+
+    /**
+     * Saves the refresh token
+     */
+    fun saveRefreshToken(refreshToken: String) {
+        try {
+            sharedPreferences.edit()
+                .putString(REFRESH_TOKEN_KEY, refreshToken)
+                .apply()
+        } catch (e: Exception) {
+            // If saving refresh token fails, log the error
+            android.util.Log.e("TokenManager", "Failed to save refresh token to encrypted preferences", e)
+        }
+    }
+
+    /**
+     * Checks if token needs to be refreshed (will expire within the next 5 minutes)
+     */
+    fun needsTokenRefresh(): Boolean {
+        return try {
+            val expiration = sharedPreferences.getLong(TOKEN_EXPIRY_KEY, 0)
+            expiration > 0 && System.currentTimeMillis() > (expiration - 300000)
+        } catch (e: Exception) {
+            // If checking token refresh fails, log the error and return false
+            android.util.Log.e("TokenManager", "Failed to check if token needs refresh", e)
+            false
+        }
     }
 }

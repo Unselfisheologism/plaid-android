@@ -92,8 +92,17 @@ class AuthActivity : AppCompatActivity() {
                             
                             val token = json.getString("access_token")
                             val expiresIn = json.optLong("expires_in", 3600) // Default to 1 hour if not provided
+                            val refreshToken = json.optString("refresh_token", null) // Get refresh token if available
                             
-                            saveToken(token, expiresIn)
+                            if (refreshToken != null) {
+                                // Save with refresh token if available
+                                val tokenManager = TokenManager(this@AuthActivity)
+                                tokenManager.saveTokenWithRefresh(token, refreshToken, expiresIn)
+                            } else {
+                                // Save without refresh token
+                                val tokenManager = TokenManager(this@AuthActivity)
+                                tokenManager.saveToken(token, expiresIn)
+                            }
                             showSuccess()
                             
                             // Notify other components
@@ -125,7 +134,7 @@ class AuthActivity : AppCompatActivity() {
     }
 
     private fun saveToken(token: String, expiresIn: Long) {
-        val tokenManager = TokenManager(this)
+        val tokenManager = TokenManager(this@AuthActivity)
         tokenManager.saveToken(token, expiresIn)
     }
 

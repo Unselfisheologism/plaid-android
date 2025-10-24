@@ -56,13 +56,8 @@ class PuterAuthHelper(private val context: Context) {
 
     fun needsTokenRefresh(): Boolean {
         // Check if token will expire within the next 5 minutes
-        val token = getAuthToken()
-        val expiration = if (token != null) {
-            // We need to store expiration time in TokenManager, so we'll use the manager's internal logic
-            val prefs = context.getSharedPreferences("secure_puter_auth_prefs", Context.MODE_PRIVATE)
-            prefs.getLong("token_expiration", 0)
-        } else 0
-        return expiration > 0 && System.currentTimeMillis() > (expiration - 300000)
+        // Use TokenManager to get expiration time
+        return tokenManager.needsTokenRefresh()
     }
 
     fun refreshTokenIfNeeded(onComplete: (Boolean) -> Unit) {
@@ -71,8 +66,8 @@ class PuterAuthHelper(private val context: Context) {
             return
         }
 
-        val prefs = context.getSharedPreferences("secure_puter_auth_prefs", Context.MODE_PRIVATE)
-        val refreshToken = prefs.getString("refresh_token", null) ?: run {
+        // Get refresh token using TokenManager
+        val refreshToken = tokenManager.getRefreshToken() ?: run {
             onComplete(false)
             return
         }
@@ -104,8 +99,15 @@ class PuterAuthHelper(private val context: Context) {
                             val json = org.json.JSONObject(responseBody)
                             val token = json.getString("access_token")
                             val expiresIn = json.optLong("expires_in", 3600)
+                            val refreshToken = json.optString("refresh_token", null) // Get refresh token if available
                             
-                            tokenManager.saveToken(token, expiresIn)
+                            if (refreshToken != null) {
+                                // Save with refresh token if available
+                                tokenManager.saveTokenWithRefresh(token, refreshToken, expiresIn)
+                            } else {
+                                // Save without refresh token
+                                tokenManager.saveToken(token, expiresIn)
+                            }
                             onComplete(true)
                             return
                         }
