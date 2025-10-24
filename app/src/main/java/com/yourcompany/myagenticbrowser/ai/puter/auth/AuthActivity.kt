@@ -6,7 +6,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import android.net.Uri
-import okhttp3.*
+import okhttp3.FormBody
+import okhttp3.Request
+import okhttp3.Callback
+import okhttp3.Call
+import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
 
@@ -69,7 +73,7 @@ class AuthActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         try {
                             val responseBody = response.body?.string()
-                            val json = JSONObject(responseBody!!)
+                            val json = JSONObject(responseBody)
                             val token = json.getString("access_token")
                             saveToken(token)
                             Toast.makeText(this@AuthActivity, "Authentication successful!", Toast.LENGTH_SHORT).show()
