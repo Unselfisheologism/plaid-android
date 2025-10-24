@@ -10,8 +10,7 @@ import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.suspendCancellableCoroutine
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+// Removed CountDownLatch imports as we're using suspendCancellableCoroutine instead
 import kotlin.coroutines.resume
 
 /**
@@ -214,66 +213,6 @@ class PuterClient {
             webView.webChromeClient = CustomWebChromeClient(webView)
         }
         
-        // Add JavaScript interface for authentication callbacks
-        webView.addJavascriptInterface(object : Any() {
-            @android.webkit.JavascriptInterface
-            fun handleAuthSuccess(userJson: String) {
-                isAuthenticated = true
-            }
-            
-            @android.webkit.JavascriptInterface
-            fun handleAuthError(errorMessage: String) {
-                isAuthenticated = false
-            }
-        }, "AndroidInterface")
-        
-        // Inject JavaScript to handle authentication popup completion
-        val jsCode = """
-            (function() {
-                // Handle authentication popup completion
-                window.handleAuthPopupClose = function() {
-                    // Check if signed in
-                    if (window.puter && window.puter.auth && window.puter.auth.isSignedIn()) {
-                        if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
-                            window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
-                        }
-                    } else {
-                        if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
-                            window.AndroidInterface.handleAuthError("Authentication failed or cancelled");
-                        }
-                    }
-                };
-                
-                // Override signIn to handle popup flow
-                if (window.puter && window.puter.auth) {
-                    const originalSignIn = window.puter.auth.signIn;
-                    window.puter.auth.signIn = function() {
-                        return new Promise((resolve, reject) => {
-                            // Set up listener for popup completion
-                            window.handleAuthPopupClose = function() {
-                                if (window.puter.auth.isSignedIn()) {
-                                    if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
-                                        window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
-                                    }
-                                    resolve(window.puter.auth.getUser());
-                                } else {
-                                    if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
-                                        window.AndroidInterface.handleAuthError("Authentication failed");
-                                    }
-                                    reject(new Error("Authentication failed"));
-                                }
-                            };
-                            
-                            // Call original signIn
-                            originalSignIn().catch(reject);
-                        });
-                    };
-                }
-            })();
-        """.trimIndent()
-        
-        webView.evaluateJavascript(jsCode, null)
-        
         // Check if user is authenticated with Puter.js
         val authCheckResult = suspendCancellableCoroutine<Boolean> { continuation ->
             webView.evaluateJavascript(
@@ -281,10 +220,9 @@ class PuterClient {
             ) { result ->
                 val isSignedIn = result.removeSurrounding("\"").toBoolean()
                 if (isSignedIn) {
-                    isAuthenticated = true
                     continuation.resume(true)
                 } else {
-                    // Try to sign in
+                    // Try to sign in - this will open in a new tab
                     webView.evaluateJavascript(
                         "(async function() { " +
                         "  try {" +
@@ -293,14 +231,13 @@ class PuterClient {
                         "      return await window.puter.auth.isSignedIn();" +
                         "    }" +
                         "    return false;" +
-                        "  } catch (e) {" +
+                        " } catch (e) {" +
                         "    console.error('Sign-in error:', e);" +
                         "    return false;" +
                         " }" +
                         "})();"
                     ) { signInResult ->
                         val isSignedInAfterSignIn = signInResult.removeSurrounding("\"").toBoolean()
-                        isAuthenticated = isSignedInAfterSignIn
                         continuation.resume(isSignedInAfterSignIn)
                     }
                 }

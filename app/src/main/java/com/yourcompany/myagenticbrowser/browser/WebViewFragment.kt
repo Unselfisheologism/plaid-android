@@ -292,6 +292,10 @@ class WebViewFragment : Fragment() {
      */
     private fun checkAndAuthenticatePuter(webView: WebView?) {
         webView?.let { view ->
+            // Enable popup windows for Puter.js authentication
+            view.settings.javaScriptCanOpenWindowsAutomatically = true
+            view.settings.setSupportMultipleWindows(true)
+            
             // Check authentication status
             view.evaluateJavascript(
                 "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"

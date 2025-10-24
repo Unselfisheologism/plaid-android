@@ -169,8 +169,10 @@
                         authButton.textContent = 'Signing in...';
                         authButton.disabled = true;
                         
-                        // Login
+                        // Login - this will open in a new tab in the Android app
                         await window.puter.auth.signIn();
+                        
+                        // Check if signed in after authentication
                         const isSignedInAfter = await window.puter.auth.isSignedIn();
                         if (isSignedInAfter) {
                             authStatusText.textContent = 'Authenticated';
@@ -188,9 +190,9 @@
             } catch (error) {
                 console.error('Error in toggleAuth:', error);
                 // Reset button state in case of error
-                if (!await window.puter.auth.isSignedIn()) {
+                if (window.puter && window.puter.auth && !await window.puter.auth.isSignedIn()) {
                     authButton.textContent = 'Login with Puter';
-                } else {
+                } else if (window.puter && window.puter.auth) {
                     authButton.textContent = 'Logout';
                 }
                 authButton.disabled = false;

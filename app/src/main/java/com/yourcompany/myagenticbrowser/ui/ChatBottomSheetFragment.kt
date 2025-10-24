@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import android.webkit.WebChromeClient
+import android.webkit.WebView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.yourcompany.myagenticbrowser.R
 import com.yourcompany.myagenticbrowser.agent.AiAgent
@@ -185,29 +187,18 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
             // Check if user is authenticated with Puter.js
             puterClient.loadPuterJS(webView)
             // Give time for Puter.js to load
-            delay(100)
+            delay(10)
             
             // Enable popup windows for Puter.js authentication
             webView.settings.javaScriptCanOpenWindowsAutomatically = true
             webView.settings.setSupportMultipleWindows(true)
             
             // Set up WebViewClient to handle authentication in a new tab instead of popup
-            if (webView.webChromeClient == null || webView.webChromeClient !is PuterClient.CustomWebChromeClient) {
+            val browserActivity = activity as? BrowserActivity
+            if (browserActivity != null) {
+                // Use the same CustomWebChromeClient from PuterClient for consistency
                 webView.webChromeClient = PuterClient.CustomWebChromeClient(webView)
             }
-            
-            // Add JavaScript interface for authentication callbacks
-            webView.addJavascriptInterface(object : Any() {
-                @android.webkit.JavascriptInterface
-                fun handleAuthSuccess(userJson: String) {
-                    // Authentication successful
-                }
-                
-                @android.webkit.JavascriptInterface
-                fun handleAuthError(errorMessage: String) {
-                    // Authentication failed
-                }
-            }, "AndroidInterface")
             
             // Check if user is authenticated with Puter.js
             val authCheckResult = suspendCancellableCoroutine { continuation ->
@@ -218,7 +209,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
                     if (isSignedIn) {
                         continuation.resume(true, null)
                     } else {
-                        // Try to sign in
+                        // Try to sign in - this will open in a new tab
                         webView.evaluateJavascript(
                             "(async function() { " +
                             "  try {" +

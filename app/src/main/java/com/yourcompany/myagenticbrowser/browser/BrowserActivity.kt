@@ -253,31 +253,7 @@ class BrowserActivity : AppCompatActivity() {
             webView.settings.javaScriptCanOpenWindowsAutomatically = true
             webView.settings.setSupportMultipleWindows(true)
             
-            // Add JavaScript interface for authentication callbacks
-            webView.addJavascriptInterface(object : Any() {
-                @android.webkit.JavascriptInterface
-                fun handleAuthSuccess(userJson: String) {
-                    runOnUiThread {
-                        // Handle successful authentication
-                        // You can update UI or save authentication state here
-                    }
-                }
-                
-                @android.webkit.JavascriptInterface
-                fun handleAuthError(errorMessage: String) {
-                    runOnUiThread {
-                        // Handle authentication error
-                        // You can show error message to user here
-                        android.widget.Toast.makeText(
-                            this@BrowserActivity,
-                            "Authentication failed: $errorMessage",
-                            android.widget.Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-            }, "AndroidInterface")
-            
-            // Set up WebViewClient to handle popup windows
+            // Set up WebViewClient to handle authentication in a new tab instead of popup
             webView.webChromeClient = object : android.webkit.WebChromeClient() {
                 override fun onCreateWindow(
                     view: android.webkit.WebView,
@@ -285,85 +261,32 @@ class BrowserActivity : AppCompatActivity() {
                     isUserGesture: Boolean,
                     resultMsg: android.os.Message
                 ): Boolean {
+                    // Get the URL that would be loaded in the popup
+                    val transport = resultMsg.obj as android.webkit.WebView.WebViewTransport
                     val newWebView = android.webkit.WebView(this@BrowserActivity)
+                    
+                    // Set up the new WebView to detect when the authentication page loads
                     newWebView.webViewClient = object : android.webkit.WebViewClient() {
-                        override fun shouldOverrideUrlLoading(view: android.webkit.WebView, url: String): Boolean {
-                            // Close the popup when authentication completes
-                            if (url.contains("puter.com/auth/callback")) {
-                                view.stopLoading()
-                                android.os.Handler(android.os.Looper.getMainLooper()).post {
-                                    // Notify main WebView that authentication completed
-                                    webView.evaluateJavascript(
-                                        "if (window.handleAuthPopupClose) window.handleAuthPopupClose();",
-                                        null
-                                    )
-                                    view.destroy()
+                        override fun onPageStarted(view: android.webkit.WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                            super.onPageStarted(view, url, favicon)
+                            if (url?.contains("puter.com/auth") == true) {
+                                // This is an authentication page, so we'll open it in a new tab
+                                runOnUiThread {
+                                    // Create a new tab with this URL
+                                    addNewTab(url, com.yourcompany.myagenticbrowser.browser.tab.TabOwner.USER)
                                 }
-                                return true
+                                
+                                // Close the temporary WebView and send the result
+                                view?.destroy()
+                                resultMsg.sendToTarget()
                             }
-                            return false
                         }
                     }
                     
-                    newWebView.settings.javaScriptEnabled = true
-                    newWebView.settings.domStorageEnabled = true
-                    newWebView.settings.javaScriptCanOpenWindowsAutomatically = true
-                    newWebView.settings.setSupportMultipleWindows(true)
-                    
-                    val transport = resultMsg.obj as android.webkit.WebView.WebViewTransport
-                    transport.webView = newWebView
-                    resultMsg.sendToTarget()
-                    
+                    newWebView.loadUrl("about:blank") // Load a blank page to trigger the client
                     return true
                 }
             }
-            
-            // Inject JavaScript to handle authentication popup completion
-            val jsCode = """
-                (function() {
-                    // Handle authentication popup completion
-                    window.handleAuthPopupClose = function() {
-                        // Check if signed in
-                        if (window.puter && window.puter.auth && window.puter.auth.isSignedIn()) {
-                            if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
-                                window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
-                            }
-                        } else {
-                            if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
-                                window.AndroidInterface.handleAuthError("Authentication failed or cancelled");
-                            }
-                        }
-                    };
-                    
-                    // Override signIn to handle popup flow
-                    if (window.puter && window.puter.auth) {
-                        const originalSignIn = window.puter.auth.signIn;
-                        window.puter.auth.signIn = function() {
-                            return new Promise((resolve, reject) => {
-                                // Set up listener for popup completion
-                                window.handleAuthPopupClose = function() {
-                                    if (window.puter.auth.isSignedIn()) {
-                                        if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
-                                            window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
-                                        }
-                                        resolve(window.puter.auth.getUser());
-                                    } else {
-                                        if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
-                                            window.AndroidInterface.handleAuthError("Authentication failed");
-                                        }
-                                        reject(new Error("Authentication failed"));
-                                    }
-                                };
-                                
-                                // Call original signIn
-                                originalSignIn().catch(reject);
-                            });
-                        };
-                    }
-                })();
-            """.trimIndent()
-            
-            webView.evaluateJavascript(jsCode, null)
             
             // Check if user is authenticated with Puter.js
             webView.evaluateJavascript(
@@ -373,7 +296,7 @@ class BrowserActivity : AppCompatActivity() {
                 if (isAuthenticated) {
                     action(true)
                 } else {
-                    // Try to authenticate
+                    // Try to authenticate - this will open in a new tab
                     webView.evaluateJavascript(
                         "(async function() { " +
                         "  try {" +
