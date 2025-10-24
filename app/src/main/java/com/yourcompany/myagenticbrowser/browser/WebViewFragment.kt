@@ -112,6 +112,7 @@ class WebViewFragment : Fragment() {
                 Logger.logInfo("WebViewFragment", "Page finished loading: $currentUrl through Puter.js infrastructure")
                 
                 // Load Puter.js script into the page through Puter.js infrastructure
+                puterClient.loadPuterJS(view)
                 view?.evaluateJavascript(puterClient.getPuterJSScript(), null)
                 
                 // Check if Puter.js is authenticated, and if not, initiate authentication

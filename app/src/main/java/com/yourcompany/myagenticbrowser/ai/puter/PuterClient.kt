@@ -4,6 +4,8 @@ import android.webkit.ValueCallback
 import android.webkit.WebView
 import com.yourcompany.myagenticbrowser.ai.puter.PuterSearchOrchestrator
 import com.yourcompany.myagenticbrowser.ai.puter.SearchResults
+import com.yourcompany.myagenticbrowser.browser.BrowserActivity
+import com.yourcompany.myagenticbrowser.browser.tab.TabOwner
 import com.yourcompany.myagenticbrowser.utilities.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -225,6 +227,53 @@ class PuterClient {
             }
         }, "AndroidInterface")
         
+        // Inject JavaScript to handle authentication popup completion
+        val jsCode = """
+            (function() {
+                // Handle authentication popup completion
+                window.handleAuthPopupClose = function() {
+                    // Check if signed in
+                    if (window.puter && window.puter.auth && window.puter.auth.isSignedIn()) {
+                        if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
+                            window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
+                        }
+                    } else {
+                        if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
+                            window.AndroidInterface.handleAuthError("Authentication failed or cancelled");
+                        }
+                    }
+                };
+                
+                // Override signIn to handle popup flow
+                if (window.puter && window.puter.auth) {
+                    const originalSignIn = window.puter.auth.signIn;
+                    window.puter.auth.signIn = function() {
+                        return new Promise((resolve, reject) => {
+                            // Set up listener for popup completion
+                            window.handleAuthPopupClose = function() {
+                                if (window.puter.auth.isSignedIn()) {
+                                    if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
+                                        window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
+                                    }
+                                    resolve(window.puter.auth.getUser());
+                                } else {
+                                    if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
+                                        window.AndroidInterface.handleAuthError("Authentication failed");
+                                    }
+                                    reject(new Error("Authentication failed"));
+                                }
+                            };
+                            
+                            // Call original signIn
+                            originalSignIn().catch(reject);
+                        });
+                    };
+                }
+            })();
+        """.trimIndent()
+        
+        webView.evaluateJavascript(jsCode, null)
+        
         // Check if user is authenticated with Puter.js
         val authCheckResult = suspendCancellableCoroutine<Boolean> { continuation ->
             webView.evaluateJavascript(
@@ -302,54 +351,6 @@ class PuterClient {
             // If we can't get the activity, fall back to default behavior
             return false
         }
-    }
-    
-        // Inject JavaScript to handle authentication popup completion
-        val jsCode = """
-            (function() {
-                // Handle authentication popup completion
-                window.handleAuthPopupClose = function() {
-                    // Check if signed in
-                    if (window.puter && window.puter.auth && window.puter.auth.isSignedIn()) {
-                        if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
-                            window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
-                        }
-                    } else {
-                        if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
-                            window.AndroidInterface.handleAuthError("Authentication failed or cancelled");
-                        }
-                    }
-                };
-                
-                // Override signIn to handle popup flow
-                if (window.puter && window.puter.auth) {
-                    const originalSignIn = window.puter.auth.signIn;
-                    window.puter.auth.signIn = function() {
-                        return new Promise((resolve, reject) => {
-                            // Set up listener for popup completion
-                            window.handleAuthPopupClose = function() {
-                                if (window.puter.auth.isSignedIn()) {
-                                    if (window.AndroidInterface && window.AndroidInterface.handleAuthSuccess) {
-                                        window.AndroidInterface.handleAuthSuccess(JSON.stringify(window.puter.auth.getUser()));
-                                    }
-                                    resolve(window.puter.auth.getUser());
-                                } else {
-                                    if (window.AndroidInterface && window.AndroidInterface.handleAuthError) {
-                                        window.AndroidInterface.handleAuthError("Authentication failed");
-                                    }
-                                    reject(new Error("Authentication failed"));
-                                }
-                            };
-                            
-                            // Call original signIn
-                            originalSignIn().catch(reject);
-                        });
-                    };
-                }
-            })();
-        """.trimIndent()
-        
-        webView.evaluateJavascript(jsCode, null)
     }
 
     /**

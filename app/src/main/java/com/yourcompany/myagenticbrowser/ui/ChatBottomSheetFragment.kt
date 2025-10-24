@@ -210,13 +210,13 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
             }, "AndroidInterface")
             
             // Check if user is authenticated with Puter.js
-            val authCheckResult = suspendCancellableCoroutine<Boolean> { continuation ->
+            val authCheckResult = suspendCancellableCoroutine { continuation ->
                 webView.evaluateJavascript(
                     "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
                 ) { result ->
                     val isSignedIn = result.removeSurrounding("\"").toBoolean()
                     if (isSignedIn) {
-                        continuation.resume(true)
+                        continuation.resume(true, null)
                     } else {
                         // Try to sign in
                         webView.evaluateJavascript(
@@ -234,7 +234,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
                             "})();"
                         ) { signInResult ->
                             val isSignedInAfterSignIn = signInResult.removeSurrounding("\"").toBoolean()
-                            continuation.resume(isSignedInAfterSignIn)
+                            continuation.resume(isSignedInAfterSignIn, null)
                         }
                     }
                 }
