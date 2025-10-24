@@ -10,18 +10,15 @@ import java.security.GeneralSecurityException
 class TokenManager(private val context: Context) {
     private val sharedPreferences: SharedPreferences by lazy {
         try {
-            val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+            val masterKey = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
             EncryptedSharedPreferences.create(
                 context,
                 "secure_puter_auth_prefs",
-                masterKeyAlias,
+                masterKey,
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
-        } catch (e: GeneralSecurityException) {
-            // Fallback to regular SharedPreferences if encryption fails
-            context.getSharedPreferences("secure_puter_auth_prefs", Context.MODE_PRIVATE)
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             // Fallback to regular SharedPreferences if encryption fails
             context.getSharedPreferences("secure_puter_auth_prefs", Context.MODE_PRIVATE)
         }
