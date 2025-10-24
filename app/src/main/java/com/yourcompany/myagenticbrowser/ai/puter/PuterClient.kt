@@ -303,8 +303,8 @@ class PuterClient {
             return false
         }
     }
-        
-        // Inject JavaScript to handle authentication popup completion
+    
+    // Inject JavaScript to handle authentication popup completion
         val jsCode = """
             (function() {
                 // Handle authentication popup completion
