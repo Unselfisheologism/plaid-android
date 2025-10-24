@@ -7,17 +7,21 @@ plugins {
 android {
     namespace = "com.yourcompany.myagenticbrowser"
     compileSdk = 34
-
+    
     defaultConfig {
         applicationId = "com.yourcompany.myagenticbrowser"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Add manifest placeholder for redirect scheme
+        manifestPlaceholders = mapOf(
+            "appAuthRedirectScheme" to "myagenticbrowser"
+        )
     }
-
+    
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -66,6 +70,13 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+
+    // Add AndroidX Browser Library for Chrome Custom Tabs
+    // The first step for a Custom Tabs integration is adding the AndroidX Browser Library to your project [[19]]
+    implementation("androidx.browser:browser:1.6.0")
+
+    // Add AppAuth for secure OAuth implementation
+    implementation("net.openid:appauth:0.15.0")
     
     // OkHttp for HTTP requests
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
