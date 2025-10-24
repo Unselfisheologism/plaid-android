@@ -75,15 +75,19 @@ class AuthActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         try {
                             val responseBody = response.body?.string()
-                            val json = if (responseBody != null) JSONObject(responseBody) else throw JSONException("Response body is null")
-                            val token = json.getString("access_token")
-                            saveToken(token)
-                            Toast.makeText(this@AuthActivity, "Authentication successful!", Toast.LENGTH_SHORT).show()
-                            
-                            // Notify the BrowserActivity about the authentication status change
-                            val intent = Intent("com.yourcompany.myagenticbrowser.AUTH_STATUS_CHANGED")
-                            intent.putExtra("is_authenticated", true)
-                            sendBroadcast(intent)
+                            if (responseBody != null) {
+                                val json = JSONObject(responseBody)
+                                val token = json.getString("access_token")
+                                saveToken(token)
+                                Toast.makeText(this@AuthActivity, "Authentication successful!", Toast.LENGTH_SHORT).show()
+                                
+                                // Notify the BrowserActivity about the authentication status change
+                                val intent = Intent("com.yourcompany.myagenticbrowser.AUTH_STATUS_CHANGED")
+                                intent.putExtra("is_authenticated", true)
+                                sendBroadcast(intent)
+                            } else {
+                                throw JSONException("Response body is null")
+                            }
                         } catch (e: Exception) {
                             Toast.makeText(this@AuthActivity, "Error parsing response: ${e.message}", Toast.LENGTH_LONG).show()
                         }
