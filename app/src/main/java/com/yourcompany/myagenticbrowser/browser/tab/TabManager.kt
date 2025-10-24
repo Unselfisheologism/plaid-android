@@ -47,10 +47,11 @@ class TabManager(private val context: Context) {
                 Logger.logInfo("TabManager", "Removed oldest tab: ${oldestTab.url}")
             }
         }
-        
-        fun getTabOwner(index: Int): TabOwner? {
-            return if (index >= 0 && index < tabs.size) {
-                tabs[index].owner
+    }
+    
+    fun getTabOwner(index: Int): TabOwner? {
+        return if (index >= 0 && index < tabs.size) {
+            tabs[index].owner
             } else {
                 null
             }

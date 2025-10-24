@@ -27,9 +27,9 @@ import com.yourcompany.myagenticbrowser.ai.puter.auth.PuterAuthHelper
 class BrowserActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
     private lateinit var tabAdapter: TabAdapter
-    private lateinit var tabManager: TabManager
+    lateinit var tabManager: TabManager
     private lateinit var toolbar: MaterialToolbar
-    private lateinit var puterAuthHelper: PuterAuthHelper
+    lateinit var puterAuthHelper: PuterAuthHelper
     
     private val authStatusReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -186,18 +186,14 @@ class BrowserActivity : AppCompatActivity() {
     }
     
     override fun onDestroy() {
-        Logger.logInfo("BrowserActivity", "Destroying BrowserActivity")
-        super.onDestroy()
-        MemoryManager.gc()
-    }
-    
-    override fun onDestroy() {
         try {
             unregisterReceiver(authStatusReceiver)
         } catch (e: IllegalArgumentException) {
             // Receiver was not registered, ignore
         }
+        Logger.logInfo("BrowserActivity", "Destroying BrowserActivity")
         super.onDestroy()
+        MemoryManager.gc()
     }
     
     override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
@@ -338,29 +334,29 @@ class BrowserActivity : AppCompatActivity() {
             ).show()
             puterAuthHelper.launchAuthentication()
         }
-        
-        /**
-         * Update authentication status and notify all tabs
-         * Called when authentication status changes
-         */
-        fun updateAuthStatus(isAuthenticated: Boolean) {
-            // Update the authentication status in shared preferences
-            val prefs = getSharedPreferences("puter_auth_prefs", MODE_PRIVATE)
-            prefs.edit()
-                .putBoolean("is_authenticated", isAuthenticated)
-                .apply()
-                
-            // Notify all WebView fragments about the authentication status change
-            for (i in 0 until tabManager.getTabCount()) {
-                val fragment = supportFragmentManager.findFragmentByTag("f$i")
-                if (fragment is WebViewFragment) {
-                    val webView = fragment.getWebView()
-                    webView.post {
-                        webView.evaluateJavascript(
-                            "if (typeof updateAuthStatus === 'function') updateAuthStatus($isAuthenticated);",
-                            null
-                        )
-                    }
+    }
+    
+    /**
+     * Update authentication status and notify all tabs
+     * Called when authentication status changes
+     */
+    fun updateAuthStatus(isAuthenticated: Boolean) {
+        // Update the authentication status in shared preferences
+        val prefs = getSharedPreferences("puter_auth_prefs", MODE_PRIVATE)
+        prefs.edit()
+            .putBoolean("is_authenticated", isAuthenticated)
+            .apply()
+            
+        // Notify all WebView fragments about the authentication status change
+        for (i in 0 until tabManager.getTabCount()) {
+            val fragment = supportFragmentManager.findFragmentByTag("f$i")
+            if (fragment is WebViewFragment) {
+                val webView = fragment.getWebView()
+                webView.post {
+                    webView.evaluateJavascript(
+                        "if (typeof updateAuthStatus === 'function') updateAuthStatus($isAuthenticated);",
+                        null
+                    )
                 }
             }
         }

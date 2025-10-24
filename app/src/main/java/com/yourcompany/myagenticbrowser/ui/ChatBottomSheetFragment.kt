@@ -6,8 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import android.webkit.WebChromeClient
-import android.webkit.WebView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.yourcompany.myagenticbrowser.R
 import com.yourcompany.myagenticbrowser.agent.AiAgent
@@ -170,71 +168,9 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private suspend fun checkAuthentication(): Boolean = withContext(Dispatchers.Main) {
-        // Try to get the current WebView from the parent activity
-        val webView = try {
-            val parentActivity = activity
-            if (parentActivity is BrowserActivity) {
-                parentActivity.getCurrentWebViewFragment()?.getWebView()
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            Logger.logError("ChatBottomSheetFragment", "Error getting WebView: ${e.message}", e)
-            null
-        }
-        
-        if (webView != null) {
-            // Check if user is authenticated with Puter.js
-            puterClient.loadPuterJS(webView)
-            // Give time for Puter.js to load
-            delay(10)
-            
-            // Enable popup windows for Puter.js authentication
-            webView.settings.javaScriptCanOpenWindowsAutomatically = true
-            webView.settings.setSupportMultipleWindows(true)
-            
-            // Set up WebViewClient to handle authentication in a new tab instead of popup
-            val browserActivity = activity as? BrowserActivity
-            if (browserActivity != null) {
-                // Use the same CustomWebChromeClient from PuterClient for consistency
-                webView.webChromeClient = PuterClient.CustomWebChromeClient(webView)
-            }
-            
-            // Check if user is authenticated with Puter.js
-            val authCheckResult = suspendCancellableCoroutine { continuation ->
-                webView.evaluateJavascript(
-                    "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
-                ) { result ->
-                    val isSignedIn = result.removeSurrounding("\"").toBoolean()
-                    if (isSignedIn) {
-                        continuation.resume(true, null)
-                    } else {
-                        // Try to sign in - this will open in a new tab
-                        webView.evaluateJavascript(
-                            "(async function() { " +
-                            "  try {" +
-                            "    if (window.puter && window.puter.auth) {" +
-                            "      await window.puter.auth.signIn();" +
-                            "      return await window.puter.auth.isSignedIn();" +
-                            "    }" +
-                            "    return false;" +
-                            "  } catch (e) {" +
-                            "    console.error('Sign-in error:', e);" +
-                            "    return false;" +
-                            " }" +
-                            "})();"
-                        ) { signInResult ->
-                            val isSignedInAfterSignIn = signInResult.removeSurrounding("\"").toBoolean()
-                            continuation.resume(isSignedInAfterSignIn, null)
-                        }
-                    }
-                }
-            }
-            
-            authCheckResult
-        } else {
-            false
-        }
+        // Use the new Chrome Custom Tabs authentication approach
+        val browserActivity = activity as? BrowserActivity
+        return@withContext browserActivity?.puterAuthHelper?.isAuthenticated() ?: false
     }
 
     private suspend fun getAiResponse(message: String): String {
