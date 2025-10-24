@@ -175,27 +175,6 @@ class PuterJSInterface(
      * Show chat popup from JavaScript
      * This method is called from the agent_home.html page
      */
-    }
-    
-    /**
-     * Check if user is authenticated with Puter
-     * This uses the new Chrome Custom Tabs authentication approach
-     */
-    @JavascriptInterface
-    fun isPuterAuthenticated(): Boolean {
-        return try {
-            val activity = webView.context as? BrowserActivity
-            activity?.puterAuthHelper?.isAuthenticated() ?: false
-        } catch (e: Exception) {
-            Logger.logError("PuterJSInterface", "Error checking Puter auth status: ${e.message}", e)
-            false
-        }
-    }
-    
-    /**
-     * Show chat popup from JavaScript
-     * This method is called from the agent_home.html page
-     */
     @JavascriptInterface
     fun showChatPopup() {
         scope.launch {

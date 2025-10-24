@@ -52,41 +52,40 @@ class TabManager(private val context: Context) {
     fun getTabOwner(index: Int): TabOwner? {
         return if (index >= 0 && index < tabs.size) {
             tabs[index].owner
-            } else {
-                null
-            }
+        } else {
+            null
         }
-        
-        fun getTabStatus(index: Int): TabStatus? {
-            return if (index >= 0 && index < tabs.size) {
-                tabs[index].status
-            } else {
-                null
-            }
+    }
+    
+    fun getTabStatus(index: Int): TabStatus? {
+        return if (index >= 0 && index < tabs.size) {
+            tabs[index].status
+        } else {
+            null
         }
-        
-        fun updateTabOwner(index: Int, owner: TabOwner) {
-            if (index >= 0 && index < tabs.size) {
-                tabs[index] = tabs[index].copy(owner = owner)
-                Logger.logInfo("TabManager", "Updated tab owner at index $index to $owner")
-            } else {
-                Logger.logError("TabManager", "Attempted to update owner at invalid index: $index")
-            }
+    }
+    
+    fun updateTabOwner(index: Int, owner: TabOwner) {
+        if (index >= 0 && index < tabs.size) {
+            tabs[index] = tabs[index].copy(owner = owner)
+            Logger.logInfo("TabManager", "Updated tab owner at index $index to $owner")
+        } else {
+            Logger.logError("TabManager", "Attempted to update owner at invalid index: $index")
         }
-        
-        fun updateTabStatus(index: Int, status: TabStatus) {
-            if (index >= 0 && index < tabs.size) {
-                tabs[index] = tabs[index].copy(status = status)
-                Logger.logInfo("TabManager", "Updated tab status at index $index to $status")
-            } else {
-                Logger.logError("TabManager", "Attempted to update status at invalid index: $index")
-            }
+    }
+    
+    fun updateTabStatus(index: Int, status: TabStatus) {
+        if (index >= 0 && index < tabs.size) {
+            tabs[index] = tabs[index].copy(status = status)
+            Logger.logInfo("TabManager", "Updated tab status at index $index to $status")
+        } else {
+            Logger.logError("TabManager", "Attempted to update status at invalid index: $index")
         }
-        
-        fun getTabsByOwner(owner: TabOwner): List<Pair<Int, TabState>> {
-            return tabs.mapIndexedNotNull { index, tab ->
-                if (tab.owner == owner) index to tab else null
-            }
+    }
+    
+    fun getTabsByOwner(owner: TabOwner): List<Pair<Int, TabState>> {
+        return tabs.mapIndexedNotNull { index, tab ->
+            if (tab.owner == owner) index to tab else null
         }
     }
     
