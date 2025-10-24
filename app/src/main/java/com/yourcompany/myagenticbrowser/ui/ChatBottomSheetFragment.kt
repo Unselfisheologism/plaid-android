@@ -210,7 +210,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
             }, "AndroidInterface")
             
             // Check if user is authenticated with Puter.js
-            val authCheckResult = suspendCancellableCoroutine { continuation ->
+            val authCheckResult = suspendCancellableCoroutine<Boolean> { continuation ->
                 webView.evaluateJavascript(
                     "(function() { return window.puter && window.puter.auth ? window.puter.auth.isSignedIn() : false; })();"
                 ) { result ->

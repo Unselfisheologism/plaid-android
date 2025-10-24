@@ -304,7 +304,7 @@ class PuterClient {
         }
     }
     
-    // Inject JavaScript to handle authentication popup completion
+        // Inject JavaScript to handle authentication popup completion
         val jsCode = """
             (function() {
                 // Handle authentication popup completion
@@ -356,7 +356,7 @@ class PuterClient {
      * Execute JavaScript in the WebView and return the result as a string
     */
     private suspend fun executeJavaScriptWithResult(webView: WebView, jsCode: String): String {
-        return suspendCancellableCoroutine { continuation ->
+        return suspendCancellableCoroutine<String> { continuation ->
             webView.evaluateJavascript(jsCode, ValueCallback<String> { result ->
                 if (result != null && result != "null") {
                     // Remove quotes if they exist (evaluateJavascript returns string values with quotes)
