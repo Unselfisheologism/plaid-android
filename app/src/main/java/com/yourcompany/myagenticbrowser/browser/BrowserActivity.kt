@@ -342,10 +342,8 @@ class BrowserActivity : AppCompatActivity() {
      */
     fun updateAuthStatus(isAuthenticated: Boolean) {
         // Update the authentication status in shared preferences
-        val prefs = getSharedPreferences("puter_auth_prefs", MODE_PRIVATE)
-        prefs.edit()
-            .putBoolean("is_authenticated", isAuthenticated)
-            .apply()
+        val tokenManager = TokenManager(this)
+        tokenManager.setAuthStatus(isAuthenticated)
             
         // Notify all WebView fragments about the authentication status change
         for (i in 0 until tabManager.getTabCount()) {

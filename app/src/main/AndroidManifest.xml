@@ -30,21 +30,6 @@
             </intent-filter>
         </activity>
         
-        <!-- Add AuthActivity to handle OAuth redirect -->
-        <!-- This allows the app to receive the redirect from Chrome Custom Tabs [[18]] -->
-        <activity
-            android:name="ai.puter.auth.AuthActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="myagenticbrowser"
-                    android:host="auth" />
-            </intent-filter>
-        </activity>
-            
         <activity
             android:name=".agent.AgentHomePage"
             android:exported="false"
@@ -92,7 +77,8 @@
             
         <activity
             android:name=".ai.puter.auth.AuthActivity"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

@@ -6,20 +6,22 @@ import android.content.SharedPreferences
 import java.time.Instant
 
 class TokenManager(private val context: Context) {
-    private val sharedPreferences: SharedPreferences = 
-        context.getSharedPreferences("puter_auth_prefs", Context.MODE_PRIVATE)
+    private val sharedPreferences: SharedPreferences by lazy {
+        context.getSharedPreferences("secure_puter_auth_prefs", Context.MODE_PRIVATE)
+    }
     
     companion object {
-        private const val ACCESS_TOKEN_KEY = "puter_access_token"
-        private const val TOKEN_EXPIRY_KEY = "token_expiry"
+        private const val ACCESS_TOKEN_KEY = "puter_auth_token"
+        private const val TOKEN_EXPIRY_KEY = "token_expiration"
         private const val REFRESH_TOKEN_KEY = "refresh_token"
+        private const val AUTH_STATUS_KEY = "is_authenticated"
     }
 
     /**
      * Saves the authentication token and its expiry time
      */
     fun saveToken(accessToken: String, expiresIn: Long = 3600) {
-        val expiryTime = Instant.now().plusSeconds(expiresIn).epochSecond
+        val expiryTime = System.currentTimeMillis() + (expiresIn * 1000)
         
         sharedPreferences.edit()
             .putString(ACCESS_TOKEN_KEY, accessToken)
@@ -34,7 +36,7 @@ class TokenManager(private val context: Context) {
         val token = sharedPreferences.getString(ACCESS_TOKEN_KEY, null)
         val expiryTime = sharedPreferences.getLong(TOKEN_EXPIRY_KEY, 0)
         
-        return if (token != null && Instant.now().epochSecond < expiryTime) {
+        return if (token != null && System.currentTimeMillis() < expiryTime) {
             token
         } else {
             null
@@ -57,5 +59,26 @@ class TokenManager(private val context: Context) {
             .remove(TOKEN_EXPIRY_KEY)
             .remove(REFRESH_TOKEN_KEY)
             .apply()
+    }
+
+    /**
+     * Returns the SharedPreferences editor for direct access if needed
+     */
+    fun getPreferencesEditor() = sharedPreferences.edit()
+    
+    /**
+     * Sets the authentication status
+     */
+    fun setAuthStatus(isAuthenticated: Boolean) {
+        sharedPreferences.edit()
+            .putBoolean(AUTH_STATUS_KEY, isAuthenticated)
+            .apply()
+    }
+    
+    /**
+     * Gets the authentication status
+     */
+    fun getAuthStatus(): Boolean {
+        return sharedPreferences.getBoolean(AUTH_STATUS_KEY, false)
     }
 }

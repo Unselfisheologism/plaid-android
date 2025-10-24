@@ -34,17 +34,28 @@ class AuthActivity : AppCompatActivity() {
         handleRedirect(intent)
     }
 
-    // In AuthActivity.kt, replace the current handleRedirect with:
     private fun handleRedirect(intent: Intent?) {
-        val authService = AuthService(this)
-        val success = intent?.let { authService.handleAuthenticationCallback(it) } ?: false
-    
-        if (success) {
-            Toast.makeText(this, "Authentication successful!", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "Authentication failed", Toast.LENGTH_SHORT).show()
+        val data = intent?.data ?: run {
+            showError("No data received from authentication")
+            return
         }
-        finish()
+
+        if (data.scheme == "myagenticbrowser" && data.host == "auth") {
+            val code = data.getQueryParameter("code")
+            val error = data.getQueryParameter("error")
+            
+            if (!code.isNullOrEmpty()) {
+                // Exchange the authorization code for a token
+                exchangeCodeForToken(code)
+            } else if (!error.isNullOrEmpty()) {
+                val errorDescription = data.getQueryParameter("error_description")
+                showError("Authentication error: $error${if (errorDescription != null) " - $errorDescription" else ""}")
+            } else {
+                showError("Invalid authentication response")
+            }
+        } else {
+            showError("Invalid redirect URI")
+        }
     }
 
     private fun exchangeCodeForToken(code: String) {
@@ -114,11 +125,8 @@ class AuthActivity : AppCompatActivity() {
     }
 
     private fun saveToken(token: String, expiresIn: Long) {
-        val prefs = getSharedPreferences("puter_auth_prefs", MODE_PRIVATE)
-        val editor = prefs.edit()
-        editor.putString("puter_auth_token", token)
-        editor.putLong("token_expiration", System.currentTimeMillis() + (expiresIn * 1000))
-        editor.apply()
+        val tokenManager = TokenManager(this)
+        tokenManager.saveToken(token, expiresIn)
     }
 
     private fun sendAuthStatusBroadcast(isAuthenticated: Boolean) {

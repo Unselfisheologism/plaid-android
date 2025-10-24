@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
 import android.net.Uri
+import com.yourcompany.myagenticbrowser.ai.puter.auth.TokenManager
 
 class AuthService(private val context: Context) {
     private val tokenManager = TokenManager(context)
@@ -36,11 +37,12 @@ class AuthService(private val context: Context) {
         val data = intent.data ?: return false
         
         if (data.scheme == AUTH_SCHEME && data.host == AUTH_HOST) {
-            val token = data.getQueryParameter("token")
+            val code = data.getQueryParameter("code")
             val error = data.getQueryParameter("error")
             
-            if (!token.isNullOrEmpty()) {
-                tokenManager.saveToken(token)
+            if (!code.isNullOrEmpty()) {
+                // The code should be exchanged for a token in the AuthActivity
+                // This is handled in AuthActivity, not here
                 return true
             } else if (!error.isNullOrEmpty()) {
                 // Handle error

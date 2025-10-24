@@ -2,45 +2,25 @@ package com.yourcompany.myagenticbrowser.ai.puter.auth
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
 import com.yourcompany.myagenticbrowser.R
-import java.security.GeneralSecurityException
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 
+import com.yourcompany.myagenticbrowser.ai.puter.auth.TokenManager
+
 class PuterAuthHelper(private val context: Context) {
-    private val sharedPreferences: SharedPreferences
-    
-    init {
-        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-        
-        sharedPreferences = EncryptedSharedPreferences.create(
-            "secure_puter_auth_prefs",
-            masterKeyAlias,
-            context,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
-    }
+    private val tokenManager = TokenManager(context)
 
     fun isAuthenticated(): Boolean {
-        val token = getAuthToken() ?: return false
-        val expiration = getTokenExpiration()
-        return System.currentTimeMillis() < expiration
+        return tokenManager.hasValidToken()
     }
 
     fun getAuthToken(): String? {
-        return sharedPreferences.getString("puter_auth_token", null)
-    }
-
-    private fun getTokenExpiration(): Long {
-        return sharedPreferences.getLong("token_expiration", 0)
+        return tokenManager.getValidToken()
     }
 
     fun launchAuthentication() {
@@ -71,15 +51,17 @@ class PuterAuthHelper(private val context: Context) {
     }
 
     fun clearAuthentication() {
-        sharedPreferences.edit()
-            .remove("puter_auth_token")
-            .remove("token_expiration")
-            .apply()
+        tokenManager.clearTokens()
     }
 
     fun needsTokenRefresh(): Boolean {
         // Check if token will expire within the next 5 minutes
-        val expiration = getTokenExpiration()
+        val token = getAuthToken()
+        val expiration = if (token != null) {
+            // We need to store expiration time in TokenManager, so we'll use the manager's internal logic
+            val prefs = context.getSharedPreferences("secure_puter_auth_prefs", Context.MODE_PRIVATE)
+            prefs.getLong("token_expiration", 0)
+        } else 0
         return expiration > 0 && System.currentTimeMillis() > (expiration - 300000)
     }
 
@@ -89,7 +71,8 @@ class PuterAuthHelper(private val context: Context) {
             return
         }
 
-        val refreshToken = sharedPreferences.getString("refresh_token", null) ?: run {
+        val prefs = context.getSharedPreferences("secure_puter_auth_prefs", Context.MODE_PRIVATE)
+        val refreshToken = prefs.getString("refresh_token", null) ?: run {
             onComplete(false)
             return
         }
@@ -122,7 +105,7 @@ class PuterAuthHelper(private val context: Context) {
                             val token = json.getString("access_token")
                             val expiresIn = json.optLong("expires_in", 3600)
                             
-                            saveToken(token, expiresIn)
+                            tokenManager.saveToken(token, expiresIn)
                             onComplete(true)
                             return
                         }
@@ -133,25 +116,6 @@ class PuterAuthHelper(private val context: Context) {
                 onComplete(false)
             }
         })
-    }
-
-    private fun saveToken(token: String, expiresIn: Long) {
-        val editor = sharedPreferences.edit()
-        editor.putString("puter_auth_token", token)
-        editor.putLong("token_expiration", System.currentTimeMillis() + (expiresIn * 1000))
-        
-        // Save refresh token if provided
-        try {
-            val json = org.json.JSONObject(token) // This would need to be adjusted based on actual response
-            val refreshToken = json.optString("refresh_token", "")
-            if (refreshToken.isNotEmpty()) {
-                editor.putString("refresh_token", refreshToken)
-            }
-        } catch (e: Exception) {
-            // Not a JSON token or doesn't contain refresh token
-        }
-        
-        editor.apply()
     }
     
     companion object {
