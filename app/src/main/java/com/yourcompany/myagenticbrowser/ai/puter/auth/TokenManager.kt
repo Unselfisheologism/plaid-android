@@ -99,66 +99,66 @@ class TokenManager(private val context: Context) {
             android.util.Log.e("TokenManager", "Failed to get auth status", e)
             false
         }
-        
-        /**
-         * Checks if the token needs refresh (will expire in less than 5 minutes)
-         */
-        fun needsTokenRefresh(): Boolean {
-            return try {
-                val expiryTime = sharedPreferences.getLong(TOKEN_EXPIRY_KEY, 0)
-                val fiveMinutesInMillis = 5 * 60 * 1000L // 5 minutes in milliseconds
-                val willExpireSoon = System.currentTimeMillis() + fiveMinutesInMillis >= expiryTime
-                
-                willExpireSoon && hasValidToken()
-            } catch (e: Exception) {
-                android.util.Log.e("TokenManager", "Failed to check if token needs refresh", e)
-                false
-            }
-        }
-    
-        /**
-         * Gets the refresh token
-         */
-        fun getRefreshToken(): String? {
-            return try {
-                sharedPreferences.getString(REFRESH_TOKEN_KEY, null)
-            } catch (e: Exception) {
-                android.util.Log.e("TokenManager", "Failed to read refresh token", e)
-                null
-            }
-        }
-    
-        /**
-         * Saves token with refresh token
-         */
-        fun saveTokenWithRefresh(accessToken: String, refreshToken: String?, expiresIn: Long = 3600) {
-            val expiryTime = System.currentTimeMillis() + (expiresIn * 1000)
+    }
+
+    /**
+     * Checks if the token needs refresh (will expire in less than 5 minutes)
+     */
+    fun needsTokenRefresh(): Boolean {
+        return try {
+            val expiryTime = sharedPreferences.getLong(TOKEN_EXPIRY_KEY, 0)
+            val fiveMinutesInMillis = 5 * 60 * 1000L // 5 minutes in milliseconds
+            val willExpireSoon = System.currentTimeMillis() + fiveMinutesInMillis >= expiryTime
             
-            try {
-                val editor = sharedPreferences.edit()
-                editor.putString(ACCESS_TOKEN_KEY, accessToken)
-                editor.putLong(TOKEN_EXPIRY_KEY, expiryTime)
-                if (refreshToken != null) {
-                    editor.putString(REFRESH_TOKEN_KEY, refreshToken)
-                }
-                editor.putBoolean(AUTH_STATUS_KEY, true)
-                editor.apply()
-            } catch (e: Exception) {
-                android.util.Log.e("TokenManager", "Failed to save token with refresh", e)
-            }
+            willExpireSoon && hasValidToken()
+        } catch (e: Exception) {
+            android.util.Log.e("TokenManager", "Failed to check if token needs refresh", e)
+            false
         }
-    
-        /**
-         * Sets the authentication status
-         */
-        fun setAuthStatus(isAuthenticated: Boolean) {
-            try {
-                sharedPreferences.edit()
-                    .putBoolean(AUTH_STATUS_KEY, isAuthenticated)
-                    .apply()
-            } catch (e: Exception) {
-                android.util.Log.e("TokenManager", "Failed to set auth status", e)
+    }
+
+    /**
+     * Gets the refresh token
+     */
+    fun getRefreshToken(): String? {
+        return try {
+            sharedPreferences.getString(REFRESH_TOKEN_KEY, null)
+        } catch (e: Exception) {
+            android.util.Log.e("TokenManager", "Failed to read refresh token", e)
+            null
+        }
+    }
+
+    /**
+     * Saves token with refresh token
+     */
+    fun saveTokenWithRefresh(accessToken: String, refreshToken: String?, expiresIn: Long = 3600) {
+        val expiryTime = System.currentTimeMillis() + (expiresIn * 1000)
+        
+        try {
+            val editor = sharedPreferences.edit()
+            editor.putString(ACCESS_TOKEN_KEY, accessToken)
+            editor.putLong(TOKEN_EXPIRY_KEY, expiryTime)
+            if (refreshToken != null) {
+                editor.putString(REFRESH_TOKEN_KEY, refreshToken)
             }
+            editor.putBoolean(AUTH_STATUS_KEY, true)
+            editor.apply()
+        } catch (e: Exception) {
+            android.util.Log.e("TokenManager", "Failed to save token with refresh", e)
+        }
+    }
+
+    /**
+     * Sets the authentication status
+     */
+    fun setAuthStatus(isAuthenticated: Boolean) {
+        try {
+            sharedPreferences.edit()
+                .putBoolean(AUTH_STATUS_KEY, isAuthenticated)
+                .apply()
+        } catch (e: Exception) {
+            android.util.Log.e("TokenManager", "Failed to set auth status", e)
         }
     }
 }
