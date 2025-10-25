@@ -4,138 +4,76 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
-import java.io.IOException
 import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
 import android.view.View
 import android.widget.ProgressBar
 import com.yourcompany.myagenticbrowser.R
 
 class AuthActivity : AppCompatActivity() {
-    private val client = OkHttpClient()
     private lateinit var progressBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_auth) // Added layout for progress indicator
+        setContentView(R.layout.activity_auth)
         
         progressBar = findViewById(R.id.progress_bar)
         progressBar.visibility = View.VISIBLE
         
-        handleRedirect(intent)
+        handleAuthenticationResult(intent)
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        handleRedirect(intent)
+        handleAuthenticationResult(intent)
     }
 
-    private fun handleRedirect(intent: Intent?) {
+    private fun handleAuthenticationResult(intent: Intent?) {
         val data = intent?.data ?: run {
             showError("No data received from authentication")
             return
         }
 
+        // Check if this is our authentication callback
         if (data.scheme == "myagenticbrowser" && data.host == "auth") {
-            val code = data.getQueryParameter("code")
+            val token = data.getQueryParameter("token")
             val error = data.getQueryParameter("error")
             
-            if (!code.isNullOrEmpty()) {
-                // Exchange the authorization code for a token
-                exchangeCodeForToken(code)
+            if (!token.isNullOrEmpty()) {
+                // Puter.js returns the token directly - no exchange needed!
+                saveToken(token)
+                showSuccess()
+                sendAuthStatusBroadcast(true)
             } else if (!error.isNullOrEmpty()) {
                 val errorDescription = data.getQueryParameter("error_description")
                 showError("Authentication error: $error${if (errorDescription != null) " - $errorDescription" else ""}")
             } else {
-                showError("Invalid authentication response")
+                showError("Invalid authentication response - no token received")
             }
         } else {
-            showError("Invalid redirect URI")
+            // If not a callback, start authentication flow
+            if (intent?.action == Intent.ACTION_VIEW) {
+                showError("Invalid redirect URI")
+            } else {
+                startAuthentication()
+            }
         }
+        
+        finish()
     }
 
-    private fun exchangeCodeForToken(code: String) {
-        val json = """{
-            "code": "$code",
-            "client_id": "myagenticbrowser",
-            "redirect_uri": "myagenticbrowser://auth",
-            "grant_type": "authorization_code"
-        }""".trimIndent()
+    private fun startAuthentication() {
+        val authUrl = "https://puter.com/action/sign-in"
         
-        val requestBody = json.toRequestBody("application/json".toMediaType())
-        
-        val request = Request.Builder()
-            .url("https://puter.com/api/token")
-            .post(requestBody)
+        val customTabsIntent = CustomTabsIntent.Builder()
+            .setToolbarColor(getColor(R.color.primary))
             .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread {
-                    progressBar.visibility = View.GONE
-                    showError("Network error: ${e.message}")
-                }
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                runOnUiThread {
-                    progressBar.visibility = View.GONE
-                    
-                    if (response.isSuccessful) {
-                        try {
-                            val responseBody = response.body?.string() ?: throw Exception("Empty response")
-                            val json = JSONObject(responseBody)
-                            
-                            val token = json.getString("access_token")
-                            val expiresIn = json.optLong("expires_in", 3600) // Default to 1 hour if not provided
-                            val refreshToken = json.optString("refresh_token", null) // Get refresh token if available
-                            
-                            if (refreshToken != null) {
-                                // Save with refresh token if available
-                                val tokenManager = TokenManager(this@AuthActivity)
-                                tokenManager.saveTokenWithRefresh(token, refreshToken, expiresIn)
-                            } else {
-                                // Save without refresh token
-                                val tokenManager = TokenManager(this@AuthActivity)
-                                tokenManager.saveToken(token, expiresIn)
-                            }
-                            showSuccess()
-                            
-                            // Notify other components
-                            sendAuthStatusBroadcast(true)
-                        } catch (e: Exception) {
-                            showError("Error processing response: ${e.message}")
-                        }
-                    } else {
-                        try {
-                            val errorBody = response.body?.string()
-                            val errorMessage = if (!errorBody.isNullOrEmpty()) {
-                                try {
-                                    val json = JSONObject(errorBody)
-                                    "${json.optString("error", "Authentication failed")}: ${json.optString("error_description", "")}"
-                                } catch (e: Exception) {
-                                    "Server error: ${response.code}"
-                                }
-                            } else {
-                                "Authentication failed: ${response.code}"
-                            }
-                            showError(errorMessage)
-                        } catch (e: Exception) {
-                            showError("Authentication failed with status ${response.code}")
-                        }
-                    }
-                }
-            }
-        })
+            
+        customTabsIntent.launchUrl(this, Uri.parse(authUrl))
     }
 
-    private fun saveToken(token: String, expiresIn: Long) {
-        val tokenManager = TokenManager(this@AuthActivity)
-        tokenManager.saveToken(token, expiresIn)
+    private fun saveToken(token: String) {
+        val tokenManager = TokenManager(this)
+        tokenManager.saveToken(token)
     }
 
     private fun sendAuthStatusBroadcast(isAuthenticated: Boolean) {
@@ -147,7 +85,6 @@ class AuthActivity : AppCompatActivity() {
     private fun showError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         sendAuthStatusBroadcast(false)
-        finish()
     }
 
     private fun showSuccess() {

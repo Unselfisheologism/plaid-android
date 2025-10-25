@@ -6,6 +6,9 @@ import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
 import android.net.Uri
 import com.yourcompany.myagenticbrowser.ai.puter.auth.TokenManager
+import com.yourcompany.myagenticbrowser.R
+import android.graphics.BitmapFactory
+import androidx.core.content.ContextCompat
 
 class AuthService(private val context: Context) {
     private val tokenManager = TokenManager(context)
@@ -37,15 +40,16 @@ class AuthService(private val context: Context) {
         val data = intent.data ?: return false
         
         if (data.scheme == AUTH_SCHEME && data.host == AUTH_HOST) {
-            val code = data.getQueryParameter("code")
+            val token = data.getQueryParameter("token")
             val error = data.getQueryParameter("error")
             
-            if (!code.isNullOrEmpty()) {
-                // The code should be exchanged for a token in the AuthActivity
-                // This is handled in AuthActivity, not here
+            if (!token.isNullOrEmpty()) {
+                // CRITICAL FIX: Puter.js returns the token directly - save it immediately
+                tokenManager.saveToken(token)
                 return true
             } else if (!error.isNullOrEmpty()) {
                 // Handle error
+                val errorDescription = data.getQueryParameter("error_description")
                 return false
             }
         }
