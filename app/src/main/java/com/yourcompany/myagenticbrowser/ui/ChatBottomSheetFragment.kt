@@ -168,7 +168,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private suspend fun checkAuthentication(): Boolean = withContext(Dispatchers.Main) {
-        // Use the new Chrome Custom Tabs authentication approach
+        // Use the new WebView-based authentication approach
         val browserActivity = activity as? BrowserActivity
         return@withContext browserActivity?.puterAuthHelper?.isAuthenticated() ?: false
     }

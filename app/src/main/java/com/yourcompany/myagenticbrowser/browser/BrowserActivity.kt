@@ -23,7 +23,6 @@ import com.yourcompany.myagenticbrowser.agent.AgentService
 import com.yourcompany.myagenticbrowser.agent.SearchVisualizationActivity
 import com.yourcompany.myagenticbrowser.ui.ChatBottomSheetFragment
 import com.yourcompany.myagenticbrowser.ai.puter.auth.AuthService
-import com.yourcompany.myagenticbrowser.ai.puter.auth.PuterAuthHelper
 import com.yourcompany.myagenticbrowser.ai.puter.auth.TokenManager
 
 class BrowserActivity : AppCompatActivity() {
@@ -31,8 +30,8 @@ class BrowserActivity : AppCompatActivity() {
     private lateinit var tabAdapter: TabAdapter
     lateinit var tabManager: TabManager
     private lateinit var toolbar: MaterialToolbar
-    lateinit var puterAuthHelper: PuterAuthHelper
     private lateinit var authService: AuthService
+    val puterAuthHelper: PuterAuthHelper by lazy { PuterAuthHelper(this) }
     
     private val authStatusReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -48,19 +47,13 @@ class BrowserActivity : AppCompatActivity() {
         
         // Initialize authentication service first
         authService = AuthService(this)
-        puterAuthHelper = PuterAuthHelper(this)
         
         // CRITICAL FIX: Handle authentication flow before setting content
         if (!authService.isAuthenticated()) {
-            // Only start authentication if we're not already processing a callback
-            if (intent?.data == null ||
-                (intent.scheme != AuthService.AUTH_SCHEME || intent.data?.host != AuthService.AUTH_HOST)) {
-                
-                Logger.logInfo("BrowserActivity", "No valid token found, starting authentication flow")
-                authService.startAuthentication()
-                finish() // Close BrowserActivity until authentication completes
-                return
-            }
+            Logger.logInfo("BrowserActivity", "No valid token found, starting authentication flow")
+            authService.startAuthentication()
+            finish() // Close BrowserActivity until authentication completes
+            return
         }
         
         // Proceed with normal initialization only if authenticated
@@ -126,30 +119,6 @@ class BrowserActivity : AppCompatActivity() {
         MemoryManager.logMemoryUsage()
     }
     
-    // CRITICAL FIX: Handle authentication callback when returning from browser
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        
-        // Only process if we have a valid intent with data
-        if (intent?.data != null) {
-            setIntent(intent) // Must call this to update the activity's intent
-            
-            // Check if this is an authentication callback
-            if (intent.scheme == AuthService.AUTH_SCHEME && intent.data?.host == AuthService.AUTH_HOST) {
-                val success = authService.handleAuthenticationCallback(intent)
-                
-                if (success) {
-                    Logger.logInfo("BrowserActivity", "Authentication successful, reloading UI")
-                    // Restart the activity to properly initialize with the new token
-                    recreate()
-                } else {
-                    Logger.logError("BrowserActivity", "Authentication failed, redirecting to login")
-                    authService.startAuthentication()
-                    finish()
-                }
-            }
-        }
-    }
 
     fun addNewTab(url: String = "https://www.google.com", owner: com.yourcompany.myagenticbrowser.browser.tab.TabOwner = com.yourcompany.myagenticbrowser.browser.tab.TabOwner.USER) {
         tabManager.addTab(url, owner)

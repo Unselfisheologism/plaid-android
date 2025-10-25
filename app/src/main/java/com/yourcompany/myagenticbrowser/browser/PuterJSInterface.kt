@@ -139,8 +139,8 @@ class PuterJSInterface(
     }
     
     /**
-     * Launch Puter authentication using Chrome Custom Tabs
-     * This replaces the old webview-based authentication
+     * Launch Puter authentication using WebView-based approach
+     * This is the correct implementation for Puter.js authentication
      */
     @JavascriptInterface
     fun launchPuterAuth() {
@@ -158,7 +158,7 @@ class PuterJSInterface(
     
     /**
      * Check if user is authenticated with Puter
-     * This uses the new Chrome Custom Tabs authentication approach
+     * This uses the WebView-based authentication approach
      */
     @JavascriptInterface
     fun isPuterAuthenticated(): Boolean {

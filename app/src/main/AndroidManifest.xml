@@ -87,6 +87,18 @@
                 <data android:scheme="myagenticbrowser" android:host="auth" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name=".ai.puter.auth.PuterAuthActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MyAgenticBrowser">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="myagenticbrowser" android:host="auth" />
+            </intent-filter>
+        </activity>
 
         <service
             android:name=".agent.AgentService"

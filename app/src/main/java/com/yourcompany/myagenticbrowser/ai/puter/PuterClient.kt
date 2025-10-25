@@ -199,7 +199,7 @@ class PuterClient {
 
     /**
      * Check authentication status before any Puter.js API call
-     * This now uses the Chrome Custom Tabs approach instead of webview-based authentication
+     * This now uses the WebView-based authentication approach
      */
     private suspend fun ensureAuthenticated(webView: WebView): Boolean = withContext(Dispatchers.Main) {
         // Get the BrowserActivity to access the PuterAuthHelper
