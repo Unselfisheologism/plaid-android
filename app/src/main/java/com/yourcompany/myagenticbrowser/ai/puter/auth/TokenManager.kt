@@ -12,9 +12,9 @@ class TokenManager(private val context: Context) {
         try {
             val masterKey = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
             EncryptedSharedPreferences.create(
-                context,
                 "secure_puter_auth_prefs",
-                masterKey,
+                "prefs_key", // This is the second string parameter required by this signature
+                context,
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
