@@ -24,6 +24,7 @@ import com.yourcompany.myagenticbrowser.agent.SearchVisualizationActivity
 import com.yourcompany.myagenticbrowser.ui.ChatBottomSheetFragment
 import com.yourcompany.myagenticbrowser.ai.puter.auth.AuthService
 import com.yourcompany.myagenticbrowser.ai.puter.auth.TokenManager
+import com.yourcompany.myagenticbrowser.ai.puter.auth.PuterAuthHelper
 
 class BrowserActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
