@@ -5,7 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.*import android.widget.FrameLayout
+import android.webkit.*
+import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import com.yourcompany.myagenticbrowser.R
 import com.yourcompany.myagenticbrowser.browser.cookies.CookieManager
@@ -241,7 +242,7 @@ class WebViewFragment : Fragment() {
                 
                 val transport = resultMsg.obj as WebView.WebViewTransport
                 transport.webView = newWebView
-                resultMsg.send()
+                resultMsg.sendToTarget()
                 return true
             }
         }
