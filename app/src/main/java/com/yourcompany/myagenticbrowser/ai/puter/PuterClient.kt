@@ -202,10 +202,32 @@ class PuterClient {
      * This now uses the WebView-based authentication approach
      */
     private suspend fun ensureAuthenticated(webView: WebView): Boolean = withContext(Dispatchers.Main) {
+        // Check if Puter.js is loaded in the WebView
+        val jsCheck = """
+            (function() {
+                return !!window.puter;
+            })();
+        """.trimIndent()
+        
+        var isPuterLoadedResult: String? = null
+        webView.evaluateJavascript(jsCheck) { result ->
+            isPuterLoadedResult = result
+        }
+        
+        // Wait briefly for the result to be processed
+        kotlinx.coroutines.delay(500)
+        
+        val isPuterLoaded = isPuterLoadedResult?.trim()?.equals("true") ?: false
+        
+        if (!isPuterLoaded) {
+            Logger.logError("PuterClient", "Puter.js not loaded in WebView")
+            return@withContext false
+        }
+        
         // Get the BrowserActivity to access the PuterAuthHelper
         val activity = webView.context as? com.yourcompany.myagenticbrowser.browser.BrowserActivity
         if (activity != null) {
-            // Use the new authentication helper that uses Chrome Custom Tabs
+            // Use the new authentication helper that uses WebView-based approach
             return@withContext activity.puterAuthHelper.isAuthenticated()
         } else {
             // If we can't get the activity, return false

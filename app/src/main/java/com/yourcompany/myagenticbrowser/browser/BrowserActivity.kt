@@ -49,15 +49,7 @@ class BrowserActivity : AppCompatActivity() {
         // Initialize authentication service first
         authService = AuthService(this)
         
-        // CRITICAL FIX: Handle authentication flow before setting content
-        if (!authService.isAuthenticated()) {
-            Logger.logInfo("BrowserActivity", "No valid token found, starting authentication flow")
-            authService.startAuthentication()
-            finish() // Close BrowserActivity until authentication completes
-            return
-        }
-        
-        // Proceed with normal initialization only if authenticated
+        // Proceed with normal initialization regardless of authentication status
         setContentView(R.layout.activity_browser)
         Logger.logInfo("BrowserActivity", "Creating BrowserActivity")
 

@@ -89,6 +89,11 @@ class WebViewFragment : Fragment() {
         webView.settings.setGeolocationEnabled(false)
         webView.settings.setSaveFormData(false)
         
+        // CRITICAL SETTINGS FOR PUTER.JS
+        webView.settings.setSupportMultipleWindows(true)
+        webView.settings.javaScriptCanOpenWindowsAutomatically = true
+        webView.settings.mediaPlaybackRequiresUserGesture = false
+        
         // Initialize Puter.js client and interface for communication with JavaScript through Puter.js infrastructure
         puterClient = PuterClient()
         puterJSInterface = PuterJSInterface(puterClient, webView)
@@ -105,12 +110,17 @@ class WebViewFragment : Fragment() {
                 
                 Logger.logInfo("WebViewFragment", "Page finished loading: $currentUrl through Puter.js infrastructure")
                 
-                // Load Puter.js script into the page through Puter.js infrastructure
-                view?.let { webView ->
-                    puterClient.loadPuterJS(webView)
-                    webView.evaluateJavascript(puterClient.getPuterJSScript(), null)
+                // Check if we're on a page that needs Puter.js
+                if (url?.contains("agent_home.html") == true || url?.contains("puter") == true) {
+                    // Load Puter.js and set up authentication
+                    loadPuterJSAndInitialize(view)
+                } else {
+                    // Load Puter.js script into the page through Puter.js infrastructure
+                    view?.let { webView ->
+                        puterClient.loadPuterJS(webView)
+                        webView.evaluateJavascript(puterClient.getPuterJSScript(), null)
+                    }
                 }
-                
                 
                 // Update the tab title in the TabManager if we have a position
                 if (position >= 0) {
@@ -200,8 +210,106 @@ class WebViewFragment : Fragment() {
                         }
                     }
                 }
+                 
             }
             
+            // Set up WebChromeClient to handle popup windows
+            webView.webChromeClient = object : WebChromeClient() {
+                override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                    super.onProgressChanged(view, newProgress)
+                    // Update progress if needed
+                    Logger.logInfo("WebViewFragment", "Loading progress through Puter.js: $newProgress%")
+                }
+                
+                override fun onReceivedTitle(view: WebView?, title: String?) {
+                    super.onReceivedTitle(view, title)
+                    Logger.logInfo("WebViewFragment", "Received title through Puter.js: $title")
+                    
+                    // Update the tab title in the TabManager if we have a position
+                    if (position >= 0) {
+                        val activity = activity as? BrowserActivity
+                        activity?.let { browserActivity ->
+                            browserActivity.runOnUiThread {
+                                browserActivity.tabManager.updateTabTitle(position, title ?: "New Tab")
+                                browserActivity.updateToolbarTitle()
+                            }
+                        }
+                    }
+                }
+                
+                override fun onCreateWindow(
+                    view: WebView,
+                    isDialog: Boolean,
+                    isUserGesture: Boolean,
+                    resultMsg: android.os.Message
+                ): Boolean {
+                    val newWebView = WebView(requireContext())
+                    newWebView.webViewClient = object : WebViewClient() {
+                        override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                            if (url.startsWith("myagenticbrowser://auth")) {
+                                // Handle authentication callback directly
+                                val token = android.net.Uri.parse(url).getQueryParameter("token")
+                                if (!token.isNullOrEmpty()) {
+                                    val tokenManager = com.yourcompany.myagenticbrowser.ai.puter.auth.TokenManager(requireContext())
+                                    tokenManager.saveToken(token)
+                                    
+                                    // Close the popup
+                                    view.stopLoading()
+                                    (view.parent as? ViewGroup)?.removeView(view)
+                                    return true
+                                }
+                            }
+                            return false
+                        }
+                    }
+                    
+                    val transport = resultMsg.obj as WebView.WebViewTransport
+                    transport.webView = newWebView
+                    resultMsg.send()
+                    return true
+                }
+            }
+        }
+        
+        private fun loadPuterJSAndInitialize(webView: WebView?) {
+            if (webView == null) return
+            
+            val jsCode = """
+                (function() {
+                    try {
+                        // Check if we've already loaded Puter.js
+                        if (window.puterJSLoaded) return;
+                        window.puterJSLoaded = true;
+                        
+                        // Create script element for Puter.js
+                        const script = document.createElement('script');
+                        script.src = 'https://cdn.puter.com/puter.js';
+                        script.async = true;
+                        
+                        script.onload = function() {
+                            // Puter.js is now loaded, set up authentication
+                            if (window.Android) {
+                                window.Android.handlePuterResult("Puter.js loaded successfully");
+                            }
+                        };
+                        
+                        script.onerror = function() {
+                            if (window.Android) {
+                                window.Android.handlePuterError("Failed to load Puter.js from CDN");
+                            }
+                        };
+                        
+                        document.head.appendChild(script);
+                    } catch (e) {
+                        if (window.Android) {
+                            window.Android.handlePuterError("Error initializing Puter.js: " + e.message);
+                        }
+                    }
+                })();
+            """.trimIndent()
+            
+            webView.evaluateJavascript(jsCode, null)
+        }
         }
     }
     

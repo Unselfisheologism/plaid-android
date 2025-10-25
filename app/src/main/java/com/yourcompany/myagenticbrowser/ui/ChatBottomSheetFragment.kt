@@ -168,9 +168,59 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private suspend fun checkAuthentication(): Boolean = withContext(Dispatchers.Main) {
-        // Use the new WebView-based authentication approach
-        val browserActivity = activity as? BrowserActivity
-        return@withContext browserActivity?.puterAuthHelper?.isAuthenticated() ?: false
+        // Try to get the current WebView from the parent activity
+        val webView = try {
+            val parentActivity = activity
+            if (parentActivity is BrowserActivity) {
+                parentActivity.getCurrentWebViewFragment()?.getWebView()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Logger.logError("ChatBottomSheetFragment", "Error getting WebView: ${e.message}", e)
+            null
+        }
+        
+        if (webView == null) {
+            // No WebView available, use the auth helper
+            val browserActivity = activity as? BrowserActivity
+            return@withContext browserActivity?.puterAuthHelper?.isAuthenticated() ?: false
+        }
+        
+        // Check if Puter.js is loaded in the WebView
+        val jsCheck = """
+            (function() {
+                return !!window.puter;
+            })();
+        """.trimIndent()
+        
+        var isPuterLoaded = false
+        webView.evaluateJavascript(jsCheck) { result ->
+            isPuterLoaded = result?.trim()?.equals("true") ?: false
+        }
+        
+        // Wait briefly for the result to be processed
+        kotlinx.coroutines.delay(500)
+        
+        if (isPuterLoaded) {
+            // Puter.js is loaded, check if authenticated
+            val browserActivity = activity as? BrowserActivity
+            return@withContext browserActivity?.puterAuthHelper?.isAuthenticated() ?: false
+        } else {
+            // Puter.js not loaded yet, try to set up authentication
+            val authInterface = com.yourcompany.myagenticbrowser.ai.puter.auth.PuterAuthInterface(
+                requireContext(),
+                webView,
+                onAuthSuccess = { },
+                onAuthError = { error ->
+                    Logger.logError("ChatBottomSheetFragment", "Authentication error: $error")
+                }
+            )
+            
+            // Start authentication
+            authInterface.authenticate()
+            return@withContext false  // Return false for now, but authentication is in progress
+        }
     }
 
     private suspend fun getAiResponse(message: String): String {
@@ -188,23 +238,62 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
         }
         
         return if (webView != null) {
-            // Ensure Puter.js is loaded and authenticated before making chat request
-            puterClient.loadPuterJS(webView)
-            // Give time for Puter.js to load
-            kotlinx.coroutines.delay(1000)
-            try {
-                puterClient.chat(
-                    webView = webView,
-                    message = message,
-                    context = "Current context for chat popup"
-                )
-            } catch (e: Exception) {
-                Logger.logError("ChatBottomSheetFragment", "Error in Puter.js chat: ${e.message}", e)
-                if (e is SecurityException || e.message?.contains("Authentication") == true) {
-                    "Authentication required. Please authenticate with Puter.js to access AI features."
-                } else {
-                    "Error: ${e.message}"
+            // First check if Puter.js is loaded
+            val jsCheck = """
+                (function() {
+                    return !!window.puter;
+                })();
+            """.trimIndent()
+            
+            var isPuterLoadedResult: String? = null
+            webView.evaluateJavascript(jsCheck) { result ->
+                isPuterLoadedResult = result
+            }
+            
+            // Wait briefly for the result to be processed
+            kotlinx.coroutines.delay(500)
+            
+            var isPuterLoaded = isPuterLoadedResult?.trim()?.equals("true") ?: false
+            
+            if (!isPuterLoaded) {
+                // Puter.js is not loaded, try to load it
+                puterClient.loadPuterJS(webView)
+                // Give time for Puter.js to load
+                kotlinx.coroutines.delay(2000)
+                
+                // Check again if Puter.js is loaded
+                webView.evaluateJavascript(jsCheck) { result ->
+                    isPuterLoadedResult = result
                 }
+                kotlinx.coroutines.delay(500)
+                isPuterLoaded = isPuterLoadedResult?.trim()?.equals("true") ?: false
+            }
+            
+            if (isPuterLoaded) {
+                // Check if authenticated
+                val browserActivity = activity as? BrowserActivity
+                val isAuthenticated = browserActivity?.puterAuthHelper?.isAuthenticated() ?: false
+                
+                if (isAuthenticated) {
+                    try {
+                        puterClient.chat(
+                            webView = webView,
+                            message = message,
+                            context = "Current context for chat popup"
+                        )
+                    } catch (e: Exception) {
+                        Logger.logError("ChatBottomSheetFragment", "Error in Puter.js chat: ${e.message}", e)
+                        if (e is SecurityException || e.message?.contains("Authentication") == true) {
+                            "Authentication required. Please authenticate with Puter.js to access AI features."
+                        } else {
+                            "Error: ${e.message}"
+                        }
+                    }
+                } else {
+                    "Authentication required. Please authenticate with Puter.js to access AI features."
+                }
+            } else {
+                "Puter.js not loaded. Please ensure internet connection and try again."
             }
         } else {
             "Unable to get response - no WebView available"

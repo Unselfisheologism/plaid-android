@@ -19,6 +19,9 @@ class PuterAuthActivity : AppCompatActivity() {
         webView = findViewById(R.id.webView)
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
+        webView.settings.setSupportMultipleWindows(true)
+        webView.settings.javaScriptCanOpenWindowsAutomatically = true
+        webView.settings.mediaPlaybackRequiresUserGesture = false
         
         // Enable JavaScript interface
         webView.addJavascriptInterface(AuthJavaScriptInterface(), "AndroidAuth")
@@ -29,28 +32,12 @@ class PuterAuthActivity : AppCompatActivity() {
             <html>
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <script src="https://cdn.puter.com/puter.js"></script>
-                <script>
-                    function startAuthentication() {
-                        if (window.puter && window.puter.auth) {
-                            puter.auth.signIn().then(token => {
-                                AndroidAuth.handleToken(token);
-                            }).catch(error => {
-                                AndroidAuth.handleError(error.message);
-                            });
-                        } else {
-                            AndroidAuth.handleError("Puter.js not loaded");
-                        }
-                    }
-                    
-                    // Start authentication when page loads
-                    window.onload = startAuthentication;
-                </script>
+                <title>Puter Authentication</title>
             </head>
             <body>
                 <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
                     <div class="spinner"></div>
-                    <p>Authenticating with Puter...</p>
+                    <p>Authenticating with Puter...<br>Please wait while Puter.js loads.</p>
                 </div>
                 <style>
                     .spinner {
@@ -60,12 +47,49 @@ class PuterAuthActivity : AppCompatActivity() {
                         border-top: 4px solid #3498db;
                         border-radius: 50%;
                         animation: spin 1s linear infinite;
+                        margin-right: 10px;
                     }
                     @keyframes spin {
                         0% { transform: rotate(0deg); }
                         100% { transform: rotate(360deg); }
                     }
                 </style>
+                <script>
+                    function loadPuterJS() {
+                        const script = document.createElement('script');
+                        script.src = 'https://cdn.puter.com/puter.js';
+                        script.async = true;
+                        
+                        script.onload = function() {
+                            // Puter.js loaded successfully, now start authentication after a brief delay
+                            setTimeout(startAuthentication, 1000);
+                        };
+                        
+                        script.onerror = function() {
+                            AndroidAuth.handleError("Failed to load Puter.js from CDN");
+                        };
+                        
+                        document.head.appendChild(script);
+                    }
+                    
+                    function startAuthentication() {
+                        // Wait a bit more to ensure Puter.js is fully initialized
+                        setTimeout(function() {
+                            if (window.puter && window.puter.auth) {
+                                puter.auth.signIn().then(token => {
+                                    AndroidAuth.handleToken(token);
+                                }).catch(error => {
+                                    AndroidAuth.handleError(error.message || "Authentication failed");
+                                });
+                            } else {
+                                AndroidAuth.handleError("Puter.js not loaded or not initialized");
+                            }
+                        }, 100);
+                    }
+                    
+                    // Start loading Puter.js when page loads
+                    window.onload = loadPuterJS;
+                </script>
             </body>
             </html>
         """.trimIndent()
