@@ -53,8 +53,8 @@ class BrowserActivity : AppCompatActivity() {
         // CRITICAL FIX: Handle authentication flow before setting content
         if (!authService.isAuthenticated()) {
             // Only start authentication if we're not already processing a callback
-            if (intent?.data == null || 
-                (intent.scheme != AuthService.AUTH_SCHEME || intent.host != AuthService.AUTH_HOST)) {
+            if (intent?.data == null ||
+                (intent.scheme != AuthService.AUTH_SCHEME || intent.data?.host != AuthService.AUTH_HOST)) {
                 
                 Logger.logInfo("BrowserActivity", "No valid token found, starting authentication flow")
                 authService.startAuthentication()
@@ -135,7 +135,7 @@ class BrowserActivity : AppCompatActivity() {
             setIntent(intent) // Must call this to update the activity's intent
             
             // Check if this is an authentication callback
-            if (intent.scheme == AuthService.AUTH_SCHEME && intent.host == AuthService.AUTH_HOST) {
+            if (intent.scheme == AuthService.AUTH_SCHEME && intent.data?.host == AuthService.AUTH_HOST) {
                 val success = authService.handleAuthenticationCallback(intent)
                 
                 if (success) {

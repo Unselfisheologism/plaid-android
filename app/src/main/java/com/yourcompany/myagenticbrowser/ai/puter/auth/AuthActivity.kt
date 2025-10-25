@@ -8,6 +8,7 @@ import android.net.Uri
 import android.view.View
 import android.widget.ProgressBar
 import com.yourcompany.myagenticbrowser.R
+import androidx.browser.customtabs.CustomTabsIntent
 
 class AuthActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
@@ -65,7 +66,7 @@ class AuthActivity : AppCompatActivity() {
         val authUrl = "https://puter.com/action/sign-in"
         
         val customTabsIntent = CustomTabsIntent.Builder()
-            .setToolbarColor(getColor(R.color.primary))
+            .setToolbarColor(getColor(R.color.primary_color))
             .build()
             
         customTabsIntent.launchUrl(this, Uri.parse(authUrl))
