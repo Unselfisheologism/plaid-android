@@ -129,7 +129,7 @@ class SideMenuFragment : BottomSheetDialogFragment() {
         browserActivity?.getCurrentWebViewFragment()?.let { webViewFragment ->
             val webView = webViewFragment.getWebView()
             val url = webViewFragment.getUrl()
-            val title = webView?.title ?: ""
+            val title = webView.title ?: ""
             
             Logger.logInfo("SideMenuFragment", "Summarizing page: $url")
             
@@ -192,7 +192,7 @@ class SideMenuFragment : BottomSheetDialogFragment() {
         browserActivity?.getCurrentWebViewFragment()?.let { webViewFragment ->
             val webView = webViewFragment.getWebView()
             val url = webViewFragment.getUrl()
-            val title = webView?.title ?: ""
+            val title = webView.title ?: ""
             
             Logger.logInfo("SideMenuFragment", "Asking about page: $url")
             
