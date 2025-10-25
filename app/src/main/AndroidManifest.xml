@@ -78,7 +78,7 @@
         <activity
             android:name=".ai.puter.auth.AuthActivity"
             android:exported="true"
-            android:theme="@style/Theme.MyAgenticBrowser"  <!-- THIS IS THE CRITICAL ADDITION -->
+            android:theme="@style/Theme.MyAgenticBrowser"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -88,7 +88,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Rest of the manifest remains unchanged -->
         <service
             android:name=".agent.AgentService"
             android:enabled="true"
